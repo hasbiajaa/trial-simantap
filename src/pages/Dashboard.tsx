@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, useMemo } from "react";
-import logoTSU from "@/imports/LOGO_TSU_png.png";
+const logoTSU = "/LOGO_TSU.png";
 import {
   PieChart, Pie, Cell, BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
