@@ -1,0 +1,10 @@
+{
+  "description": "This web application serves as a management platform for internal campus oversight, enabling efficient monitoring and reporting for academic institutions.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
