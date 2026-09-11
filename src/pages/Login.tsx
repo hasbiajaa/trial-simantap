@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { ACCOUNTS, User } from "@/types/auth";
-import logoTSU from "@/imports/LOGO_TSU_png.png";
+const logoTSU = "/LOGO_TSU.png";
 
 const IconEye = ({ className = "" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
