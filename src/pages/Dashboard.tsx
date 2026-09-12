@@ -329,11 +329,76 @@ const agendaList = [
   { icon: <IconClipboard className="w-4 h-4" />,color: "bg-purple-100 text-purple-600",title: "Audit Pendahuluan LPPM",      sub: "Audit Kinerja",      tgl: "26 Mei 2025", jam: "09.00 WIB" },
 ];
 
-const kpiPengawasan = [
-  { label: "Realisasi Program Audit",       icon: <IconClipboard className="w-5 h-5" />, bg: "bg-blue-100 text-blue-600",   target: 15, real: 12, sat: "Audit",   trend: +20 },
-  { label: "RTL Diselesaikan Tepat Waktu",  icon: <IconCheck     className="w-5 h-5" />, bg: "bg-green-100 text-green-600", target: 38, real: 32, sat: "Temuan",  trend: +8  },
-  { label: "Kepatuhan Unit Kerja",          icon: <IconShield    className="w-5 h-5" />, bg: "bg-teal-100 text-teal-600",   target: 90, real: 85.2, sat: "%",    trend: +3.2},
-  { label: "Temuan Risiko Tertangani",      icon: <IconShield    className="w-5 h-5" />, bg: "bg-purple-100 text-purple-600",target:20, real: 18, sat: "Temuan",  trend: -5  },
+const kpiData = [
+  {
+    kategori: "1", label: "Audit & Assurance", icon: "📋",
+    accent: "#3b82f6", lightBg: "#eff6ff", textCls: "text-blue-600",
+    items: [
+      { kode:"1a", label:"Realisasi Program Audit Tahunan",       target:90,  bobot:4, real:87, arah:"atas"  },
+      { kode:"1b", label:"Audit Selesai Tepat Waktu",             target:90,  bobot:4, real:92, arah:"atas"  },
+      { kode:"1c", label:"LHA Diterbitkan Tepat Waktu",           target:90,  bobot:4, real:85, arah:"atas"  },
+      { kode:"1d", label:"Unit Diaudit Sesuai Rencana",           target:100, bobot:3, real:90, arah:"atas"  },
+    ],
+  },
+  {
+    kategori: "2", label: "Kepatuhan & Tata Kelola", icon: "🏛️",
+    accent: "#0e8080", lightBg: "#f0fdfa", textCls: "text-teal-600",
+    items: [
+      { kode:"2a", label:"Unit Memenuhi Ketentuan Tata Kelola",   target:85,  bobot:4, real:82, arah:"atas"  },
+      { kode:"2b", label:"Kelengkapan Dokumen Tata Kelola",       target:90,  bobot:4, real:88, arah:"atas"  },
+      { kode:"2c", label:"Kepatuhan terhadap SOP",               target:85,  bobot:4, real:83, arah:"atas"  },
+      { kode:"2d", label:"Temuan Ketidakpatuhan",                target:10,  bobot:3, real:8,  arah:"bawah" },
+    ],
+  },
+  {
+    kategori: "3", label: "Pengendalian Internal", icon: "🔒",
+    accent: "#7c3aed", lightBg: "#f5f3ff", textCls: "text-purple-600",
+    items: [
+      { kode:"3a", label:"Unit dengan Pengendalian Memadai",      target:80,  bobot:4, real:78, arah:"atas"  },
+      { kode:"3b", label:"Kelemahan Pengendalian Diperbaiki",     target:80,  bobot:4, real:82, arah:"atas"  },
+      { kode:"3c", label:"Unit Melaksanakan Self-Assessment",     target:80,  bobot:4, real:75, arah:"atas"  },
+    ],
+  },
+  {
+    kategori: "4", label: "Manajemen Risiko", icon: "🛡️",
+    accent: "#f59e0b", lightBg: "#fffbeb", textCls: "text-amber-600",
+    items: [
+      { kode:"4a", label:"Unit Memiliki Risk Register",           target:100, bobot:4, real:100, arah:"atas" },
+      { kode:"4b", label:"Risiko Prioritas Memiliki Mitigasi",   target:80,  bobot:4, real:82, arah:"atas"  },
+      { kode:"4c", label:"Pelaksanaan Mitigasi Risiko",          target:80,  bobot:4, real:78, arah:"atas"  },
+      { kode:"4d", label:"Risiko Tinggi Dimonitor Berkala",      target:100, bobot:3, real:95, arah:"atas"  },
+    ],
+  },
+  {
+    kategori: "5", label: "Tindak Lanjut Audit", icon: "✅",
+    accent: "#22c55e", lightBg: "#f0fdf4", textCls: "text-green-600",
+    items: [
+      { kode:"5a", label:"Rekomendasi Audit Ditindaklanjuti",    target:80,  bobot:5, real:83, arah:"atas"  },
+      { kode:"5b", label:"Temuan Selesai Tepat Waktu",           target:80,  bobot:5, real:78, arah:"atas"  },
+      { kode:"5c", label:"Temuan Berulang",                      target:10,  bobot:5, real:8,  arah:"bawah" },
+      { kode:"5d", label:"Rekomendasi Diverifikasi SPI",         target:90,  bobot:5, real:91, arah:"atas"  },
+    ],
+  },
+  {
+    kategori: "6", label: "Pengawasan Keuangan & Aset", icon: "💰",
+    accent: "#0ea5e9", lightBg: "#f0f9ff", textCls: "text-sky-600",
+    items: [
+      { kode:"6a", label:"LPJ Lengkap dan Tepat Waktu",          target:90,  bobot:3, real:88, arah:"atas"  },
+      { kode:"6b", label:"Kesesuaian Realisasi dengan RAB",      target:90,  bobot:3, real:91, arah:"atas"  },
+      { kode:"6c", label:"Tindak Lanjut Temuan Keuangan",        target:90,  bobot:3, real:87, arah:"atas"  },
+      { kode:"6d", label:"Aset Terinventarisasi",                target:95,  bobot:3, real:92, arah:"atas"  },
+    ],
+  },
+  {
+    kategori: "7", label: "Kinerja & Efektivitas Organisasi", icon: "📈",
+    accent: "#ec4899", lightBg: "#fdf2f8", textCls: "text-pink-600",
+    items: [
+      { kode:"7a", label:"Unit Mencapai Target Kinerja",         target:80,  bobot:2, real:76, arah:"atas"  },
+      { kode:"7b", label:"Program Mencapai Target Output",       target:80,  bobot:2, real:78, arah:"atas"  },
+      { kode:"7c", label:"Rekomendasi Efisiensi Dilaksanakan",   target:80,  bobot:3, real:81, arah:"atas"  },
+      { kode:"7d", label:"Rekomendasi Audit Kinerja Ditindaklanjuti", target:80, bobot:4, real:80, arah:"atas" },
+    ],
+  },
 ];
 const kpiBackoffice = [
   { label: "Surat Terproses",     icon: <IconMail      className="w-5 h-5" />, bg: "bg-teal-100 text-teal-600",    target: 56,  real: 50,  sat: "Surat",    trend: +12 },
@@ -458,6 +523,133 @@ const pwSections = [
 
 // ── Pengawasan sub-sections ───────────────────────────────────────────────────
 
+function KpiPengawasanPanel() {
+  const [popupKat, setPopupKat] = useState<string | null>(null);
+
+  const statusItem = (item: typeof kpiData[0]["items"][0]) => {
+    if (item.arah === "bawah") {
+      if (item.real <= item.target) return "Baik";
+      if (item.real <= item.target * 1.3) return "Cukup";
+      return "Kurang";
+    }
+    const pct = (item.real / item.target) * 100;
+    if (pct >= 100) return "Baik";
+    if (pct >= 80) return "Cukup";
+    return "Kurang";
+  };
+
+  const katScore = (kat: typeof kpiData[0]) => {
+    const scores = kat.items.map(it =>
+      it.arah === "bawah"
+        ? it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10)
+        : Math.min(100, Math.round((it.real / it.target) * 100))
+    );
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  };
+
+  const totalBobot = kpiData.flatMap(k => k.items).reduce((s, i) => s + i.bobot, 0);
+  const indeks = Math.round(kpiData.flatMap(k => k.items).reduce((s, it) => {
+    const score = it.arah === "bawah"
+      ? (it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10))
+      : Math.min(100, (it.real / it.target) * 100);
+    return s + score * it.bobot;
+  }, 0) / totalBobot);
+
+  const popupData = kpiData.find(k => k.kategori === popupKat) ?? null;
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Header + indeks */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-gray-700">KPI Pengawasan — 7 Kategori · 25 Indikator</h3>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border" style={{ borderColor: "var(--tsu-teal)", background: "var(--tsu-teal-light)" }}>
+          <span className="text-[10px] font-bold" style={{ color: "var(--tsu-teal)" }}>Indeks Komposit</span>
+          <span className="text-sm font-black" style={{ color: "var(--tsu-teal-dark)" }}>{indeks}%</span>
+        </div>
+      </div>
+
+      {/* Horizontal slider */}
+      <div className="overflow-x-auto pb-2 -mx-1 px-1">
+        <div className="flex gap-3" style={{ width: "max-content" }}>
+          {kpiData.map(kat => {
+            const score = katScore(kat);
+            const color = score >= 90 ? "#22c55e" : score >= 75 ? "#f59e0b" : "#ef4444";
+            return (
+              <button key={kat.kategori}
+                onClick={() => setPopupKat(kat.kategori)}
+                className="flex flex-col bg-white rounded-xl border border-gray-100 p-3 shadow-sm hover:shadow-md transition-all text-left"
+                style={{ width: 148, flexShrink: 0 }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg">{kat.icon}</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: color }}>{score}%</span>
+                </div>
+                <div className="text-[10px] font-bold text-gray-700 leading-tight mb-2 flex-1">{kat.label}</div>
+                <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1">
+                  <div className="h-1.5 rounded-full transition-all" style={{ width: `${score}%`, background: color }} />
+                </div>
+                <div className="text-[9px] text-gray-400">{kat.items.length} indikator · {kat.items.reduce((s, i) => s + i.bobot, 0)}%</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Popup modal detail */}
+      {popupData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.4)" }}
+          onClick={() => setPopupKat(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 flex items-center gap-3 border-b border-gray-100" style={{ background: popupData.lightBg }}>
+              <span className="text-xl">{popupData.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color: popupData.accent }}>Kategori {popupData.kategori}</div>
+                <div className="text-sm font-black text-gray-800 leading-tight">{popupData.label}</div>
+              </div>
+              <button onClick={() => setPopupKat(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0">✕</button>
+            </div>
+            <div className="divide-y divide-gray-50 max-h-96 overflow-y-auto">
+              {popupData.items.map(it => {
+                const status = statusItem(it);
+                const pct = it.arah === "bawah"
+                  ? (it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10))
+                  : Math.min(100, Math.round((it.real / it.target) * 100));
+                const barColor = status === "Baik" ? "#22c55e" : status === "Cukup" ? "#f59e0b" : "#ef4444";
+                const badgeCls = status === "Baik" ? "bg-green-50 text-green-600" : status === "Cukup" ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-500";
+                return (
+                  <div key={it.kode} className="px-5 py-3">
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-[10px] font-black flex-shrink-0" style={{ color: popupData.accent }}>{it.kode}</span>
+                        <span className="text-[11px] font-semibold text-gray-700 leading-tight">{it.label}</span>
+                      </div>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badgeCls}`}>{status}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                        <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: barColor }} />
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-700 w-8 text-right flex-shrink-0">{it.real}%</span>
+                    </div>
+                    <div className="text-[9px] text-gray-400 mt-1">
+                      Target: {it.arah === "bawah" ? "≤" : "≥"}{it.target}% · Bobot {it.bobot}%
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="px-5 py-3 border-t border-gray-100 flex justify-end">
+              <button onClick={() => setPopupKat(null)}
+                className="text-xs font-semibold px-4 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PwRingkasan() {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
@@ -488,15 +680,8 @@ function PwRingkasan() {
         </div>
       )}
 
-      {/* ── KPI strip (non-auditee only) ── */}
-      {!myUnit && (
-        <div>
-          <h3 className="text-sm font-bold text-gray-700 mb-2">KPI Modul Pengawasan</h3>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {kpiPengawasan.map((k) => <KpiCard key={k.label} {...k} />)}
-          </div>
-        </div>
-      )}
+      {/* ── KPI 7 Kategori (non-auditee only) ── */}
+      {!myUnit && <KpiPengawasanPanel />}
 
       {/* ── 4 module summary charts (non-auditee) ── */}
       {!myUnit && (() => {
