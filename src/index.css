@@ -36,3 +36,10 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.25);
 }
+
+/* Prevent iOS Safari auto-zoom when focusing inputs smaller than 16px */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

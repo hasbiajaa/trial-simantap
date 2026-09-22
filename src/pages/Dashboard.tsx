@@ -30,10 +30,10 @@ const PESERTA_INTERNAL = ["Ketua SPI", "Tim Auditor", "Staf Back Office"];
 const UNIT_KERJA_LIST = [
   "BAAK","BAKPU","BAUK","Sarpras","SDM","BPU",
   "D3-DKV","D3-DPT","D3-SI","D3-TI",
-  "F. Sains & Humaniora","F. Teknik","Sekolah Vokasi",
+  "Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi",
   "KUI","LPM","LPPM","Perpustakaan","PMB",
   "S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi",
-  "S1-ReKom","S1-Sistem Informasi","Marcomm","PIKDI",
+  "S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD",
 ];
 
 // Mapping peserta → role notifikasi
@@ -86,18 +86,18 @@ interface AuditCtxType {
   setRencanaList: React.Dispatch<React.SetStateAction<RencanaItem[]>>;
 }
 const LAPORAN_AWAL: LaporanItem[] = [
-  { no: "LHA-001/SPI/IV/2025", unit: "Fakultas Teknik", tgl: "10 Apr 2025", temuan: 3, rekomendasi: 5, status: "Diterima", link: "https://drive.google.com/file/lha-001-spi-2025" },
+  { no: "LHA-001/SPI/IV/2025", unit: "Fak. Teknik", tgl: "10 Apr 2025", temuan: 3, rekomendasi: 5, status: "Diterima", link: "https://drive.google.com/file/lha-001-spi-2025" },
   { no: "LHA-002/SPI/IV/2025", unit: "LPPM",            tgl: "25 Apr 2025", temuan: 2, rekomendasi: 3, status: "Diterima", link: "https://drive.google.com/file/lha-002-spi-2025" },
   { no: "LHA-003/SPI/V/2025",  unit: "BAAK",            tgl: "Draft",       temuan: 2, rekomendasi: 4, status: "Draft",    link: null },
 ];
 const RENCANA_AWAL: RencanaItem[] = [
   { no: "PA-001", unit: "Sarpras",       jenis: "Kinerja",   tim: "Budi S., Ratna D.", anggaran: "Rp 4.500.000", tglMulai: "5 Mei 2025",  status: "Disetujui" },
-  { no: "PA-002", unit: "Keuangan",      jenis: "Keuangan",  tim: "Ratna D., Andi P.", anggaran: "Rp 3.200.000", tglMulai: "20 Mei 2025", status: "Disetujui" },
-  { no: "PA-003", unit: "Kemahasiswaan", jenis: "Kinerja",   tim: "Andi P., Siti A.",  anggaran: "Rp 2.800.000", tglMulai: "1 Jun 2025",  status: "Draft" },
+  { no: "PA-002", unit: "BAUK",      jenis: "Keuangan",  tim: "Ratna D., Andi P.", anggaran: "Rp 3.200.000", tglMulai: "20 Mei 2025", status: "Disetujui" },
+  { no: "PA-003", unit: "LPM", jenis: "Kinerja",   tim: "Andi P., Siti A.",  anggaran: "Rp 2.800.000", tglMulai: "1 Jun 2025",  status: "Draft" },
   { no: "PA-004", unit: "Perpustakaan",  jenis: "Kepatuhan", tim: "Siti A.",            anggaran: "Rp 1.500.000", tglMulai: "15 Jun 2025", status: "Draft" },
 ];
 const RIWAYAT_HISTORIS: Record<string, { tahun: string; jenis: string; ketua: string; temuan: number; rtl: number; status: string }[]> = {
-  "Fakultas Teknik": [
+  "Fak. Teknik": [
     { tahun:"2024", jenis:"Kepatuhan", ketua:"Ratna D.", temuan:2, rtl:2, status:"Selesai" },
     { tahun:"2023", jenis:"Kinerja",   ketua:"Budi S.",  temuan:4, rtl:4, status:"Selesai" },
   ],
@@ -111,7 +111,7 @@ const RIWAYAT_HISTORIS: Record<string, { tahun: string; jenis: string; ketua: st
     { tahun:"2024", jenis:"Keuangan",  ketua:"Ratna D.", temuan:3, rtl:3, status:"Selesai" },
     { tahun:"2022", jenis:"Kinerja",   ketua:"Budi S.",  temuan:5, rtl:5, status:"Selesai" },
   ],
-  "Kemahasiswaan": [
+  "LPM": [
     { tahun:"2023", jenis:"Kepatuhan", ketua:"Siti A.",  temuan:2, rtl:2, status:"Selesai" },
   ],
 };
@@ -119,6 +119,9 @@ const AuditCtx = createContext<AuditCtxType>({
   laporanList: LAPORAN_AWAL, setLaporanList: () => {},
   rencanaList: RENCANA_AWAL, setRencanaList: () => {},
 });
+
+type NavFn = (module: string, section: string, subSection: string, suratTab?: "Masuk" | "Keluar") => void;
+const NavCtx = createContext<NavFn>(() => {});
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const Ic = (path: string) =>
@@ -154,13 +157,13 @@ const risikoDonut = [
   { name: "Rendah", value: 1, color: "#22c55e" },
 ];
 const risikoPerUnit = [
-  { unit: "Keuangan",      tinggi: 1, sedang: 0, rendah: 0 },
+  { unit: "BAUK",          tinggi: 1, sedang: 0, rendah: 0 },
   { unit: "Sarpras",       tinggi: 1, sedang: 0, rendah: 0 },
-  { unit: "Kemahasiswaan", tinggi: 1, sedang: 0, rendah: 0 },
+  { unit: "LPM",           tinggi: 1, sedang: 0, rendah: 0 },
   { unit: "BAAK",          tinggi: 0, sedang: 1, rendah: 0 },
   { unit: "LPPM",          tinggi: 0, sedang: 1, rendah: 0 },
-  { unit: "Prodi Mnj.",    tinggi: 0, sedang: 1, rendah: 0 },
-  { unit: "Humas",         tinggi: 0, sedang: 0, rendah: 1 },
+  { unit: "S1-Manajemen",  tinggi: 0, sedang: 1, rendah: 0 },
+  { unit: "Marcomm",       tinggi: 0, sedang: 0, rendah: 1 },
   { unit: "Perpustakaan",  tinggi: 0, sedang: 0, rendah: 1 },
 ];
 
@@ -173,8 +176,8 @@ const auditTahapDonut = [
 const auditPerUnit = [
   { unit: "Sarpras",       progress: 50, tahap: "KKA",          color: "#0e8080" },
   { unit: "BAAK",          progress: 75, tahap: "Draft Temuan",  color: "#f5a623" },
-  { unit: "Keuangan",      progress: 20, tahap: "Entry Meeting", color: "#3b82f6" },
-  { unit: "Kemahasiswaan", progress: 8,  tahap: "Rencana",       color: "#cbd5e1" },
+  { unit: "BAUK",          progress: 20, tahap: "Entry Meeting", color: "#3b82f6" },
+  { unit: "LPM",           progress: 8,  tahap: "Rencana",       color: "#cbd5e1" },
 ];
 
 const riwayatDonut = [
@@ -187,25 +190,25 @@ const riwayatPerUnit = [
   { unit: "Sarpras",       selesai: 2, berjalan: 1, rencana: 0 },
   { unit: "LPPM",          selesai: 2, berjalan: 0, rencana: 0 },
   { unit: "BAAK",          selesai: 1, berjalan: 1, rencana: 0 },
-  { unit: "Kemahasiswaan", selesai: 1, berjalan: 0, rencana: 1 },
-  { unit: "Keuangan",      selesai: 0, berjalan: 1, rencana: 0 },
+  { unit: "LPM",           selesai: 1, berjalan: 0, rencana: 1 },
+  { unit: "BAUK",          selesai: 0, berjalan: 1, rencana: 0 },
 ];
 const rtlPerUnit = [
-  { unit: "Fak. Hukum",    selesai: 0, proses: 1, terlambat: 1 },
+  { unit: "Marcomm",       selesai: 0, proses: 1, terlambat: 1 },
   { unit: "LPPM",          selesai: 1, proses: 2, terlambat: 1 },
   { unit: "Sarpras",       selesai: 2, proses: 1, terlambat: 1 },
   { unit: "Fak. Teknik",   selesai: 3, proses: 1, terlambat: 0 },
   { unit: "BAAK",          selesai: 0, proses: 1, terlambat: 0 },
-  { unit: "Kemahasiswaan", selesai: 1, proses: 0, terlambat: 0 },
+  { unit: "LPM",           selesai: 1, proses: 0, terlambat: 0 },
 ];
 
 // Radar data — risk profile per unit (4 dimensions)
 const risikoRadarUnits = [
-  { unit: "Keuangan",      Keuangan: 3, Operasional: 1, Kepatuhan: 1, Teknologi: 0 },
+  { unit: "BAUK",          Keuangan: 3, Operasional: 1, Kepatuhan: 1, Teknologi: 0 },
   { unit: "Sarpras",       Keuangan: 1, Operasional: 3, Kepatuhan: 1, Teknologi: 0 },
   { unit: "BAAK",          Keuangan: 0, Operasional: 1, Kepatuhan: 2, Teknologi: 1 },
   { unit: "LPPM",          Keuangan: 0, Operasional: 2, Kepatuhan: 1, Teknologi: 0 },
-  { unit: "Kemahasiswaan", Keuangan: 2, Operasional: 0, Kepatuhan: 1, Teknologi: 0 },
+  { unit: "LPM",           Keuangan: 2, Operasional: 0, Kepatuhan: 1, Teknologi: 0 },
 ];
 const risikoRadarDimensions = ["Keuangan","Operasional","Kepatuhan","Teknologi"];
 
@@ -222,8 +225,8 @@ const auditFunnelData = [
 const auditGanttData = [
   { unit: "Sarpras",       mulai: 1,  durasi: 25, tahap: "KKA",           color: "#0e8080" },
   { unit: "BAAK",          mulai: 3,  durasi: 20, tahap: "Draft Temuan",  color: "#f5a623" },
-  { unit: "Keuangan",      mulai: 18, durasi: 35, tahap: "Entry Meeting", color: "#3b82f6" },
-  { unit: "Kemahasiswaan", mulai: 28, durasi: 30, tahap: "Rencana",       color: "#cbd5e1" },
+  { unit: "BAUK",          mulai: 18, durasi: 35, tahap: "Entry Meeting", color: "#3b82f6" },
+  { unit: "LPM",           mulai: 28, durasi: 30, tahap: "Rencana",       color: "#cbd5e1" },
   { unit: "LPPM",          mulai: 23, durasi: 28, tahap: "Pelaporan",     color: "#22c55e" },
 ];
 
@@ -246,10 +249,10 @@ const rtlWaterfallData = [
 
 // Riwayat multi-line (temuan per tahun)
 const riwayatTrenTemuan = [
-  { tahun: "2022", FakTeknik: 4, LPPM: 0, BAAK: 0, Sarpras: 5, Keuangan: 0, Kemahasiswaan: 0 },
-  { tahun: "2023", FakTeknik: 4, LPPM: 0, BAAK: 3, Sarpras: 0, Keuangan: 0, Kemahasiswaan: 2 },
-  { tahun: "2024", FakTeknik: 2, LPPM: 3, BAAK: 0, Sarpras: 3, Keuangan: 0, Kemahasiswaan: 0 },
-  { tahun: "2025", FakTeknik: 3, LPPM: 2, BAAK: 2, Sarpras: 4, Keuangan: 0, Kemahasiswaan: 0 },
+  { tahun: "2022", FakTeknik: 4, LPPM: 0, BAAK: 0, Sarpras: 5, BAUK: 0, LPM: 0 },
+  { tahun: "2023", FakTeknik: 4, LPPM: 0, BAAK: 3, Sarpras: 0, BAUK: 0, LPM: 2 },
+  { tahun: "2024", FakTeknik: 2, LPPM: 3, BAAK: 0, Sarpras: 3, BAUK: 0, LPM: 0 },
+  { tahun: "2025", FakTeknik: 3, LPPM: 2, BAAK: 2, Sarpras: 4, BAUK: 0, LPM: 0 },
 ];
 const riwayatLineColors = ["#0e8080","#f5a623","#3b82f6","#ef4444","#8b5cf6","#22c55e"];
 const riwayatLineUnits = [
@@ -257,13 +260,29 @@ const riwayatLineUnits = [
   { key: "LPPM",           label: "LPPM" },
   { key: "BAAK",           label: "BAAK" },
   { key: "Sarpras",        label: "Sarpras" },
-  { key: "Keuangan",       label: "Keuangan" },
-  { key: "Kemahasiswaan",  label: "Kemahasiswaan" },
+  { key: "BAUK",           label: "BAUK" },
+  { key: "LPM",            label: "LPM" },
 ];
 
 // Kalender heatmap data (May 2025, intensity per day)
 const kalHeatmap: Record<number, number> = {
   1:1, 5:3, 8:1, 10:3, 12:2, 15:3, 18:2, 19:2, 20:2, 22:3, 23:1, 26:3, 28:2, 31:2,
+};
+
+// Activity heatmap — full year 2025 (month 1-12 → day → intensity 0-3)
+const yearActivity: Record<number, Record<number, number>> = {
+  1:  { 6:1, 8:2, 13:1, 15:2, 20:1, 22:2, 27:1, 29:3 },
+  2:  { 3:1, 7:2, 10:1, 14:3, 17:1, 21:2, 24:2, 28:3 },
+  3:  { 3:2, 5:1, 10:3, 12:2, 17:2, 19:1, 24:3, 26:1, 31:2 },
+  4:  { 2:1, 7:2, 9:1, 14:3, 16:2, 21:2, 23:1, 28:3 },
+  5:  { 1:1, 5:3, 8:1, 10:3, 12:2, 15:3, 18:2, 19:2, 20:2, 22:3, 23:1, 26:3, 28:2, 31:2 },
+  6:  { 2:1, 5:2, 9:1, 12:3, 16:2, 19:2, 23:1, 26:3, 30:1 },
+  7:  { 1:1, 4:2, 7:1, 10:3, 14:2, 17:2, 21:1, 24:3, 28:2, 31:1 },
+  8:  { 4:2, 7:1, 11:3, 13:1, 18:2, 20:1, 25:3, 27:2 },
+  9:  { 1:1, 4:2, 8:3, 10:1, 15:2, 17:1, 22:3, 24:2, 29:1 },
+  10: { 1:1, 6:2, 8:3, 13:1, 16:2, 20:1, 23:3, 27:2, 29:1 },
+  11: { 3:1, 6:2, 10:3, 12:1, 17:2, 19:1, 24:3, 26:2 },
+  12: { 1:1, 4:2, 8:3, 10:1, 15:2, 17:1, 22:3, 24:2, 29:1 },
 };
 
 // Back office: surat trend
@@ -278,11 +297,11 @@ const suratTrend = [
 // Back office: audit universe bubble chart
 const auditUniverseBubble = [
   { unit: "Sarpras",       risiko: 4, dampak: 4, temuan: 4 },
-  { unit: "Keuangan",      risiko: 3, dampak: 5, temuan: 3 },
+  { unit: "BAUK",          risiko: 3, dampak: 5, temuan: 3 },
   { unit: "BAAK",          risiko: 3, dampak: 3, temuan: 2 },
   { unit: "LPPM",          risiko: 2, dampak: 3, temuan: 2 },
-  { unit: "Kemahasiswaan", risiko: 4, dampak: 2, temuan: 1 },
-  { unit: "Humas",         risiko: 1, dampak: 2, temuan: 1 },
+  { unit: "LPM",           risiko: 4, dampak: 2, temuan: 1 },
+  { unit: "Marcomm",       risiko: 1, dampak: 2, temuan: 1 },
   { unit: "Perpustakaan",  risiko: 2, dampak: 1, temuan: 1 },
   { unit: "Fak. Teknik",   risiko: 3, dampak: 4, temuan: 3 },
 ];
@@ -313,13 +332,13 @@ const anggaranTrend = [
 ];
 
 const auditRows = [
-  { no: 1, unit: "Fakultas Teknik",   jenis: "Kinerja",    status: "Pelaksanaan",   progress: 65 },
+  { no: 1, unit: "Fak. Teknik",        jenis: "Kinerja",    status: "Pelaksanaan",   progress: 65 },
   { no: 2, unit: "LPPM",              jenis: "Kepatuhan",  status: "Pelaporan",     progress: 90 },
   { no: 3, unit: "BAAK",              jenis: "Kinerja",    status: "Perencanaan",   progress: 30 },
-  { no: 4, unit: "Prodi Manajemen",   jenis: "Kepatuhan",  status: "Verifikasi RTL",progress: 45 },
+  { no: 4, unit: "S1-Manajemen",      jenis: "Kepatuhan",  status: "Verifikasi RTL",progress: 45 },
 ];
 const rtlRows = [
-  { no: 1, unit: "Fakultas Hukum", temuan: "SOP Tidak Lengkap",      tgl: "10 Mei 2025" },
+  { no: 1, unit: "Marcomm",        temuan: "SOP Tidak Lengkap",      tgl: "10 Mei 2025" },
   { no: 2, unit: "LPPM",          temuan: "Dokumentasi Kegiatan",    tgl: "15 Mei 2025" },
   { no: 3, unit: "Sarpras",       temuan: "Pengelolaan Aset",        tgl: "18 Mei 2025" },
 ];
@@ -417,7 +436,7 @@ const navGroups = [
       { label: "Audit",                  sectionKey: "audit",     icon: <IconClipboard  className="w-4 h-4" />, children: ["Rencana & Laporan Audit", "Entry Meeting – Draft – Exit", "Kertas Kerja Audit (KKA)"] },
       { label: "RTL",                    sectionKey: "rtl",       icon: <IconCheck      className="w-4 h-4" />, children: ["Tindak Lanjut (RTL)", "Verifikasi RTL"] },
       { label: "Riwayat Audit per Unit", sectionKey: "riwayat",   icon: <IconFolder     className="w-4 h-4" />, children: ["Riwayat per Unit", "Temuan Berulang"] },
-      { label: "Kalender Pengawasan",    sectionKey: "kalender",  icon: <IconCalendar   className="w-4 h-4" />, children: ["Jadwal Audit", "Deadline & Reminder"] },
+      { label: "Kalender Pengawasan",    sectionKey: "kalender",  icon: <IconCalendar   className="w-4 h-4" />, children: ["Kalender Pengawasan", "Deadline & Reminder"] },
     ],
   },
   {
@@ -455,6 +474,31 @@ function NavItem({
       <span className="flex-1 text-left text-xs">{label}</span>
       {isActive && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "var(--tsu-gold)" }} />}
     </button>
+  );
+}
+
+function ConfirmModal({ message, confirmLabel = "Ya, Hapus", onConfirm, onCancel }: {
+  message: string; confirmLabel?: string; onConfirm: () => void; onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }}
+      onClick={onCancel}>
+      <div className="bg-white rounded-2xl shadow-2xl w-72 mx-4 p-6 text-center" onClick={e => e.stopPropagation()}>
+        <div className="text-3xl mb-3">⚠️</div>
+        <div className="text-sm font-bold text-gray-800 mb-1">{message}</div>
+        <div className="text-xs text-gray-400 mb-5">Tindakan ini tidak dapat dibatalkan.</div>
+        <div className="flex gap-2">
+          <button onClick={onCancel}
+            className="flex-1 text-xs font-semibold py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+            Batal
+          </button>
+          <button onClick={onConfirm}
+            className="flex-1 text-xs font-semibold py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors">
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -967,7 +1011,7 @@ function PwRingkasan() {
           myUnit === "Sarpras" ? [
             { id: "R-002", deskripsi: "Pengelolaan aset tidak terdokumentasi",     kategori: "Operasional", tingkat: "Tinggi",  status: "Proses"         },
             { id: "R-010", deskripsi: "Belanja modal tidak disertai BA serah terima",kategori: "Keuangan",  tingkat: "Sedang",  status: "Belum Ditindak" },
-          ] : myUnit === "Keuangan" ? [
+          ] : myUnit === "BAUK" ? [
             { id: "R-001", deskripsi: "Ketidaksesuaian pencatatan aset tetap",     kategori: "Keuangan",    tingkat: "Tinggi",  status: "Belum Ditindak" },
           ] : []
         );
@@ -1106,14 +1150,14 @@ function PwRisiko({ subSection }: { subSection: string }) {
   const [tambahModal, setTambahModal] = useState<string | null>(null);
 
   const [temuan, setTemuan] = useState([
-    { id: "R-001", unit: "Keuangan & Akuntansi",  deskripsi: "Ketidaksesuaian pencatatan aset tetap",          kategori: "Keuangan",      tingkat: "Tinggi",  status: "Belum Ditindak" },
+    { id: "R-001", unit: "BAUK",                  deskripsi: "Ketidaksesuaian pencatatan aset tetap",          kategori: "Keuangan",      tingkat: "Tinggi",  status: "Belum Ditindak" },
     { id: "R-002", unit: "Sarpras",               deskripsi: "Pengelolaan aset tidak terdokumentasi",           kategori: "Operasional",   tingkat: "Tinggi",  status: "Proses" },
     { id: "R-003", unit: "BAAK",                  deskripsi: "SOP penerimaan mahasiswa tidak diperbarui",       kategori: "Kepatuhan",     tingkat: "Sedang",  status: "Proses" },
     { id: "R-004", unit: "LPPM",                  deskripsi: "Dokumentasi kegiatan penelitian tidak lengkap",   kategori: "Operasional",   tingkat: "Sedang",  status: "Selesai" },
-    { id: "R-005", unit: "Humas & Marketing",     deskripsi: "Pengelolaan data alumni tanpa prosedur baku",     kategori: "Teknologi",     tingkat: "Rendah",  status: "Selesai" },
-    { id: "R-006", unit: "Prodi Manajemen",       deskripsi: "Laporan akreditasi tidak diarsipkan dengan baik", kategori: "Kepatuhan",     tingkat: "Sedang",  status: "Belum Ditindak" },
+    { id: "R-005", unit: "Marcomm",               deskripsi: "Pengelolaan data alumni tanpa prosedur baku",     kategori: "Teknologi",     tingkat: "Rendah",  status: "Selesai" },
+    { id: "R-006", unit: "S1-Manajemen",          deskripsi: "Laporan akreditasi tidak diarsipkan dengan baik", kategori: "Kepatuhan",     tingkat: "Sedang",  status: "Belum Ditindak" },
     { id: "R-007", unit: "Perpustakaan",          deskripsi: "Sistem katalog tidak terintegrasi dengan SIAKAD", kategori: "Teknologi",     tingkat: "Rendah",  status: "Proses" },
-    { id: "R-008", unit: "Kemahasiswaan",         deskripsi: "Pertanggungjawaban dana kegiatan UKM tidak tepat waktu", kategori: "Keuangan", tingkat: "Tinggi", status: "Belum Ditindak" },
+    { id: "R-008", unit: "LPM",                   deskripsi: "Pertanggungjawaban dana kegiatan UKM tidak tepat waktu", kategori: "Keuangan", tingkat: "Tinggi", status: "Belum Ditindak" },
   ]);
 
   const tingkatColor: Record<string, string> = {
@@ -1534,7 +1578,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
       {tambahModal === "Tambah Temuan" && (
         <TambahFormModal title="Tambah Temuan Risiko" fields={[
           { key:"kode",    label:"Kode Temuan",     type:"text",   placeholder:"R-009" },
-          { key:"unit",    label:"Unit Kerja",      type:"select", options:["Keuangan & Akuntansi","Sarpras","BAAK","LPPM","Humas & Marketing","Prodi Manajemen","Perpustakaan","Kemahasiswaan"] },
+          { key:"unit",    label:"Unit Kerja",      type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
           { key:"deskripsi",label:"Deskripsi Temuan", type:"textarea" },
           { key:"kategori",label:"Kategori",        type:"select", options:["Keuangan","Operasional","Kepatuhan","Teknologi"] },
           { key:"tingkat", label:"Tingkat Risiko",  type:"select", options:["Tinggi","Sedang","Rendah"] },
@@ -1553,6 +1597,7 @@ function AuditPageRencana() {
   const canEdit = user?.role !== "rektor";
   const [filterRencana, setFilterRencana] = useState("Semua");
   const [tambahModal, setTambahModal] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
   const [showLHAModal, setShowLHAModal] = useState(false);
   const [lhaSaved, setLhaSaved] = useState(false);
   const [lhaStep, setLhaStep] = useState<"form" | "confirm" | "saved">("form");
@@ -1569,9 +1614,9 @@ function AuditPageRencana() {
 
   const auditBerjalan = [
     { unit: "Sarpras",       tahap: "kka",     jenis: "Kinerja",   ketua: "Budi S.",  mulai: "5 Mei",  target: "30 Mei" },
-    { unit: "Keuangan",      tahap: "entry",   jenis: "Keuangan",  ketua: "Ratna D.", mulai: "20 Mei", target: "25 Jun" },
+    { unit: "BAUK",          tahap: "entry",   jenis: "Keuangan",  ketua: "Ratna D.", mulai: "20 Mei", target: "25 Jun" },
     { unit: "BAAK",          tahap: "draft",   jenis: "Kepatuhan", ketua: "Budi S.",  mulai: "1 Apr",  target: "20 Mei" },
-    { unit: "Kemahasiswaan", tahap: "rencana", jenis: "Kinerja",   ketua: "Andi P.",  mulai: "1 Jun",  target: "31 Jul" },
+    { unit: "LPM",           tahap: "rencana", jenis: "Kinerja",   ketua: "Andi P.",  mulai: "1 Jun",  target: "31 Jul" },
   ];
 
   const { laporanList, setLaporanList, rencanaList, setRencanaList } = useContext(AuditCtx);
@@ -1734,7 +1779,7 @@ function AuditPageRencana() {
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-gray-50 text-left">
-                {["No PA","Unit Kerja","Jenis Audit","Tim Auditor","Anggaran","Tgl Mulai","Status"].map(h=>(
+                {["No PA","Unit Kerja","Jenis Audit","Tim Auditor","Anggaran","Tgl Mulai","Status","Aksi"].map(h=>(
                   <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -1750,6 +1795,27 @@ function AuditPageRencana() {
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{r.tglMulai}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status==="Disetujui"?"bg-green-50 text-green-600":"bg-gray-100 text-gray-500"}`}>{r.status}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {!myUnit && canEdit && (
+                      <div className="flex items-center gap-1.5">
+                        {r.status === "Draft" && (
+                          <button
+                            onClick={() => setRencanaList(prev => prev.map(x => x.no === r.no ? { ...x, status: "Disetujui" } : x))}
+                            className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors whitespace-nowrap">
+                            ✓ Setujui
+                          </button>
+                        )}
+                        {r.status === "Disetujui" && (
+                          <span className="text-[9px] text-gray-300 italic">—</span>
+                        )}
+                        <button
+                          onClick={() => setPendingDelete({ msg: `Batalkan rencana audit "${r.no} — ${r.unit}"?`, fn: () => setRencanaList(prev => prev.filter(x => x.no !== r.no)) })}
+                          className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors whitespace-nowrap">
+                          ✕ Batal
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -1786,21 +1852,37 @@ function AuditPageRencana() {
                   <td className="px-4 py-3 text-center font-black text-red-500">{l.temuan}</td>
                   <td className="px-4 py-3 text-center font-black text-amber-600">{l.rekomendasi}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${l.status==="Diterima"?"bg-green-50 text-green-600":"bg-gray-100 text-gray-500"}`}>{l.status}</span>
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${l.status==="Diterima"?"bg-green-50 text-green-600":l.status==="Revisi"?"bg-amber-50 text-amber-600":"bg-gray-100 text-gray-500"}`}>{l.status}</span>
                   </td>
                   <td className="px-4 py-3">
-                    {l.status === "Diterima" && l.link && (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {/* Link buka dokumen */}
+                      {l.status === "Diterima" && l.link && (
                         <a href={l.link} target="_blank" rel="noreferrer"
-                          className="text-[10px] font-semibold flex items-center gap-1 hover:opacity-80"
+                          className="text-[9px] font-semibold flex items-center gap-0.5 hover:opacity-80 whitespace-nowrap"
                           style={{ color: "var(--tsu-teal)" }}>
-                          ↗ Buka LHA
+                          ↗ Buka
                         </a>
-                      </div>
-                    )}
-                    {l.status === "Draft" && (
-                      <span className="text-[9px] text-gray-300 italic">Belum ada link</span>
-                    )}
+                      )}
+                      {/* Tombol aksi — hanya SPI/Ketua, bukan auditee */}
+                      {!myUnit && canEdit && l.status === "Draft" && (
+                        <button
+                          onClick={() => setLaporanList(prev => prev.map(x => x.no === l.no ? { ...x, status: "Diterima", tgl: new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}) } : x))}
+                          className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors whitespace-nowrap">
+                          ✓ Setujui
+                        </button>
+                      )}
+                      {!myUnit && canEdit && (
+                        <button
+                          onClick={() => setLaporanList(prev => prev.map(x => x.no === l.no ? { ...x, status: "Revisi" } : x))}
+                          className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors whitespace-nowrap">
+                          ↩ Revisi
+                        </button>
+                      )}
+                      {(!canEdit || myUnit) && l.status !== "Diterima" && (
+                        <span className="text-[9px] text-gray-300 italic">—</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -1832,7 +1914,7 @@ function AuditPageRencana() {
                     <select value={lhaForm.unit} onChange={e => setLhaForm(p => ({ ...p, unit: e.target.value }))}
                       className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400">
                       <option value="">-- Pilih Unit --</option>
-                      {["Sarpras","Keuangan","BAAK","Kemahasiswaan","LPPM","Perpustakaan","Humas"].map(u => (
+                      {["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"].map(u => (
                         <option key={u} value={u}>{u}</option>
                       ))}
                     </select>
@@ -1909,13 +1991,20 @@ function AuditPageRencana() {
 
       {tambahModal === "Tambah Rencana Audit" && (
         <TambahFormModal title="Tambah Rencana Audit" fields={[
-          { key:"unit",   label:"Unit Kerja",         type:"select", options:["BAAK","LPPM","Sarpras","Keuangan","Kemahasiswaan","Fak. Teknik","Fak. Hukum"] },
+          { key:"unit",   label:"Unit Kerja",         type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
           { key:"jenis",  label:"Jenis Audit",        type:"select", options:["Kinerja","Kepatuhan","Keuangan","Investigatif"] },
           { key:"periode",label:"Periode Rencana",    type:"text",   placeholder:"Q3 2025" },
           { key:"ketua",  label:"Ketua Tim Auditor",  type:"text" },
         ]}
         onSave={(v) => setRencanaList(prev => [{ no: `PA-${String(prev.length + 1).padStart(3,"0")}`, unit: v.unit || "-", jenis: v.jenis || "-", tim: v.ketua || "-", anggaran: "-", tglMulai: v.periode || "-", status: "Draft" }, ...prev])}
         onClose={() => setTambahModal(null)} />
+      )}
+      {pendingDelete && (
+        <ConfirmModal
+          message={pendingDelete.msg}
+          onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
       )}
     </div>
   );
@@ -1935,10 +2024,13 @@ function AuditPageLapangan() {
     { key: "exit"  as const, label: "Exit Meeting",               icon: "🏁", desc: "Rapat penutupan & kesepakatan temuan" },
   ];
 
-  const [entryList, setEntryList] = useState([
-    { unit: "Sarpras",  tgl: "5 Mei 2025",  peserta: "Kepala Sarpras, Tim Audit SPI",   notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana" },
-    { unit: "Keuangan", tgl: "20 Mei 2025", peserta: "Kabag Keuangan, Tim Audit SPI",   notulen: "Ada",    ba: "Proses",statusEntry: "Dijadwalkan" },
-    { unit: "BAAK",     tgl: "2 Apr 2025",  peserta: "Kabag BAAK, Dekan, Tim Audit SPI",notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana" },
+  const [entryList, setEntryList] = useState<{
+    unit: string; tgl: string; notulen: string; ba: string; statusEntry: string;
+    linkNotulen: string | null; linkBA: string | null; linkPresensi: string | null;
+  }[]>([
+    { unit: "Sarpras",  tgl: "5 Mei 2025",  notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana",  linkNotulen: "https://drive.google.com/file/notulen-entry-sarpras", linkBA: "https://drive.google.com/file/ba-entry-sarpras",  linkPresensi: "https://drive.google.com/file/presensi-entry-sarpras" },
+    { unit: "BAUK",     tgl: "20 Mei 2025", notulen: "Ada",    ba: "Proses",statusEntry: "Dijadwalkan", linkNotulen: "https://drive.google.com/file/notulen-entry-bauk",    linkBA: null,                                              linkPresensi: "https://drive.google.com/file/presensi-entry-bauk"    },
+    { unit: "BAAK",     tgl: "2 Apr 2025",  notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana",  linkNotulen: "https://drive.google.com/file/notulen-entry-baak",    linkBA: "https://drive.google.com/file/ba-entry-baak",     linkPresensi: "https://drive.google.com/file/presensi-entry-baak"   },
   ]);
   const [draftList, setDraftList] = useState([
     { unit: "BAAK", no: "DT-001", temuan: "SOP Penerimaan Mahasiswa Tidak Diperbarui", tglKirim: "15 Mei 2025", disposisi: "Setuju",     catatan: "Akan diperbarui pada Q3 2025" },
@@ -1946,9 +2038,12 @@ function AuditPageLapangan() {
     { unit: "Sarpras", no: "DT-003", temuan: "Aset Gedung Tidak Tercatat di SIMAK",    tglKirim: "18 Mei 2025", disposisi: "Menunggu",   catatan: "—" },
     { unit: "Sarpras", no: "DT-004", temuan: "Belanja Modal Tanpa Berita Acara",       tglKirim: "18 Mei 2025", disposisi: "Setuju",     catatan: "BA sedang disiapkan" },
   ]);
-  const [exitList, setExitList] = useState([
-    { unit: "BAAK",           tgl: "19 Mei 2025", kehadiran: "Dekan, Kabag BAAK, Tim Audit", temuanSepakat: 2, ba: "Ditandatangani", tindakLanjut: "Unit menyepakati perbaikan SOP penerimaan mhs paling lambat Q3 2025. Arsip mahasiswa keluar akan distrukturisasi dalam 30 hari." },
-    { unit: "Fakultas Teknik",tgl: "2 Apr 2025",  kehadiran: "Dekan, Kabag, Tim Audit",      temuanSepakat: 3, ba: "Ditandatangani", tindakLanjut: "Tiga temuan disepakati dengan RTL: rekonsiliasi aset (14 hari), pembaruan SOP (30 hari), dan pelatihan staf (60 hari)." },
+  const [exitList, setExitList] = useState<{
+    unit: string; tgl: string; linkPresensi: string | null; temuanSepakat: number;
+    ba: string; tindakLanjut: string; catatan: string;
+  }[]>([
+    { unit: "BAAK",        tgl: "19 Mei 2025", linkPresensi: "https://drive.google.com/file/presensi-exit-baak",      temuanSepakat: 2, ba: "Ditandatangani", tindakLanjut: "Unit menyepakati perbaikan SOP penerimaan mhs paling lambat Q3 2025. Arsip mahasiswa keluar akan distrukturisasi dalam 30 hari.", catatan: "Semua pihak hadir, proses berjalan lancar." },
+    { unit: "Fak. Teknik", tgl: "2 Apr 2025",  linkPresensi: "https://drive.google.com/file/presensi-exit-fak-teknik", temuanSepakat: 3, ba: "Ditandatangani", tindakLanjut: "Tiga temuan disepakati dengan RTL: rekonsiliasi aset (14 hari), pembaruan SOP (30 hari), dan pelatihan staf (60 hari).",       catatan: "Dekan menyetujui seluruh rekomendasi." },
   ]);
 
   const visibleEntry = myUnit ? entryList.filter(e => e.unit === myUnit) : entryList;
@@ -1959,8 +2054,8 @@ function AuditPageLapangan() {
   const unitProgressSummary = [
     { unit: "Sarpras",       step: "KKA",          color: "#0e8080" },
     { unit: "BAAK",          step: "Draft Temuan",  color: "#f5a623" },
-    { unit: "Keuangan",      step: "Entry Meeting", color: "#3b82f6" },
-    { unit: "Kemahasiswaan", step: "Rencana",       color: "#cbd5e1" },
+    { unit: "BAUK",          step: "Entry Meeting", color: "#3b82f6" },
+    { unit: "LPM",           step: "Rencana",       color: "#cbd5e1" },
   ];
 
   return (
@@ -2024,17 +2119,39 @@ function AuditPageLapangan() {
                     {e.statusEntry}
                   </span>
                 </div>
-                <div className="flex gap-2">
-                  <span className={`text-[9px] font-bold px-2 py-1 rounded-lg ${e.notulen==="Ada"?"bg-green-50 text-green-600 border border-green-200":"bg-gray-50 text-gray-400"}`}>
-                    📋 Notulen: {e.notulen}
-                  </span>
-                  <span className={`text-[9px] font-bold px-2 py-1 rounded-lg ${e.ba==="Ada"?"bg-green-50 text-green-600 border border-green-200":"bg-amber-50 text-amber-600 border border-amber-200"}`}>
-                    📄 Berita Acara: {e.ba}
-                  </span>
+                <div className="flex gap-2 flex-wrap">
+                  {e.linkNotulen ? (
+                    <a href={e.linkNotulen} target="_blank" rel="noreferrer"
+                      className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors">
+                      📋 Notulen ↗
+                    </a>
+                  ) : (
+                    <span className="text-[9px] font-bold px-2 py-1 rounded-lg bg-gray-50 text-gray-400">
+                      📋 Notulen: Belum
+                    </span>
+                  )}
+                  {e.linkBA ? (
+                    <a href={e.linkBA} target="_blank" rel="noreferrer"
+                      className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors">
+                      📄 Berita Acara ↗
+                    </a>
+                  ) : (
+                    <span className={`text-[9px] font-bold px-2 py-1 rounded-lg ${e.ba === "Proses" ? "bg-amber-50 text-amber-600 border border-amber-200" : "bg-gray-50 text-gray-400"}`}>
+                      📄 Berita Acara: {e.ba}
+                    </span>
+                  )}
                 </div>
               </div>
-              <div className="text-[10px] text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
-                👥 Peserta: {e.peserta}
+              <div className="text-[10px] bg-gray-50 rounded-lg px-3 py-2">
+                {e.linkPresensi ? (
+                  <a href={e.linkPresensi} target="_blank" rel="noreferrer"
+                    className="font-semibold hover:opacity-80 transition-opacity flex items-center gap-1"
+                    style={{ color: "var(--tsu-teal)" }}>
+                    🖨 Scan Presensi ↗ Buka Dokumen
+                  </a>
+                ) : (
+                  <span className="text-gray-400 italic">🖨 Scan Presensi: Belum diunggah</span>
+                )}
               </div>
             </div>
           ))}
@@ -2102,18 +2219,32 @@ function AuditPageLapangan() {
               </div>
               <div className="grid grid-cols-2 gap-2 text-[10px] mb-2">
                 <div className="bg-gray-50 rounded-lg px-3 py-2">
-                  <span className="text-gray-400">Kehadiran:</span>
-                  <div className="text-gray-700 font-medium mt-0.5">{e.kehadiran}</div>
+                  <span className="text-gray-400 block mb-0.5">🖨 Scan Presensi:</span>
+                  {e.linkPresensi ? (
+                    <a href={e.linkPresensi} target="_blank" rel="noreferrer"
+                      className="font-semibold hover:opacity-80 transition-opacity flex items-center gap-1"
+                      style={{ color: "var(--tsu-teal)" }}>
+                      ↗ Buka Dokumen
+                    </a>
+                  ) : (
+                    <span className="text-gray-400 italic">Belum diunggah</span>
+                  )}
                 </div>
                 <div className="bg-gray-50 rounded-lg px-3 py-2">
                   <span className="text-gray-400">Hasil:</span>
                   <div className="font-bold mt-0.5" style={{ color: "var(--tsu-teal)" }}>{e.temuanSepakat} temuan disepakati</div>
                 </div>
               </div>
-              <div className="rounded-lg p-3 text-[10px]" style={{ background: "var(--tsu-teal-light)" }}>
+              <div className="rounded-lg p-3 text-[10px] mb-2" style={{ background: "var(--tsu-teal-light)" }}>
                 <div className="font-bold mb-1" style={{ color: "var(--tsu-teal-dark)" }}>🤝 Tindak Lanjut yang Disepakati:</div>
                 <div style={{ color: "var(--tsu-teal-dark)" }}>{e.tindakLanjut}</div>
               </div>
+              {e.catatan && e.catatan !== "—" && (
+                <div className="bg-gray-50 rounded-lg px-3 py-2 text-[10px]">
+                  <span className="text-gray-400 font-semibold">📝 Catatan Auditor: </span>
+                  <span className="text-gray-600">{e.catatan}</span>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -2121,33 +2252,53 @@ function AuditPageLapangan() {
 
       {tambahModal === "Tambah Entry Meeting" && (
         <TambahFormModal title="Tambah Entry Meeting" fields={[
-          { key:"unit",    label:"Unit Kerja",                              type:"select", options:["Sarpras","Keuangan","BAAK","LPPM","Fak. Teknik","Kemahasiswaan"] },
-          { key:"tgl",     label:"Tanggal Pelaksanaan",                     type:"date" },
-          { key:"peserta", label:"Peserta (Auditor & Auditee)",             type:"text" },
-          { key:"link",    label:"Link Notulen / Berita Acara (Google Drive)", type:"url" },
+          { key:"unit",        label:"Unit Kerja",                                  type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
+          { key:"tgl",         label:"Tanggal Pelaksanaan",                         type:"date" },
+          { key:"linkNotulen", label:"Link Notulen Rapat (Google Drive)",           type:"url",  required: false },
+          { key:"linkBA",      label:"Link Berita Acara (Google Drive)",            type:"url",  required: false },
+          { key:"linkPresensi",label:"Link Scan Presensi (Google Drive)",           type:"url",  required: false },
         ]}
-        onSave={(v) => setEntryList(prev => [{ unit: v.unit || "-", tgl: v.tgl || "-", peserta: v.peserta || "-", notulen: v.link ? "Ada" : "Belum", ba: "Proses", statusEntry: "Dijadwalkan" }, ...prev])}
+        onSave={(v) => setEntryList(prev => [{
+          unit: v.unit || "-",
+          tgl: v.tgl || "-",
+          notulen: v.linkNotulen ? "Ada" : "Belum",
+          ba: v.linkBA ? "Ada" : "Proses",
+          statusEntry: "Dijadwalkan",
+          linkNotulen: v.linkNotulen || null,
+          linkBA: v.linkBA || null,
+          linkPresensi: v.linkPresensi || null,
+        }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Draft Temuan" && (
         <TambahFormModal title="Tambah Draft Temuan" fields={[
-          { key:"no",       label:"No Draft Temuan",                        type:"text",   placeholder:"DT-005" },
-          { key:"unit",     label:"Unit Kerja",                             type:"select", options:["Sarpras","Keuangan","BAAK","LPPM","Fak. Teknik","Kemahasiswaan"] },
+          { key:"no",       label:"No Draft Temuan",                        type:"text",     placeholder:"DT-005" },
+          { key:"unit",     label:"Unit Kerja",                             type:"select",   options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
           { key:"temuan",   label:"Deskripsi Temuan",                       type:"textarea" },
           { key:"tglKirim", label:"Tanggal Kirim Konfirmasi",               type:"date" },
-          { key:"link",     label:"Link Dokumen Konfirmasi (Google Drive)", type:"url", required:false },
+          { key:"link",     label:"Link Dokumen Konfirmasi (Google Drive)", type:"url",      required:false },
+          { key:"catatan",  label:"Catatan Auditor",                        type:"textarea", required:false },
         ]}
-        onSave={(v) => setDraftList(prev => [{ unit: v.unit || "-", no: v.no || `DT-${String(prev.length + 1).padStart(3,"0")}`, temuan: v.temuan || "-", tglKirim: v.tglKirim || "-", disposisi: "Menunggu", catatan: "—" }, ...prev])}
+        onSave={(v) => setDraftList(prev => [{ unit: v.unit || "-", no: v.no || `DT-${String(prev.length + 1).padStart(3,"0")}`, temuan: v.temuan || "-", tglKirim: v.tglKirim || "-", disposisi: "Menunggu", catatan: v.catatan || "—" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Exit Meeting" && (
         <TambahFormModal title="Tambah Exit Meeting" fields={[
-          { key:"unit",      label:"Unit Kerja",                              type:"select", options:["Sarpras","Keuangan","BAAK","LPPM","Fak. Teknik","Kemahasiswaan"] },
-          { key:"tgl",       label:"Tanggal Pelaksanaan",                     type:"date" },
-          { key:"kehadiran", label:"Peserta yang Hadir",                      type:"text" },
-          { key:"link",      label:"Link BA Exit Meeting (Google Drive)",      type:"url" },
+          { key:"unit",         label:"Unit Kerja",                              type:"select",   options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
+          { key:"tgl",          label:"Tanggal Pelaksanaan",                     type:"date" },
+          { key:"linkPresensi", label:"Link Scan Presensi (Google Drive)",       type:"url",      required:false },
+          { key:"link",         label:"Link BA Exit Meeting (Google Drive)",      type:"url",      required:false },
+          { key:"catatan",      label:"Catatan Auditor",                         type:"textarea", required:false },
         ]}
-        onSave={(v) => setExitList(prev => [{ unit: v.unit || "-", tgl: v.tgl || "-", kehadiran: v.kehadiran || "-", temuanSepakat: 0, ba: v.link ? "Ditandatangani" : "Proses", tindakLanjut: "-" }, ...prev])}
+        onSave={(v) => setExitList(prev => [{
+          unit: v.unit || "-",
+          tgl: v.tgl || "-",
+          linkPresensi: v.linkPresensi || null,
+          temuanSepakat: 0,
+          ba: v.link ? "Ditandatangani" : "Proses",
+          tindakLanjut: "-",
+          catatan: v.catatan || "—",
+        }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
     </div>
@@ -2171,34 +2322,28 @@ function AuditPageKKA() {
     { id: "KKA-S-03", unit: "Sarpras",  pengujian: "Penghapusan Aset",         auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
     { id: "KKA-B-01", unit: "BAAK",     pengujian: "Prosedur Penerimaan Mhs",  auditor: "Budi S.",  statusAudit: "Selesai",  linkAuditor: "https://drive.google.com/file/kka-b-01-auditor", linkAuditee: "https://drive.google.com/file/sop-admisi-2024" },
     { id: "KKA-B-02", unit: "BAAK",     pengujian: "Arsip Mahasiswa Keluar",   auditor: "Budi S.",  statusAudit: "Berjalan", linkAuditor: "https://drive.google.com/file/kka-b-02-draft",   linkAuditee: null },
-    { id: "KKA-K-01", unit: "Keuangan", pengujian: "Rekonsiliasi Kas & Bank",  auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
+    { id: "KKA-K-01", unit: "BAUK",     pengujian: "Rekonsiliasi Kas & Bank",  auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
   ]);
 
   const baseList = myUnit ? kkaList.filter(k => k.unit === myUnit) : kkaList;
   const units = myUnit ? [myUnit] : ["Semua", ...Array.from(new Set(kkaList.map(k => k.unit)))];
   const filtered = myUnit ? baseList : (filterUnit === "Semua" ? kkaList : kkaList.filter(k => k.unit === filterUnit));
 
-  function LinkCell({ id, role, existingLink, canEdit }: { id: string; role: "auditor"|"auditee"; existingLink: string|null; canEdit: boolean }) {
+  function LinkCell({ id, role, existingLink, canEdit, locked }: { id: string; role: "auditor"|"auditee"; existingLink: string|null; canEdit: boolean; locked?: boolean }) {
     const key = `${id}-${role}`;
     const savedLink = linkMap[key] ?? existingLink;
     return (
       <div className="flex flex-col gap-1">
         {savedLink ? (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 max-w-[140px]">
-              <span className="text-[9px]">🔗</span>
-              <span className="text-[9px] text-gray-500 truncate">Link tersedia</span>
-            </div>
-            <a href={savedLink} target="_blank" rel="noreferrer"
-              className="text-[9px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 hover:opacity-80 transition-opacity"
-              style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>
-              ↗ Buka
-            </a>
-          </div>
+          <a href={savedLink} target="_blank" rel="noreferrer"
+            className="text-[9px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 w-fit hover:opacity-80 transition-opacity"
+            style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>
+            ↗ Buka
+          </a>
         ) : (
           <span className="text-[9px] text-gray-300 italic">Belum ada link</span>
         )}
-        {canEdit && (
+        {canEdit && !locked && (
           <button onClick={() => setEditingLink({ key, value: savedLink ?? "" })}
             className="text-[9px] font-bold px-2 py-1 rounded-lg border border-dashed flex items-center gap-1 w-fit hover:opacity-80 transition-opacity"
             style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
@@ -2289,10 +2434,10 @@ function AuditPageKKA() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <LinkCell id={k.id} role="auditor" existingLink={k.linkAuditor} canEdit={!myUnit && canEdit} />
+                    <LinkCell id={k.id} role="auditor" existingLink={k.linkAuditor} canEdit={!myUnit && canEdit} locked={k.statusAudit === "Selesai"} />
                   </td>
                   <td className="px-4 py-3">
-                    <LinkCell id={k.id} role="auditee" existingLink={k.linkAuditee} canEdit={canEdit} />
+                    <LinkCell id={k.id} role="auditee" existingLink={k.linkAuditee} canEdit={canEdit} locked={k.statusAudit === "Selesai"} />
                   </td>
                   {!myUnit && canEdit && (
                     <td className="px-4 py-3">
@@ -2315,7 +2460,7 @@ function AuditPageKKA() {
       {tambahModal === "Tambah KKA" && (
         <TambahFormModal title="Tambah KKA" fields={[
           { key:"noKKA",       label:"No KKA",                              type:"text",   placeholder:"KKA-001" },
-          { key:"unit",        label:"Unit Kerja",                          type:"select", options:["Sarpras","Keuangan","BAAK","LPPM","Fak. Teknik","Kemahasiswaan"] },
+          { key:"unit",        label:"Unit Kerja",                          type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
           { key:"program",     label:"Program Pengujian",                   type:"textarea" },
           { key:"auditor",     label:"Auditor Penanggung Jawab",            type:"text" },
           { key:"linkAuditor", label:"Link Dokumen Auditor (Google Drive)", type:"url" },
@@ -2361,7 +2506,6 @@ function PwRTL({ subSection }: { subSection: string }) {
   const canEdit = user?.role !== "rektor";
   const showVerif = subSection === "Verifikasi RTL";
   const [filterRTL, setFilterRTL] = useState("Semua");
-  const [selesaiToggle, setSelesaiToggle] = useState<Record<number, boolean>>({});
   const [buktiLinks, setBuktiLinks] = useState<Record<number, string>>({});
   const [editingBukti, setEditingBukti] = useState<{ no: number; value: string } | null>(null);
   const [verifCatatan, setVerifCatatan] = useState<Record<number, string>>({});
@@ -2383,22 +2527,35 @@ function PwRTL({ subSection }: { subSection: string }) {
 
   const allRTL = [
     ...rtlRows.map(r=>({...r, statusRTL: "Terlambat"})),
-    { no:4, unit:"Fakultas Teknik", temuan:"Rekonsiliasi Aset Q1",   tgl:"31 Mei 2025", statusRTL:"Proses"  },
+    { no:4, unit:"Fak. Teknik",     temuan:"Rekonsiliasi Aset Q1",   tgl:"31 Mei 2025", statusRTL:"Proses"  },
     { no:5, unit:"LPPM",            temuan:"Revisi SOP Penelitian",   tgl:"15 Jun 2025", statusRTL:"Proses"  },
-    { no:6, unit:"Kemahasiswaan",   temuan:"Laporan Kegiatan UKM Q1", tgl:"30 Jun 2025", statusRTL:"Selesai" },
+    { no:6, unit:"LPM",             temuan:"Laporan Kegiatan UKM Q1", tgl:"30 Jun 2025", statusRTL:"Selesai" },
     { no:7, unit:"BAAK",            temuan:"Arsip Mahasiswa Keluar",  tgl:"20 Jun 2025", statusRTL:"Proses"  },
   ];
   const allVerifikasi = [
-    { unit:"Kemahasiswaan", temuan:"Laporan Kegiatan UKM Q1", tglSelesai:"25 Mei 2025", bukti:"Laporan PDF",     verifikator:"Ratna D.", hasil:"Diterima"  },
+    { unit:"LPM",           temuan:"Laporan Kegiatan UKM Q1", tglSelesai:"25 Mei 2025", bukti:"Laporan PDF",     verifikator:"Ratna D.", hasil:"Diterima"  },
     { unit:"LPPM",          temuan:"Update Profil Riset",     tglSelesai:"10 Mei 2025", bukti:"Screenshot SINTA", verifikator:"Budi S.", hasil:"Diterima"  },
     { unit:"BAAK",          temuan:"Arsip Mahasiswa Keluar",  tglSelesai:"—",           bukti:"Menunggu",         verifikator:"—",       hasil:"Menunggu" },
   ];
 
+  // Hitung status efektif per RTL berdasarkan hasil verifikasi dan bukti yang diupload
+  function getEffStatus(r: typeof allRTL[0]): string {
+    const verifIdx = allVerifikasi.findIndex(v => v.unit === r.unit && v.temuan === r.temuan);
+    if (verifIdx >= 0) {
+      const hasil = verifResult[verifIdx] ?? allVerifikasi[verifIdx].hasil;
+      if (hasil === "Diterima") return "Selesai";
+      if (hasil === "Ditolak")  return "Proses";
+    }
+    if (buktiLinks[r.no]) return "Menunggu Verifikasi";
+    return r.statusRTL;
+  }
+
   const baseRTL2 = myUnit ? allRTL.filter(r => r.unit === myUnit) : allRTL;
-  const rtlRows2 = filterRTL === "Semua"     ? baseRTL2
-    : filterRTL === "Terlambat" ? baseRTL2.filter(r => r.statusRTL === "Terlambat")
-    : filterRTL === "Proses"    ? baseRTL2.filter(r => r.statusRTL === "Proses")
-    : baseRTL2.filter(r => r.statusRTL === "Selesai");
+  const rtlRows2 = filterRTL === "Semua"               ? baseRTL2
+    : filterRTL === "Terlambat"          ? baseRTL2.filter(r => getEffStatus(r) === "Terlambat")
+    : filterRTL === "Proses"             ? baseRTL2.filter(r => getEffStatus(r) === "Proses")
+    : filterRTL === "Menunggu Verifikasi"? baseRTL2.filter(r => getEffStatus(r) === "Menunggu Verifikasi")
+    : baseRTL2.filter(r => getEffStatus(r) === "Selesai");
   const verRows  = myUnit ? allVerifikasi.filter(v => v.unit === myUnit) : allVerifikasi;
 
   return (
@@ -2506,11 +2663,11 @@ function PwRTL({ subSection }: { subSection: string }) {
         )}
         {/* Filter pills */}
         <div className="flex gap-2 flex-wrap mb-3">
-          {["Semua","Terlambat","Proses","Selesai"].map(f => (
+          {["Semua","Terlambat","Proses","Menunggu Verifikasi","Selesai"].map(f => (
             <button key={f} onClick={() => setFilterRTL(f)}
               className="text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-all"
               style={filterRTL === f
-                ? { background: f === "Terlambat" ? "#ef4444" : "var(--tsu-teal)", color: "#fff", borderColor: f === "Terlambat" ? "#ef4444" : "var(--tsu-teal)" }
+                ? { background: f === "Terlambat" ? "#ef4444" : f === "Menunggu Verifikasi" ? "#7c3aed" : "var(--tsu-teal)", color: "#fff", borderColor: f === "Terlambat" ? "#ef4444" : f === "Menunggu Verifikasi" ? "#7c3aed" : "var(--tsu-teal)" }
                 : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}>
               {f}
             </button>
@@ -2524,10 +2681,10 @@ function PwRTL({ subSection }: { subSection: string }) {
           <tbody>
             {rtlRows2.map((r,i)=>{
               const sisa = sisaHari(r.tgl);
-              const isLate = r.statusRTL === "Terlambat";
-              const markedSelesai = selesaiToggle[r.no];
+              const effStatus = getEffStatus(r);
+              const isLate = effStatus === "Terlambat";
               return (
-                <tr key={i} className={`border-b border-gray-50 last:border-0 ${isLate && !markedSelesai ? "bg-red-50" : ""}`}>
+                <tr key={i} className={`border-b border-gray-50 last:border-0 ${isLate ? "bg-red-50" : ""}`}>
                   <td className="py-1.5 text-gray-500 pr-3">{r.no}</td>
                   <td className="py-1.5 font-medium text-gray-700 pr-3">{r.unit}</td>
                   <td className="py-1.5 text-gray-500 text-[10px] pr-3">{r.temuan}</td>
@@ -2539,15 +2696,17 @@ function PwRTL({ subSection }: { subSection: string }) {
                   </td>
                   <td className="py-1.5 pr-3">
                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                      markedSelesai || r.statusRTL === "Selesai" ? "bg-green-50 text-green-600" :
-                      r.statusRTL === "Terlambat" ? "bg-red-50 text-red-600" :
+                      effStatus === "Selesai"              ? "bg-green-50 text-green-600"   :
+                      effStatus === "Terlambat"            ? "bg-red-50 text-red-600"       :
+                      effStatus === "Menunggu Verifikasi"  ? "bg-purple-50 text-purple-600" :
                       "bg-blue-50 text-blue-600"}`}>
-                      {markedSelesai ? "Selesai" : r.statusRTL}
+                      {effStatus}
                     </span>
                   </td>
                   <td className="py-1.5">
                     <div className="flex flex-col gap-1">
-                      {myUnit && r.statusRTL === "Proses" && !markedSelesai && (
+                      {/* Auditee: input/ganti bukti hanya saat Proses atau Terlambat */}
+                      {myUnit && (effStatus === "Proses" || effStatus === "Terlambat") && (
                         <>
                           {buktiLinks[r.no] ? (
                             <div className="flex items-center gap-1">
@@ -2568,13 +2727,11 @@ function PwRTL({ subSection }: { subSection: string }) {
                           ) : null}
                         </>
                       )}
-                      {!myUnit && canEdit && (r.statusRTL === "Proses" || r.statusRTL === "Terlambat") && !markedSelesai && (
-                        <button onClick={() => setSelesaiToggle(p => ({ ...p, [r.no]: true }))}
-                          className="text-[9px] font-bold px-2 py-1 rounded-lg text-white whitespace-nowrap"
-                          style={{ background: "#22c55e" }}>
-                          ✓ Tandai Selesai
-                        </button>
+                      {/* Auditee: teks info saat menunggu verifikasi */}
+                      {myUnit && effStatus === "Menunggu Verifikasi" && (
+                        <span className="text-[9px] text-purple-500 italic">Menunggu verifikasi SPI</span>
                       )}
+                      {/* Non-auditee: lihat bukti jika ada */}
                       {!myUnit && buktiLinks[r.no] && (
                         <a href={buktiLinks[r.no]} target="_blank" rel="noreferrer"
                           className="text-[9px] text-teal-600 hover:underline flex items-center gap-0.5">
@@ -2666,6 +2823,12 @@ function PwRTL({ subSection }: { subSection: string }) {
                       </div>
                     </div>
                   )}
+                  {/* Hasil sudah diputuskan — tampilkan info efek ke Daftar Tindak Lanjut */}
+                  {!myUnit && !isMenunggu && (
+                    <div className="flex-shrink-0 text-[9px] text-gray-400 italic self-center">
+                      {currentHasil === "Diterima" ? "✅ RTL otomatis Selesai" : currentHasil === "Ditolak" ? "🔄 RTL kembali ke Proses" : ""}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -2680,7 +2843,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
-  const units = ["Fakultas Teknik","LPPM","BAAK","Sarpras","Keuangan","Kemahasiswaan"];
+  const units = ["Fak. Teknik","LPPM","BAAK","Sarpras","BAUK","LPM"];
   const [activeUnit, setActiveUnit] = useState(myUnit ?? units[0]);
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const { laporanList, rencanaList } = useContext(AuditCtx);
@@ -2718,10 +2881,10 @@ function PwRiwayat({ subSection }: { subSection: string }) {
   }, [laporanList, rencanaList]);
 
   const berulang = [
-    { temuan:"Dokumentasi tidak lengkap",     units:["LPPM","BAAK","Kemahasiswaan"], frekuensi:3, rekomendasi:"Perlu SOP baku dokumentasi dan monitoring rutin per kuartal.", tren:"Meningkat" as const },
-    { temuan:"Aset tidak terdokumentasi",      units:["Sarpras","Keuangan"],         frekuensi:2, rekomendasi:"Integrasikan sistem SIMAK dengan checklist audit tahunan.",     tren:"Stabil"    as const },
-    { temuan:"SOP tidak diperbarui",           units:["BAAK","Kemahasiswaan"],       frekuensi:2, rekomendasi:"Jadwalkan review SOP wajib setiap awal tahun akademik.",        tren:"Stabil"    as const },
-    { temuan:"Laporan terlambat",              units:["Kemahasiswaan","LPPM"],       frekuensi:2, rekomendasi:"Tetapkan penanggung jawab pelaporan dan reminder otomatis.",   tren:"Meningkat" as const },
+    { temuan:"Dokumentasi tidak lengkap",     units:["LPPM","BAAK","LPM"],   frekuensi:3, rekomendasi:"Perlu SOP baku dokumentasi dan monitoring rutin per kuartal.", tren:"Meningkat" as const },
+    { temuan:"Aset tidak terdokumentasi",      units:["Sarpras","BAUK"],      frekuensi:2, rekomendasi:"Integrasikan sistem SIMAK dengan checklist audit tahunan.",     tren:"Stabil"    as const },
+    { temuan:"SOP tidak diperbarui",           units:["BAAK","LPM"],          frekuensi:2, rekomendasi:"Jadwalkan review SOP wajib setiap awal tahun akademik.",        tren:"Stabil"    as const },
+    { temuan:"Laporan terlambat",              units:["LPM","LPPM"],          frekuensi:2, rekomendasi:"Tetapkan penanggung jawab pelaporan dan reminder otomatis.",   tren:"Meningkat" as const },
   ];
 
   const showBerulang = subSection === "Temuan Berulang";
@@ -2905,8 +3068,8 @@ function PwRiwayat({ subSection }: { subSection: string }) {
                 LPPM:          { "2022": 0, "2023": 0, "2024": 3, "2025": 2 },
                 BAAK:          { "2022": 0, "2023": 3, "2024": 0, "2025": 2 },
                 Sarpras:       { "2022": 5, "2023": 0, "2024": 3, "2025": 4 },
-                Keuangan:      { "2022": 0, "2023": 0, "2024": 0, "2025": 0 },
-                Kemahasiswaan: { "2022": 0, "2023": 2, "2024": 0, "2025": 0 },
+                BAUK:          { "2022": 0, "2023": 0, "2024": 0, "2025": 0 },
+                LPM:           { "2022": 0, "2023": 2, "2024": 0, "2025": 0 },
               };
               const intensity = (v: number) => {
                 if (v === 0) return { bg: "#f8fafc", text: "#cbd5e1" };
@@ -3239,183 +3402,133 @@ function PwKalender({ subSection }: { subSection: string }) {
     );
   }
 
+  // ── Shared helpers ──
+  type PriItem = { day: number; label: string; type: string; sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
+  const todayDay = 22;
+  const allDl: PriItem[] = Object.entries(events)
+    .flatMap(([day, evs]) => evs.map(ev => {
+      const sisa = +day - todayDay;
+      const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
+        sisa < 0  ? "Kritis" :
+        sisa <= 3 ? "Tinggi" :
+        sisa <= 7 ? "Sedang" : "Normal";
+      return { day: +day, ...ev, sisa, priority };
+    }))
+    .sort((a, b) => a.sisa - b.sisa);
+
+  const priorityCls: Record<string, string> = {
+    Kritis: "bg-red-50 border-red-200 text-red-700",
+    Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
+    Sedang: "bg-amber-50 border-amber-200 text-amber-700",
+    Normal: "bg-gray-50 border-gray-200 text-gray-600",
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Heatmap calendar */}
+
+      {/* ── Kalender Pengawasan (formerly Jadwal Audit) ── */}
       {!showDeadline && (
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-bold text-gray-700">🔥 Heatmap Aktivitas — Mei 2025</h4>
-            <div className="flex items-center gap-2">
-              {[{bg:"#f8fafc",label:"Tidak ada"},{bg:"#6ee7b7",label:"Rendah"},{bg:"#059669",label:"Padat"}].map(l=>(
-                <div key={l.label} className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded" style={{ background: l.bg, border: "1px solid #e2e8f0" }} />
-                  <span className="text-[8px] text-gray-400">{l.label}</span>
+        <>
+          {/* 1. Kalender grid */}
+          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-bold text-gray-700">🗓️ Kalender Pengawasan — Mei 2025</h4>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(typeStyle).map(([t,s])=>(
+                  <div key={t} className="flex items-center gap-1 text-[9px]">
+                    <span className={`w-2 h-2 rounded-full ${s.dot}`}/>
+                    <span className="text-gray-500 capitalize">{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
+                <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
+              {Array.from({length:31},(_,i)=>i+1).map(d=>(
+                <div key={d} className={`rounded-lg p-1 min-h-[42px] ${d===today?"outline outline-2 outline-teal-500":""}`} style={d===today?{background:"var(--tsu-teal-light)"}:{}}>
+                  <div className={`text-[10px] font-semibold text-center ${d===today?"font-black":"text-gray-500"}`} style={d===today?{color:"var(--tsu-teal)"}:{}}>{d}</div>
+                  <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
+                    {events[d]?.map((ev,ei)=>(
+                      <span key={ei} className={`w-2 h-2 rounded-full ${typeStyle[ev.type].dot}`} title={ev.label}/>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
+
+          {/* 2. Agenda Bulan Ini */}
           {(() => {
-            const days = Array.from({length: 31}, (_, i) => i + 1);
-            const intStyle = (v: number) => {
-              if (!v) return { bg: "#f8fafc", border: "#e2e8f0" };
-              if (v === 1) return { bg: "#d1fae5", border: "#6ee7b7" };
-              if (v === 2) return { bg: "#6ee7b7", border: "#34d399" };
-              return { bg: "#059669", border: "#047857" };
-            };
+            const agendaItems = Object.entries(events)
+              .sort(([a],[b]) => +a - +b)
+              .flatMap(([day, evs]) => evs.map(ev => ({ day: +day, ...ev })));
+            const filteredAgenda = agendaFilter === "Semua" ? agendaItems
+              : agendaItems.filter(a => {
+                  if (agendaFilter === "Audit")    return a.type === "audit";
+                  if (agendaFilter === "Rapat")    return a.type === "rapat" || a.type === "meeting";
+                  if (agendaFilter === "Deadline") return a.type === "deadline";
+                  return true;
+                });
             return (
-              <div>
-                <div className="grid grid-cols-7 gap-1 mb-1">
-                  {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
-                    <div key={d} className="text-center text-[9px] font-bold text-gray-400">{d}</div>
-                  ))}
+              <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-xs font-bold text-gray-700">📋 Agenda Bulan Ini — Mei 2025</h4>
+                  <div className="flex gap-1.5">
+                    {["Semua","Audit","Rapat","Deadline"].map(f => (
+                      <button key={f} onClick={() => setAgendaFilter(f)}
+                        className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
+                        style={agendaFilter === f
+                          ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
+                          : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
+                        {f}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {Array.from({length:4}).map((_,i)=><div key={`e${i}`}/>)}
-                  {days.map(d => {
-                    const v = kalHeatmap[d] ?? 0;
-                    const s = intStyle(v);
-                    return (
-                      <div key={d} className="h-8 rounded-lg flex flex-col items-center justify-center cursor-default transition-transform hover:scale-110"
-                        style={{ background: s.bg, border: `1px solid ${s.border}` }}
-                        title={v > 0 ? `${d} Mei: ${v} kegiatan` : `${d} Mei`}>
-                        <span className="text-[9px] font-semibold" style={{ color: v >= 3 ? "#fff" : "#64748b" }}>{d}</span>
+                <div className="flex flex-col gap-2">
+                  {filteredAgenda.map((ev, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="flex-shrink-0 text-center w-8">
+                        <div className="text-sm font-black leading-none" style={{ color:"var(--tsu-teal)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
+                        <div className="text-[9px] text-gray-400">Mei</div>
                       </div>
-                    );
-                  })}
+                      <div className="flex-1 flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
+                        <span className={`flex-1 text-[10px] font-medium px-2 py-1 rounded-lg ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-600"}`}>{ev.label}</span>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full capitalize ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-500"}`}>{ev.type}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredAgenda.length === 0 && <p className="text-[10px] text-gray-400 py-2 text-center">Tidak ada agenda untuk filter ini.</p>}
                 </div>
               </div>
             );
           })()}
-        </div>
-      )}
 
-      {/* Agenda Bulan Ini */}
-      {!showDeadline && (() => {
-        const agendaItems = Object.entries(events)
-          .sort(([a],[b]) => +a - +b)
-          .flatMap(([day, evs]) => evs.map(ev => ({ day: +day, ...ev })));
-        const filteredAgenda = agendaFilter === "Semua" ? agendaItems
-          : agendaItems.filter(a => {
-              if (agendaFilter === "Audit")    return a.type === "audit";
-              if (agendaFilter === "Rapat")    return a.type === "rapat" || a.type === "meeting";
-              if (agendaFilter === "Deadline") return a.type === "deadline";
-              return true;
-            });
-        return (
+          {/* 3. Deadline & Reminder list */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">📋 Agenda Bulan Ini — Mei 2025</h4>
+              <h4 className="text-xs font-bold text-gray-700">⏰ Deadline & Reminder — Mei 2025</h4>
               <div className="flex gap-1.5">
-                {["Semua","Audit","Rapat","Deadline"].map(f => (
-                  <button key={f} onClick={() => setAgendaFilter(f)}
+                {["Semua","Kritis","Tinggi","Sedang","Normal"].map(f => (
+                  <button key={f} onClick={() => setDeadlineFilter(f)}
                     className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
-                    style={agendaFilter === f
-                      ? { background: "var(--tsu-teal)", color: "#fff", borderColor: "var(--tsu-teal)" }
-                      : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}>
+                    style={deadlineFilter === f
+                      ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
+                      : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
                     {f}
                   </button>
                 ))}
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              {filteredAgenda.map((ev, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 text-center w-8">
-                    <div className="text-sm font-black leading-none" style={{ color:"var(--tsu-teal)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
-                    <div className="text-[9px] text-gray-400">Mei</div>
-                  </div>
-                  <div className="flex-1 flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
-                    <span className={`flex-1 text-[10px] font-medium px-2 py-1 rounded-lg ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-600"}`}>{ev.label}</span>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full capitalize ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-500"}`}>{ev.type}</span>
-                  </div>
-                </div>
-              ))}
-              {filteredAgenda.length === 0 && <p className="text-[10px] text-gray-400 py-2 text-center">Tidak ada agenda untuk filter ini.</p>}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Calendar */}
-      {!showDeadline && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-bold text-gray-700">Kalender Pengawasan — Mei 2025</h4>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(typeStyle).map(([t,s])=>(
-              <div key={t} className="flex items-center gap-1 text-[9px]">
-                <span className={`w-2 h-2 rounded-full ${s.dot}`}/>
-                <span className="text-gray-500 capitalize">{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
-            <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
-          {Array.from({length:31},(_,i)=>i+1).map(d=>(
-            <div key={d} className={`rounded-lg p-1 min-h-[42px] ${d===today?"outline outline-2 outline-teal-500":""}`} style={d===today?{background:"var(--tsu-teal-light)"}:{}}>
-              <div className={`text-[10px] font-semibold text-center ${d===today?"font-black":"text-gray-500"}`} style={d===today?{color:"var(--tsu-teal)"}:{}}>{d}</div>
-              <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
-                {events[d]?.map((ev,i)=>(
-                  <span key={i} className={`w-2 h-2 rounded-full ${typeStyle[ev.type].dot}`} title={ev.label}/>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>}
-
-      {/* Agenda / Deadline list */}
-      {showDeadline && (() => {
-        // Compute priority: Kritis = overdue, Tinggi = ≤3 days, Sedang = ≤7 days, Normal = rest
-        type PriItem = { day: number; label: string; type: string; sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
-        const todayDay = 22; // fixed reference day in May 2025
-        const allDl: PriItem[] = Object.entries(events)
-          .flatMap(([day, evs]) => evs.map(ev => {
-            const sisa = +day - todayDay;
-            const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
-              sisa < 0  ? "Kritis" :
-              sisa <= 3 ? "Tinggi" :
-              sisa <= 7 ? "Sedang" : "Normal";
-            return { day: +day, ...ev, sisa, priority };
-          }))
-          .sort((a, b) => a.sisa - b.sisa); // overdue first, then by proximity
-
-        const filterOrder = ["Semua","Kritis","Tinggi","Sedang","Normal"];
-        const filtered = deadlineFilter === "Semua" ? allDl : allDl.filter(d => d.priority === deadlineFilter);
-
-        const priorityCls: Record<string, string> = {
-          Kritis: "bg-red-50 border-red-200 text-red-700",
-          Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
-          Sedang: "bg-amber-50 border-amber-200 text-amber-700",
-          Normal: "bg-gray-50 border-gray-200 text-gray-600",
-        };
-
-        return (
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">Deadline & Reminder — Mei 2025</h4>
-              <div className="flex gap-1.5">
-                {filterOrder.map(f => (
-                  <button key={f} onClick={() => setDeadlineFilter(f)}
-                    className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
-                    style={deadlineFilter === f
-                      ? { background: "var(--tsu-teal)", color: "#fff", borderColor: "var(--tsu-teal)" }
-                      : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}>
-                    {f}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 overflow-y-auto max-h-[500px]">
-              {filtered.map((item, i) => {
-                const key = `${item.day}-${i}`;
+              {(deadlineFilter === "Semua" ? allDl : allDl.filter(d => d.priority === deadlineFilter)).map((item, i) => {
+                const key = `dl-${item.day}-${i}`;
                 const done = doneDeadlines[key];
                 return (
                   <div key={key} className={`flex items-center gap-3 rounded-xl border p-2 transition-opacity ${done ? "opacity-40" : ""} ${priorityCls[item.priority]}`}>
@@ -3432,14 +3545,138 @@ function PwKalender({ subSection }: { subSection: string }) {
                         {" · "}<span className="font-bold">{item.priority}</span>
                       </div>
                     </div>
-                    {canEdit && <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
-                      className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
-                      {done ? "✓ Selesai" : "Tandai Selesai"}
-                    </button>}
+                    {canEdit && (
+                      <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
+                        className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
+                        {done ? "✓ Selesai" : "Tandai"}
+                      </button>
+                    )}
                   </div>
                 );
               })}
-              {filtered.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Tidak ada item untuk filter ini.</p>}
+              {allDl.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Tidak ada item.</p>}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Heatmap Aktivitas (Deadline & Reminder tab) ── */}
+      {showDeadline && (() => {
+        const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+        const monthShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+        const monthDays  = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+        const intStyle = (v: number) => {
+          if (!v)   return { bg:"#f8fafc", border:"#e2e8f0", text:"#cbd5e1" };
+          if (v===1) return { bg:"#d1fae5", border:"#6ee7b7", text:"#065f46" };
+          if (v===2) return { bg:"#6ee7b7", border:"#34d399", text:"#065f46" };
+          return       { bg:"#059669", border:"#047857", text:"#ffffff"  };
+        };
+
+        const totalByMonth = monthNames.map((_, mi) => {
+          const mData = yearActivity[mi + 1] ?? {};
+          return Object.values(mData).reduce((s, v) => s + v, 0);
+        });
+        const totalYear  = totalByMonth.reduce((s, v) => s + v, 0);
+        const busiestIdx = totalByMonth.indexOf(Math.max(...totalByMonth));
+        const quietestIdx = totalByMonth.indexOf(Math.min(...totalByMonth));
+
+        const auditEvts   = Object.values(events).flat().filter(e => e.type === "audit").length;
+        const rapatEvts   = Object.values(events).flat().filter(e => e.type === "rapat" || e.type === "meeting").length;
+        const dlEvts      = Object.values(events).flat().filter(e => e.type === "deadline").length;
+
+        return (
+          <div className="flex flex-col gap-4">
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { label:"Total Kegiatan", value:totalYear,        icon:"📊", cls:"bg-teal-50 border-teal-100 text-teal-700"   },
+                { label:"Audit",          value:auditEvts * 4,   icon:"🔍", cls:"bg-blue-50 border-blue-100 text-blue-700"   },
+                { label:"Rapat",          value:rapatEvts * 4,   icon:"🗣️", cls:"bg-purple-50 border-purple-100 text-purple-700" },
+                { label:"Deadline",       value:dlEvts * 4,      icon:"⏰", cls:"bg-red-50 border-red-100 text-red-700"      },
+              ].map(s => (
+                <div key={s.label} className={`rounded-xl border p-3 flex flex-col gap-1 ${s.cls}`}>
+                  <div className="text-lg leading-none">{s.icon}</div>
+                  <div className="text-2xl font-black leading-none">{s.value}</div>
+                  <div className="text-[9px] font-semibold opacity-80">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Full-year heatmap */}
+            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h4 className="text-xs font-bold text-gray-700">🔥 Heatmap Aktivitas Pengawasan — 2025</h4>
+                  <p className="text-[9px] text-gray-400 mt-0.5">Intensitas kegiatan per hari sepanjang tahun</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {[
+                    { bg:"#f8fafc", label:"Tidak ada" },
+                    { bg:"#d1fae5", label:"Rendah"    },
+                    { bg:"#6ee7b7", label:"Sedang"    },
+                    { bg:"#059669", label:"Padat"      },
+                  ].map(l => (
+                    <div key={l.label} className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded" style={{ background:l.bg, border:"1px solid #e2e8f0" }}/>
+                      <span className="text-[8px] text-gray-400">{l.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+                {monthNames.map((mName, mi) => {
+                  const dInM    = monthDays[mi];
+                  const firstDow = new Date(2025, mi, 1).getDay(); // 0=Sun
+                  const mData   = yearActivity[mi + 1] ?? {};
+                  const mTotal  = totalByMonth[mi];
+                  const isBusiest  = mi === busiestIdx;
+                  const isQuietest = mi === quietestIdx;
+                  return (
+                    <div key={mName}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`text-[10px] font-bold ${isBusiest ? "text-teal-700" : "text-gray-700"}`}>
+                          {monthShort[mi]}
+                          {isBusiest  && <span className="ml-1 text-[8px] text-teal-500">● Paling padat</span>}
+                          {isQuietest && <span className="ml-1 text-[8px] text-gray-400">● Paling sepi</span>}
+                        </span>
+                        <span className="text-[9px] text-gray-400">{mTotal} keg.</span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-[2px] mb-[2px]">
+                        {["M","S","S","R","K","J","S"].map((d,i)=>(
+                          <div key={i} className="text-center text-[7px] font-bold text-gray-300 leading-none">{d}</div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-[2px]">
+                        {Array.from({length: firstDow}).map((_,i) => <div key={`p${i}`}/>)}
+                        {Array.from({length: dInM}, (_, i) => i + 1).map(d => {
+                          const v = mData[d] ?? 0;
+                          const s = intStyle(v);
+                          return (
+                            <div key={d}
+                              className="aspect-square rounded-[3px] flex items-center justify-center cursor-default transition-transform hover:scale-125"
+                              style={{ background:s.bg, border:`1px solid ${s.border}` }}
+                              title={v > 0 ? `${d} ${mName}: ${v} kegiatan` : `${d} ${mName}`}>
+                              <span className="text-[6px] font-semibold leading-none" style={{ color:s.text }}>{d}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
+                <div className="text-[10px] text-gray-400">
+                  Paling padat: <span className="font-bold text-teal-700">{monthNames[busiestIdx]}</span>
+                  {" · "}Paling sepi: <span className="font-bold text-gray-600">{monthNames[quietestIdx]}</span>
+                </div>
+                <div className="text-[10px] text-gray-400">
+                  Total 2025: <span className="font-bold text-gray-700">{totalYear} kegiatan</span>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -3731,6 +3968,9 @@ function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fi
 
 function SectionRingkasan() {
   const { rapatList } = useContext(RapatCtx);
+  const navigateTo = useContext(NavCtx);
+  const user = useContext(UserCtx);
+  const isFull = user?.role === "full";
   const komponenAnggaran = [
     { komponen: "Honorarium", rencana: 55, realisasi: 48 },
     { komponen: "Perj. Dinas", rencana: 40, realisasi: 32 },
@@ -3739,155 +3979,759 @@ function SectionRingkasan() {
     { komponen: "Lain-lain",   rencana: 35, realisasi: 12 },
   ];
   const agendaMendatang = rapatList.filter(r => r.status === "Terjadwal").slice(0, 3);
-  const deadlineMendatang = [
-    { label: "RTL Terlambat — Fakultas Hukum",  deadline: "10 Mei", tag: "Overdue",  prioritas: "Kritis" },
-    { label: "Audit Pendahuluan LPPM",           deadline: "26 Mei", tag: "Audit",    prioritas: "Tinggi" },
-    { label: "Pengumpulan PKPT Semester II",     deadline: "30 Jun", tag: "Rencana",  prioritas: "Normal" },
+  const actionItems = [
+    { id: 1, kegiatan: "RTL Terlambat — Marcomm", unit: "Marcomm", deadlineFull: "10 Mei 2025", relativeTime: "17 hari lalu", isOverdue: true, daysInfo: "Terlambat 17 hari", tag: "RTL", prioritas: "Kritis", deskripsi: "Tindak lanjut rekomendasi audit belum dikirim. Segera koordinasi dengan kepala unit Marcomm untuk penyelesaian.", pic: "Siti Aisyah",
+      navFull: ["pengawasan","rtl","Tindak Lanjut (RTL)",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","A","Surat Masuk & Keluar","Keluar"] as [string,string,string,"Keluar"] },
+    { id: 2, kegiatan: "Pengiriman LHA Sarpras", unit: "Sarpras", deadlineFull: "18 Mei 2025", relativeTime: "1 hari lagi", isOverdue: false, daysInfo: "Jatuh tempo 1 hari", tag: "LHA", prioritas: "Kritis", deskripsi: "Laporan Hasil Audit Sarpras harus dikirim ke pimpinan paling lambat besok.", pic: "Budi Santoso",
+      navFull: ["pengawasan","audit","Rencana & Laporan Audit",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","A","Arsip Dokumen Audit",undefined] as [string,string,string,undefined] },
+    { id: 3, kegiatan: "Audit Pendahuluan LPPM", unit: "LPPM", deadlineFull: "26 Mei 2025", relativeTime: "9 hari lagi", isOverdue: false, daysInfo: "Sisa 9 hari", tag: "Audit", prioritas: "Tinggi", deskripsi: "Tahap pendahuluan audit kepatuhan LPPM meliputi pengumpulan data dan wawancara awal.", pic: "Ratna Dewi",
+      navFull: ["pengawasan","audit","Entry Meeting – Draft – Exit",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","B","PKPT",undefined] as [string,string,string,undefined] },
+    { id: 4, kegiatan: "Update RTL BAUK Q1", unit: "BAUK", deadlineFull: "31 Mei 2025", relativeTime: "14 hari lagi", isOverdue: false, daysInfo: "Sisa 14 hari", tag: "RTL", prioritas: "Tinggi", deskripsi: "Unit BAUK wajib memperbarui status tindak lanjut untuk semua rekomendasi Q1 2025.", pic: "Andi Prasetyo",
+      navFull: ["pengawasan","rtl","Tindak Lanjut (RTL)",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","B","PKPT",undefined] as [string,string,string,undefined] },
+    { id: 5, kegiatan: "Pengumpulan PKPT Semester II", unit: "Semua Unit", deadlineFull: "30 Jun 2025", relativeTime: "44 hari lagi", isOverdue: false, daysInfo: "Sisa 44 hari", tag: "Rencana", prioritas: "Normal", deskripsi: "Setiap unit wajib menyampaikan usulan kegiatan untuk Program Kerja Pengawasan Tahunan semester II.", pic: "Ketua SPI",
+      navFull: ["backoffice","B","PKPT",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","B","PKPT",undefined] as [string,string,string,undefined] },
+    { id: 6, kegiatan: "Penyusunan Laporan Tahunan SPI", unit: "Back Office", deadlineFull: "15 Jul 2025", relativeTime: "59 hari lagi", isOverdue: false, daysInfo: "Sisa 59 hari", tag: "Rencana", prioritas: "Normal", deskripsi: "Kompilasi dan penyusunan laporan tahunan SPI mencakup semua kegiatan audit dan administrasi 2025.", pic: "Budi Santoso",
+      navFull: ["backoffice","A","Arsip Dokumen Audit",undefined] as [string,string,string,undefined],
+      navBO:   ["backoffice","A","Arsip Dokumen Audit",undefined] as [string,string,string,undefined] },
   ];
-  const tagColor = (t: string) =>
-    t === "Overdue" ? "bg-red-100 text-red-600" : t === "Audit" ? "bg-purple-100 text-purple-600" :
-    t === "Rapat"   ? "bg-blue-100 text-blue-600" : t === "RTL" ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-500";
-  const priColor = (p: string) =>
-    p === "Kritis" ? "text-red-600 bg-red-50" : p === "Tinggi" ? "text-amber-600 bg-amber-50" : "text-gray-500 bg-gray-100";
+
+  // Agenda detail popup
+  const [agendaDetailId, setAgendaDetailId] = useState<number | null>(null);
+
+  // Administrasi chart
+  const [adminPeriod, setAdminPeriod] = useState<"bulanan" | "triwulanan">("bulanan");
+  const adminBulanan = [
+    { period: "Jan", masuk: 8,  keluar: 10, rapat: 2 },
+    { period: "Feb", masuk: 12, keluar: 14, rapat: 3 },
+    { period: "Mar", masuk: 10, keluar: 12, rapat: 4 },
+    { period: "Apr", masuk: 15, keluar: 16, rapat: 3 },
+    { period: "Mei", masuk: 28, keluar: 22, rapat: 4 },
+  ];
+  const adminTriwulanan = [
+    { period: "Q1 2025", masuk: 30, keluar: 36, rapat: 9  },
+    { period: "Q2 YTD",  masuk: 43, keluar: 38, rapat: 7  },
+  ];
+  const adminChartData = adminPeriod === "bulanan" ? adminBulanan : adminTriwulanan;
+
+  // SDM Auditor — Riwayat Penugasan
+  const [sdmYear, setSdmYear] = useState("2024");
+  const [sdmPopupAuditor, setSdmPopupAuditor] = useState<string | null>(null);
+  const sdmYearData: Record<string, { auditor: string; penugasan: number }[]> = {
+    "2023": [
+      { auditor: "Budi Santoso", penugasan: 10 },
+      { auditor: "Siti Aisyah",  penugasan: 8  },
+      { auditor: "Ratna Dewi",   penugasan: 7  },
+    ],
+    "2024": [
+      { auditor: "Budi Santoso", penugasan: 12 },
+      { auditor: "Siti Aisyah",  penugasan: 10 },
+      { auditor: "Ratna Dewi",   penugasan: 9  },
+    ],
+    "2025": [
+      { auditor: "Budi Santoso", penugasan: 5 },
+      { auditor: "Siti Aisyah",  penugasan: 4 },
+      { auditor: "Ratna Dewi",   penugasan: 3 },
+    ],
+  };
+  const sdmChartData = sdmYearData[sdmYear];
+  const sdmMostActive = sdmChartData.reduce((a, b) => a.penugasan >= b.penugasan ? a : b);
+  const sdmRiwayatDetail: Record<string, { program: string; unit: string; peran: string; periode: string; status: string }[]> = {
+    "Budi Santoso": [
+      { program: "Audit Kinerja Akademik",   unit: "BAAK",        peran: "Ketua Tim", periode: "Jan–Mar 2025", status: "Selesai"  },
+      { program: "Audit Keuangan Sarpras",   unit: "Sarpras",     peran: "Ketua Tim", periode: "Apr–Jun 2025", status: "Berjalan" },
+      { program: "Audit Kepatuhan Keuangan", unit: "BAUK",        peran: "Ketua Tim", periode: "Q3 2025",      status: "Rencana"  },
+      { program: "Audit Kinerja LPPM",       unit: "LPPM",        peran: "Ketua Tim", periode: "Q2 2024",      status: "Selesai"  },
+      { program: "Audit Regulasi BAAK",      unit: "BAAK",        peran: "Ketua Tim", periode: "Q1 2024",      status: "Selesai"  },
+    ],
+    "Siti Aisyah": [
+      { program: "Audit Keuangan Sarpras",   unit: "Sarpras",     peran: "Anggota",   periode: "Apr–Jun 2025", status: "Berjalan" },
+      { program: "Audit Kepatuhan Keuangan", unit: "BAUK",        peran: "Anggota",   periode: "Q3 2025",      status: "Rencana"  },
+      { program: "Audit Kinerja Fak. Teknik",unit: "Fak. Teknik", peran: "Anggota",   periode: "Q3 2024",      status: "Selesai"  },
+      { program: "Audit SOP PMB",            unit: "PMB",         peran: "Ketua Tim", periode: "Q1 2024",      status: "Selesai"  },
+    ],
+    "Ratna Dewi": [
+      { program: "Audit Kinerja Akademik",   unit: "BAAK",        peran: "Anggota",   periode: "Jan–Mar 2025", status: "Selesai"  },
+      { program: "Audit Kinerja Fak. Teknik",unit: "Fak. Teknik", peran: "Ketua Tim", periode: "Q3 2025",      status: "Rencana"  },
+      { program: "Audit Kepatuhan LPPM",     unit: "LPPM",        peran: "Anggota",   periode: "Q1 2024",      status: "Selesai"  },
+      { program: "Audit SDM Internal",       unit: "SDM",         peran: "Ketua Tim", periode: "Q4 2024",      status: "Selesai"  },
+    ],
+  };
+
+  // PKPT popup
+  const pkptPrograms = [
+    { no: 1, program: "Audit Kinerja Akademik",       unit: "BAAK",        periode: "Q1 2025", ketua: "Budi Santoso",  status: "Selesai"      },
+    { no: 2, program: "Audit Kepatuhan LPPM",          unit: "LPPM",        periode: "Q1 2025", ketua: "Ratna Dewi",    status: "Selesai"      },
+    { no: 3, program: "Audit Keuangan Sarpras",        unit: "Sarpras",     periode: "Q2 2025", ketua: "Budi Santoso",  status: "Berjalan"     },
+    { no: 4, program: "Audit SOP Kemahasiswaan",       unit: "LPM",         periode: "Q2 2025", ketua: "Andi Prasetyo", status: "Direncanakan" },
+    { no: 5, program: "Audit Kinerja Fak. Teknik",     unit: "Fak. Teknik", periode: "Q3 2025", ketua: "Ratna Dewi",    status: "Direncanakan" },
+    { no: 6, program: "Audit Kepatuhan Keuangan",      unit: "BAUK",        periode: "Q3 2025", ketua: "Budi Santoso",  status: "Direncanakan" },
+  ];
+
+  // KPI per menu Back Office
+  const [popupMenu, setPopupMenu] = useState<string | null>(null);
+
+  const kpiMenu = [
+    {
+      key: "A", label: "Administrasi", icon: "📬", accent: "#0e8080", lightBg: "#f0fdfa",
+      items: [
+        { label: "Surat Terproses",  target: 56,  real: 50,  sat: "Surat" },
+        { label: "Rapat Terlaksana", target: 20,  real: 18,  sat: "Rapat" },
+        { label: "Dokumen Terarsip", target: 150, real: 124, sat: "Dok"   },
+      ],
+    },
+    {
+      key: "B", label: "Perencanaan Audit", icon: "📋", accent: "#3b82f6", lightBg: "#eff6ff",
+      items: [
+        { label: "Realisasi PKPT",               target: 6,   real: 3,  sat: "Program" },
+        { label: "PKPT Tepat Waktu",             target: 100, real: 67, sat: "%"       },
+        { label: "Unit Teraudit",                target: 8,   real: 5,  sat: "Unit"    },
+        { label: "Unit Risiko Tinggi Termonitor", target: 4,   real: 4,  sat: "Unit"    },
+      ],
+    },
+    {
+      key: "C", label: "Manajemen SDM", icon: "👥", accent: "#8b5cf6", lightBg: "#f5f3ff",
+      items: [
+        { label: "Auditor Bersertifikat",  target: 10,  real: 8,  sat: "Orang" },
+        { label: "Penugasan Tepat Waktu",  target: 100, real: 83, sat: "%"     },
+        { label: "Pelatihan Terlaksana",   target: 4,   real: 2,  sat: "Sesi"  },
+      ],
+    },
+    {
+      key: "D", label: "Regulasi & SOP", icon: "📚", accent: "#f59e0b", lightBg: "#fffbeb",
+      items: [
+        { label: "Pedoman/SOP Aktif",    target: 15, real: 12, sat: "Dok" },
+        { label: "Peraturan Terdaftar",  target: 20, real: 17, sat: "Dok" },
+      ],
+    },
+    {
+      key: "G", label: "Anggaran", icon: "💰", accent: "#16a34a", lightBg: "#f0fdf4",
+      items: [
+        { label: "Realisasi Anggaran",  target: 191, real: 128, sat: "Jt"  },
+        { label: "LPJ Tepat Waktu",     target: 10,  real: 9,   sat: "LPJ" },
+      ],
+    },
+  ];
+
+  const menuScore = (menu: typeof kpiMenu[0]) => {
+    const scores = menu.items
+      .filter(it => !(it as any).alert)
+      .map(it => Math.min(100, Math.round((it.real / it.target) * 100)));
+    return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  };
+
+  const popupData = kpiMenu.find(m => m.key === popupMenu) ?? null;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* KPI Strip */}
+      {/* KPI — kartu per menu, horizontal scroll */}
       <div>
         <h3 className="text-sm font-bold text-gray-700 mb-2">KPI Modul Back Office</h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {kpiBackoffice.map((k) => <KpiCard key={k.label} {...k} />)}
+        <div className="overflow-x-auto pb-1">
+          <div className="flex gap-3" style={{ minWidth: "max-content" }}>
+            {kpiMenu.map(menu => {
+              const score = menuScore(menu);
+              const color = score >= 85 ? "#22c55e" : score >= 65 ? "#f59e0b" : "#ef4444";
+              return (
+                <button key={menu.key}
+                  onClick={() => setPopupMenu(menu.key)}
+                  className="bg-white rounded-xl border border-gray-100 p-3.5 shadow-sm hover:shadow-md transition-all text-left hover:border-gray-200 flex-shrink-0"
+                  style={{ width: 180 }}>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-xl">{menu.icon}</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: color }}>
+                      {score}%
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-bold text-gray-700 leading-tight mb-2">{menu.label}</div>
+                  <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1">
+                    <div className="h-1.5 rounded-full transition-all" style={{ width: `${score}%`, background: color }} />
+                  </div>
+                  <div className="text-[9px] text-gray-400">{menu.items.length} indikator · klik untuk detail</div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Row 1: Administrasi + Perencanaan Audit */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Administrasi */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-1">📬 Administrasi</h4>
-          <p className="text-[10px] text-gray-400 mb-3">Ringkasan surat & rapat bulan ini</p>
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {[
-              { label: "Surat Masuk",   val: "28", color: "text-teal-600" },
-              { label: "Surat Keluar",  val: "22", color: "text-blue-600" },
-              { label: "Rapat Selesai", val: "4",  color: "text-purple-600" },
-              { label: "Arsip Dokumen", val: "124", color: "text-gray-700" },
-            ].map(s => (
-              <div key={s.label} className="text-center p-2 rounded-lg bg-gray-50">
-                <div className={`text-xl font-black ${s.color}`}>{s.val}</div>
-                <div className="text-[9px] text-gray-400">{s.label}</div>
+      {/* Popup modal detail KPI per menu */}
+      {popupData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.4)" }}
+          onClick={() => setPopupMenu(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 flex items-center gap-3 border-b border-gray-100" style={{ background: popupData.lightBg }}>
+              <span className="text-xl">{popupData.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color: popupData.accent }}>KPI Menu {popupData.key}</div>
+                <div className="text-sm font-black text-gray-800 leading-tight">{popupData.label}</div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Perencanaan Audit */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-1">📋 Perencanaan Audit (PKPT)</h4>
-          <p className="text-[10px] text-gray-400 mb-3">Progres program kerja tahun ini</p>
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {[
-              { label: "Total Program",   val: "6", color: "text-gray-700" },
-              { label: "Selesai",         val: "2", color: "text-green-600" },
-              { label: "Berjalan",        val: "1", color: "text-blue-600" },
-              { label: "Direncanakan",    val: "3", color: "text-amber-600" },
-            ].map(s => (
-              <div key={s.label} className="text-center p-2 rounded-lg bg-gray-50">
-                <div className={`text-xl font-black ${s.color}`}>{s.val}</div>
-                <div className="text-[9px] text-gray-400">{s.label}</div>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-100 rounded-full h-2">
-              <div className="h-2 rounded-full bg-green-500" style={{ width: "50%" }} />
+              <button onClick={() => setPopupMenu(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0">✕</button>
             </div>
-            <span className="text-[10px] text-gray-400 flex-shrink-0">50% terlaksana</span>
+            <div className="divide-y divide-gray-50">
+              {popupData.items.map((it, i) => {
+                const isAlert = (it as any).alert;
+                if (isAlert) {
+                  return (
+                    <div key={i} className="px-5 py-3 flex items-center gap-3 bg-amber-50">
+                      <span className="text-base flex-shrink-0">⏳</span>
+                      <div className="flex-1">
+                        <div className="text-[11px] font-semibold text-amber-700">{it.label}</div>
+                        <div className="text-[9px] text-amber-600 mt-0.5">Perlu perhatian segera</div>
+                      </div>
+                      <span className="text-lg font-black text-amber-700">{it.real}</span>
+                    </div>
+                  );
+                }
+                const pct = Math.min(100, Math.round((it.real / it.target) * 100));
+                const barColor = pct >= 85 ? "#22c55e" : pct >= 65 ? "#f59e0b" : "#ef4444";
+                const status   = pct >= 85 ? "Baik" : pct >= 65 ? "Cukup" : "Kurang";
+                const badgeCls = pct >= 85 ? "bg-green-50 text-green-600" : pct >= 65 ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-500";
+                return (
+                  <div key={i} className="px-5 py-3">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-[11px] font-semibold text-gray-700 leading-tight">{it.label}</span>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${badgeCls}`}>{status}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+                        <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: barColor }} />
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-700 w-12 text-right flex-shrink-0">
+                        {it.real} / {it.target} {it.sat}
+                      </span>
+                    </div>
+                    <div className="text-[9px] text-gray-400 mt-1">{pct}% tercapai</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="px-5 py-3 border-t border-gray-100 flex justify-end">
+              <button onClick={() => setPopupMenu(null)}
+                className="text-xs font-semibold px-4 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Row 2: SDM + Anggaran */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* SDM Auditor */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-1">👥 Manajemen SDM Auditor</h4>
-          <p className="text-[10px] text-gray-400 mb-3">Kompetensi & sertifikasi tim auditor</p>
-          <div className="grid grid-cols-2 gap-2">
+      {/* Row 1: Administrasi — full width horizontal */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h4 className="text-xs font-bold text-gray-700">📬 Administrasi</h4>
+            <p className="text-[10px] text-gray-400">Ringkasan surat & rapat bulan ini</p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex rounded-lg overflow-hidden border border-gray-200">
+              {(["bulanan","triwulanan"] as const).map(p => (
+                <button key={p} onClick={() => setAdminPeriod(p)}
+                  className="text-[9px] font-semibold px-2 py-1 transition-colors"
+                  style={adminPeriod === p
+                    ? { background: "var(--tsu-teal)", color: "#fff" }
+                    : { background: "#fff", color: "#94a3b8" }}>
+                  {p === "bulanan" ? "Bulanan" : "Triwulan"}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => navigateTo("backoffice", "A", "Jadwal Rapat")}
+              className="text-[9px] font-semibold px-3 py-1 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors whitespace-nowrap">
+              Lihat Detail →
+            </button>
+          </div>
+        </div>
+        <div className="flex gap-5 items-start">
+          {/* Left: stat tiles stacked 2x2 */}
+          <div className="grid grid-cols-2 gap-2 flex-shrink-0" style={{ width: 196 }}>
             {[
-              { label: "Total Auditor",       val: "4",   color: "text-gray-700" },
-              { label: "Tersertifikasi",      val: "3",   color: "text-green-600" },
-              { label: "Rata-rata Skor",      val: "3.4", color: "text-blue-600" },
-              { label: "Pelatihan Pending",   val: "2",   color: "text-amber-600" },
+              { label: "Surat Masuk",   val: "28",  color: "text-teal-600",   hoverBg: "hover:bg-teal-50 hover:border-teal-200",   fn: () => navigateTo("backoffice", "A", "Surat Masuk & Keluar", "Masuk")  },
+              { label: "Surat Keluar",  val: "22",  color: "text-blue-600",   hoverBg: "hover:bg-blue-50 hover:border-blue-200",    fn: () => navigateTo("backoffice", "A", "Surat Masuk & Keluar", "Keluar") },
+              { label: "Rapat Selesai", val: "4",   color: "text-purple-600", hoverBg: "hover:bg-purple-50 hover:border-purple-200", fn: () => navigateTo("backoffice", "A", "Jadwal Rapat")                    },
+              { label: "Arsip Dok.",    val: "124", color: "text-gray-700",   hoverBg: "hover:bg-gray-100 hover:border-gray-300",   fn: () => navigateTo("backoffice", "A", "Arsip Dokumen Audit")             },
             ].map(s => (
-              <div key={s.label} className="text-center p-2 rounded-lg bg-gray-50">
-                <div className={`text-xl font-black ${s.color}`}>{s.val}</div>
-                <div className="text-[9px] text-gray-400">{s.label}</div>
-              </div>
+              <button key={s.label} onClick={s.fn}
+                className={`text-center p-2.5 rounded-xl bg-gray-50 border border-transparent transition-all cursor-pointer group ${s.hoverBg}`}>
+                <div className={`text-2xl font-black ${s.color}`}>{s.val}</div>
+                <div className="text-[8px] text-gray-400 leading-tight mt-0.5 group-hover:text-gray-600 transition-colors">{s.label}</div>
+              </button>
             ))}
           </div>
-        </div>
-
-        {/* Anggaran */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-1">💰 Perencanaan Anggaran</h4>
-          <p className="text-[10px] text-gray-400 mb-2">Rencana vs realisasi per komponen</p>
-          <ResponsiveContainer width="100%" height={120}>
-            <BarChart data={komponenAnggaran} barSize={10} barGap={2} margin={{ top: 2, right: 4, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="komponen" tick={{ fontSize: 7, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} unit="Jt" />
-              <Tooltip contentStyle={{ fontSize: 9, borderRadius: 8, border: "none" }} formatter={(v: unknown, name: unknown) => [`Rp ${v} Jt`, name === "rencana" ? "Rencana" : "Realisasi"]} />
-              <Bar dataKey="rencana"   fill="#cbd5e1" radius={[2,2,0,0]} />
-              <Bar dataKey="realisasi" fill="var(--tsu-teal)" radius={[2,2,0,0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {/* Right: line chart */}
+          <div className="flex-1 min-w-0">
+            <div className="text-[9px] font-semibold text-gray-500 mb-1">Tren Aktivitas Administrasi</div>
+            <ResponsiveContainer width="100%" height={130}>
+              <LineChart data={adminChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="period" tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip
+                  contentStyle={{ fontSize: 9, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                  itemStyle={{ padding: "1px 0" }}
+                  formatter={(v: unknown, name: unknown) => [`${v}`, name === "masuk" ? "Surat Masuk" : name === "keluar" ? "Surat Keluar" : "Rapat"] as [string, string]}
+                  labelStyle={{ fontWeight: 700, marginBottom: 4, color: "#374151" }}
+                />
+                <Line type="monotone" dataKey="masuk"  stroke="#0e8080" strokeWidth={2} dot={{ r: 3, fill: "#0e8080" }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="keluar" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3, fill: "#3b82f6" }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="rapat"  stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3, fill: "#8b5cf6" }} activeDot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="flex items-center gap-4 mt-1">
+              {[
+                { label: "Surat Masuk",  color: "#0e8080" },
+                { label: "Surat Keluar", color: "#3b82f6" },
+                { label: "Rapat",        color: "#8b5cf6" },
+              ].map(l => (
+                <span key={l.label} className="flex items-center gap-1.5 text-[9px] text-gray-400">
+                  <span className="w-4 h-0.5 rounded-full inline-block" style={{ background: l.color }} />
+                  {l.label}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Row 3: Agenda Mendatang + Deadline */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Agenda */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-3">📅 Agenda Mendatang</h4>
-          <div className="flex flex-col gap-2">
-            {agendaMendatang.length === 0 && (
-              <div className="text-center py-4 text-[10px] text-gray-400">Belum ada agenda mendatang.</div>
-            )}
-            {agendaMendatang.map((a) => (
-              <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                <div className="flex-shrink-0 text-center bg-teal-50 rounded-lg px-2 py-1 min-w-[48px]">
-                  <div className="text-[10px] text-teal-600 font-bold leading-tight">{a.tgl.split(" ").slice(0,2).join(" ")}</div>
-                  <div className="text-[9px] text-teal-400">{a.jam}</div>
+      {/* Row 2: PKPT — full width horizontal */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h4 className="text-xs font-bold text-gray-700">📋 PKPT — Detail Progres</h4>
+            <p className="text-[10px] text-gray-400">Program Kerja Pengawasan Tahunan 2025</p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-[9px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full">2025</span>
+            <button onClick={() => navigateTo("backoffice", "B", "PKPT")}
+              className="text-[9px] font-semibold px-3 py-1 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors whitespace-nowrap">
+              Buka PKPT →
+            </button>
+          </div>
+        </div>
+        <div className="flex gap-5 items-start">
+          {/* Left: donut + legend + progress */}
+          <div className="flex-shrink-0" style={{ width: 220 }}>
+            <button
+              className="w-full flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-blue-50 transition-colors cursor-pointer border border-transparent hover:border-blue-100"
+              onClick={() => navigateTo("backoffice", "B", "PKPT")}>
+              {(() => {
+                const slices = [
+                  { label: "Selesai",      count: 2, color: "#22c55e" },
+                  { label: "Berjalan",     count: 1, color: "#3b82f6" },
+                  { label: "Direncanakan", count: 3, color: "#f59e0b" },
+                ];
+                const total = 6;
+                const r = 32, cx = 40, cy = 40;
+                const circ = 2 * Math.PI * r;
+                let cum = 0;
+                return (
+                  <svg width={80} height={80} style={{ flexShrink: 0 }}>
+                    <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={12} />
+                    {slices.map((s, i) => {
+                      const dash = (s.count / total) * circ;
+                      const el = (
+                        <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                          stroke={s.color} strokeWidth={12}
+                          strokeDasharray={`${dash} ${circ - dash}`}
+                          strokeDashoffset={circ / 4 - cum} />
+                      );
+                      cum += dash;
+                      return el;
+                    })}
+                    <text x={cx} y={cy - 4} textAnchor="middle" dominantBaseline="middle" fontSize={16} fontWeight={800} fill="#1e293b">{total}</text>
+                    <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="middle" fontSize={8}  fill="#94a3b8">program</text>
+                  </svg>
+                );
+              })()}
+              <div className="flex flex-col gap-2 flex-1 text-left">
+                {[
+                  { label: "Selesai",      count: 2, pct: "33%", color: "#22c55e" },
+                  { label: "Berjalan",     count: 1, pct: "17%", color: "#3b82f6" },
+                  { label: "Direncanakan", count: 3, pct: "50%", color: "#f59e0b" },
+                ].map(s => (
+                  <div key={s.label} className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: s.color }} />
+                    <span className="text-[10px] text-gray-600 flex-1">{s.label}</span>
+                    <span className="text-xs font-black text-gray-800">{s.count}</span>
+                    <span className="text-[9px] text-gray-400 w-8 text-right">{s.pct}</span>
+                  </div>
+                ))}
+              </div>
+            </button>
+            <button onClick={() => navigateTo("backoffice", "B", "PKPT")}
+              className="mt-2 w-full rounded-xl border border-gray-100 px-3 py-2 hover:bg-blue-50 hover:border-blue-100 transition-colors text-left">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden flex">
+                  <div className="h-2.5 transition-all" style={{ width: "33%", background: "#22c55e" }} />
+                  <div className="h-2.5 transition-all" style={{ width: "17%", background: "#3b82f6" }} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-semibold text-gray-700 truncate">{a.judul}</div>
-                  <div className="text-[9px] text-gray-400 truncate">{a.tempat} · {pesertaLabel(a.peserta)}</div>
-                </div>
+                <span className="text-[10px] font-bold text-gray-700 flex-shrink-0">50%</span>
+              </div>
+              <p className="text-[9px] text-gray-400">Realisasi PKPT — 2 selesai · 1 berjalan · 3 direncanakan</p>
+            </button>
+          </div>
+          {/* Right: program table */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="text-[9px] font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">Daftar Program Audit</div>
+            <div className="overflow-y-auto overflow-x-auto flex-1" style={{ maxHeight: 200 }}>
+              <table className="w-full text-xs">
+                <thead className="sticky top-0 bg-white z-10">
+                  <tr className="border-b border-gray-100">
+                    {["No","Program Audit","Unit","Periode","Ketua Tim","Status"].map(h => (
+                      <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {pkptPrograms.map(p => (
+                    <tr key={p.no} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="py-2 pr-3 text-[10px] text-gray-400">{p.no}</td>
+                      <td className="py-2 pr-3 font-medium text-gray-700 whitespace-nowrap">{p.program}</td>
+                      <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{p.unit}</td>
+                      <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{p.periode}</td>
+                      <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{p.ketua}</td>
+                      <td className="py-2">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                          p.status === "Selesai"      ? "bg-green-50 text-green-600" :
+                          p.status === "Berjalan"     ? "bg-blue-50 text-blue-600"  :
+                                                        "bg-amber-50 text-amber-600"
+                        }`}>{p.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Realisasi Anggaran — full width horizontal */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h4 className="text-xs font-bold text-gray-700">💰 Realisasi Anggaran per Komponen</h4>
+            <p className="text-[10px] text-gray-400">Rencana vs realisasi (Rp Juta)</p>
+          </div>
+          <button onClick={() => navigateTo("backoffice", "G", "Rencana Anggaran")}
+            className="text-[9px] font-semibold px-3 py-1 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-shrink-0 whitespace-nowrap">
+            Lihat Detail →
+          </button>
+        </div>
+        <div className="flex gap-5 items-start">
+          {/* Left: summary KPI tiles */}
+          <div className="flex flex-col gap-2 flex-shrink-0" style={{ width: 196 }}>
+            {[
+              { label: "Total Rencana",  val: "Rp 191 Jt", color: "text-gray-700",  bg: "bg-gray-50",   border: "border-gray-100"   },
+              { label: "Realisasi",      val: "Rp 128 Jt", color: "text-teal-700",  bg: "bg-teal-50",   border: "border-teal-100"   },
+              { label: "Persentase",     val: "67%",        color: "text-blue-700",  bg: "bg-blue-50",   border: "border-blue-100"   },
+              { label: "LPJ Tepat Waktu",val: "9 / 10",    color: "text-green-700", bg: "bg-green-50",  border: "border-green-100"  },
+            ].map(s => (
+              <div key={s.label} className={`flex items-center justify-between px-3 py-2 rounded-xl border ${s.bg} ${s.border}`}>
+                <span className="text-[9px] text-gray-500">{s.label}</span>
+                <span className={`text-xs font-black ${s.color}`}>{s.val}</span>
               </div>
             ))}
           </div>
+          {/* Right: wider bar chart */}
+          <div className="flex-1 min-w-0">
+            <ResponsiveContainer width="100%" height={140}>
+              <BarChart data={komponenAnggaran} barSize={14} barGap={3} margin={{ top: 4, right: 8, left: -14, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="komponen" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} unit="Jt" />
+                <Tooltip contentStyle={{ fontSize: 9, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} formatter={(v: unknown, name: unknown) => [`Rp ${v} Jt`, name === "rencana" ? "Rencana" : "Realisasi"] as [string,string]} />
+                <Bar dataKey="rencana"   fill="#cbd5e1" radius={[3,3,0,0]} />
+                <Bar dataKey="realisasi" fill="var(--tsu-teal)" radius={[3,3,0,0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="flex items-center gap-4 mt-1">
+              {[{ label: "Rencana", color: "#cbd5e1" }, { label: "Realisasi", color: "var(--tsu-teal)" }].map(l => (
+                <span key={l.label} className="flex items-center gap-1.5 text-[9px] text-gray-400">
+                  <span className="w-3 h-3 rounded inline-block" style={{ background: l.color }} />
+                  {l.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 4: SDM + Agenda Mendatang — 2 columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* SDM card */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col gap-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-gray-700">👥 SDM — Riwayat Penugasan</h4>
+              <p className="text-[10px] text-gray-400">Jumlah penugasan per auditor</p>
+            </div>
+            <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+              {["2023","2024","2025"].map(y => (
+                <button key={y} onClick={() => setSdmYear(y)}
+                  className="text-[9px] font-semibold px-2 py-1 transition-colors"
+                  style={sdmYear === y
+                    ? { background: "var(--tsu-teal)", color: "#fff" }
+                    : { background: "#fff", color: "#94a3b8" }}>
+                  {y}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-center px-3 py-2 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0">
+              <div className="text-2xl font-black text-gray-700">3</div>
+              <div className="text-[8px] text-gray-400">Total Auditor</div>
+            </div>
+            <div className="flex-1 rounded-xl px-3 py-2 flex items-center gap-2"
+              style={{ background: "#f0fdfa", border: "1px solid #99f6e4" }}>
+              <div className="text-lg flex-shrink-0">🏆</div>
+              <div>
+                <div className="text-[8px] font-bold uppercase tracking-wider" style={{ color: "var(--tsu-teal)" }}>Most Active</div>
+                <div className="text-[11px] font-black text-gray-800 leading-tight">{sdmMostActive.auditor}</div>
+                <div className="text-[9px] font-semibold" style={{ color: "var(--tsu-teal)" }}>{sdmMostActive.penugasan} Penugasan</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <div className="text-[8px] text-gray-400 uppercase tracking-wider font-semibold">Klik bar untuk detail riwayat</div>
+            {sdmChartData.map((d) => {
+              const maxVal = Math.max(...sdmChartData.map(x => x.penugasan));
+              const pct = Math.round((d.penugasan / maxVal) * 100);
+              const isTop = d.auditor === sdmMostActive.auditor;
+              const firstName = d.auditor.split(" ")[0];
+              return (
+                <button key={d.auditor}
+                  className="w-full flex items-center gap-2 rounded-lg px-1 py-0.5 hover:bg-gray-50 transition-colors group"
+                  title={`${d.auditor} — ${d.penugasan} penugasan (${sdmYear})`}
+                  onClick={() => setSdmPopupAuditor(d.auditor)}>
+                  <span className="text-[9px] text-gray-600 group-hover:text-teal-700 font-medium transition-colors flex-shrink-0"
+                    style={{ width: 56, textAlign: "right" }}>
+                    {firstName}
+                  </span>
+                  <div className="flex-1 h-6 bg-gray-100 rounded-lg overflow-hidden">
+                    <div className="h-6 rounded-lg flex items-center justify-end pr-2 transition-all duration-500"
+                      style={{ width: `${pct}%`, background: isTop ? "var(--tsu-teal)" : "#94a3b8" }}>
+                      <span className="text-[8px] font-bold text-white">{d.penugasan}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <button onClick={() => navigateTo("backoffice", "C", "Riwayat Penugasan")}
+            className="w-full text-[9px] font-semibold py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors mt-auto">
+            Lihat Detail SDM →
+          </button>
         </div>
 
-        {/* Deadline */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-3">⏰ Deadline & Reminder</h4>
-          <div className="flex flex-col gap-2">
-            {deadlineMendatang.map((d, i) => (
-              <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-semibold text-gray-700 truncate">{d.label}</div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[9px] text-gray-400">{d.deadline}</span>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${tagColor(d.tag)}`}>{d.tag}</span>
+        {/* Agenda Mendatang card — matches SDM card height */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col gap-3 h-full">
+          <div className="flex items-center justify-between flex-shrink-0">
+            <div>
+              <h4 className="text-xs font-bold text-gray-700">📅 Agenda Mendatang</h4>
+              <p className="text-[10px] text-gray-400">Jadwal rapat & kegiatan terdekat</p>
+            </div>
+            <button onClick={() => navigateTo("backoffice", "F", "Jadwal Rapat")}
+              className="text-[9px] font-semibold text-teal-600 hover:text-teal-800 transition-colors whitespace-nowrap">
+              Lihat Semua →
+            </button>
+          </div>
+
+          {agendaMendatang.length === 0 ? (
+            <div className="text-center py-8 text-[10px] text-gray-400 flex-1">Belum ada agenda mendatang.</div>
+          ) : (
+            <div className="relative pl-5 flex-1 overflow-y-auto min-h-0">
+              <div className="absolute left-[9px] top-3 bottom-3 w-px bg-gray-200" />
+              <div className="flex flex-col gap-3">
+                {agendaMendatang.map((a, i) => {
+                  const isNearest = i === 0;
+                  const pesertaLabel = (list: string[]) => list.length <= 2 ? list.join(", ") : `${list.slice(0, 2).join(", ")} +${list.length - 2}`;
+                  return (
+                    <button key={a.id} className="relative flex items-start gap-2.5 text-left w-full group"
+                      onClick={() => setAgendaDetailId(a.id)}>
+                      <div className="absolute -left-5 top-2 flex items-center justify-center" style={{ width: 18 }}>
+                        <div className={`w-3 h-3 rounded-full border-2 transition-all flex-shrink-0 ${
+                          isNearest ? "border-teal-500 bg-teal-500 shadow-sm shadow-teal-200"
+                                    : "border-gray-300 bg-white group-hover:border-teal-400"}`} />
+                      </div>
+                      <div className={`flex-1 rounded-xl p-3 transition-all ${
+                        isNearest ? "bg-teal-50 border border-teal-100"
+                                  : "bg-gray-50 border border-transparent group-hover:border-gray-200 group-hover:bg-white"}`}>
+                        {isNearest && <span className="text-[7px] font-black uppercase tracking-widest text-teal-600 block mb-0.5">● Terdekat</span>}
+                        <div className={`text-[10px] font-bold leading-snug ${isNearest ? "text-teal-800" : "text-gray-700"}`}>{a.judul}</div>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-[9px] text-gray-500 font-medium">{a.tgl}</span>
+                          <span className="text-gray-300">·</span>
+                          <span className="text-[9px] text-gray-400">{a.jam} WIB</span>
+                        </div>
+                        <div className="text-[9px] text-gray-400 mt-0.5 truncate">📍 {a.tempat}</div>
+                        {a.peserta.length > 0 && <div className="text-[8px] text-gray-400 mt-0.5 truncate">👤 {pesertaLabel(a.peserta)}</div>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <button onClick={() => navigateTo("backoffice", "F", "Jadwal Rapat")}
+            className="w-full text-[9px] font-semibold py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex-shrink-0">
+            Lihat Semua Agenda →
+          </button>
+        </div>
+      </div>
+
+      {/* SDM — Riwayat Penugasan popup */}
+      {sdmPopupAuditor && (() => {
+        const detail = sdmRiwayatDetail[sdmPopupAuditor] ?? [];
+        const stat = sdmChartData.find(d => d.auditor === sdmPopupAuditor);
+        const statusBadge = (s: string) =>
+          s === "Selesai"  ? "bg-green-50 text-green-600"  :
+          s === "Berjalan" ? "bg-blue-50 text-blue-600"    :
+                             "bg-amber-50 text-amber-600";
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setSdmPopupAuditor(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden"
+              onClick={e => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-base font-black text-white flex-shrink-0"
+                    style={{ background: "var(--tsu-teal)" }}>
+                    {sdmPopupAuditor.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-gray-800">{sdmPopupAuditor}</div>
+                    <div className="text-[10px] text-gray-400">
+                      Riwayat Penugasan · {stat?.penugasan ?? 0} penugasan ({sdmYear})
+                      {sdmPopupAuditor === sdmMostActive.auditor && (
+                        <span className="ml-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light,#f0fdfa)", color: "var(--tsu-teal)" }}>🏆 Most Active</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${priColor(d.prioritas)}`}>{d.prioritas}</span>
+                <button onClick={() => setSdmPopupAuditor(null)}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                  Tutup
+                </button>
               </div>
-            ))}
+              {/* Table */}
+              <div className="overflow-x-auto max-h-72">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-white z-10">
+                    <tr className="border-b border-gray-100">
+                      {["Program Audit","Unit","Peran","Periode","Status"].map(h => (
+                        <th key={h} className="text-left text-[10px] font-bold text-gray-400 px-4 py-2 whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.map((r, i) => (
+                      <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-2.5 font-medium text-gray-700 whitespace-nowrap">{r.program}</td>
+                        <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{r.unit}</td>
+                        <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{r.peran}</td>
+                        <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{r.periode}</td>
+                        <td className="px-4 py-2.5">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusBadge(r.status)}`}>{r.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                    {detail.length === 0 && (
+                      <tr><td colSpan={5} className="px-4 py-6 text-center text-[10px] text-gray-400">Belum ada data riwayat.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 text-[9px] text-gray-400">
+                Menampilkan riwayat penugasan dari menu Manajemen SDM → Riwayat Penugasan
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
+
+      {/* Agenda detail popup */}
+      {agendaDetailId !== null && (() => {
+        const agenda = agendaMendatang.find(a => a.id === agendaDetailId) ?? null;
+        if (!agenda) return null;
+        const pic = agenda.peserta[0] ?? "—";
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setAgendaDetailId(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden"
+              onClick={e => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">📅</span>
+                  <div className="text-sm font-bold text-gray-800">Detail Agenda</div>
+                </div>
+                <button onClick={() => setAgendaDetailId(null)}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                  Tutup
+                </button>
+              </div>
+
+              <div className="p-5 flex flex-col gap-3">
+                {/* Judul */}
+                <div className="text-sm font-bold text-gray-800 leading-snug">{agenda.judul}</div>
+
+                {/* Date / Time / Location grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl p-3" style={{ background: "#f0fdfa", border: "1px solid #99f6e4" }}>
+                    <div className="text-[8px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--tsu-teal)" }}>Tanggal</div>
+                    <div className="text-xs font-bold text-gray-800">{agenda.tgl}</div>
+                  </div>
+                  <div className="rounded-xl p-3 bg-blue-50 border border-blue-100">
+                    <div className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mb-1">Waktu</div>
+                    <div className="text-xs font-bold text-gray-800">{agenda.jam} WIB</div>
+                  </div>
+                  <div className="rounded-xl p-3 bg-gray-50 border border-gray-100 col-span-2">
+                    <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Lokasi / Media</div>
+                    <div className="text-xs font-semibold text-gray-700">📍 {agenda.tempat}</div>
+                  </div>
+                </div>
+
+                {/* PIC */}
+                <div className="rounded-xl p-3 bg-amber-50 border border-amber-100">
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-amber-600 mb-1">PIC / Koordinator</div>
+                  <div className="text-xs font-semibold text-gray-700">{pic}</div>
+                </div>
+
+                {/* Peserta */}
+                <div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Peserta</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {agenda.peserta.map(p => (
+                      <span key={p} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{p}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Deskripsi singkat */}
+                <div className="rounded-xl p-3 bg-gray-50 border border-gray-100">
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Deskripsi Singkat</div>
+                  <div className="text-[10px] text-gray-600 leading-relaxed">
+                    {agenda.judul.toLowerCase().includes("tinjauan") && "Rapat tinjauan manajemen SPI untuk mengevaluasi pelaksanaan program kerja dan hasil audit semester berjalan."}
+                    {agenda.judul.toLowerCase().includes("koordinasi") && "Koordinasi perencanaan program audit tahun 2025 meliputi penyusunan PKPT dan pembagian penugasan auditor."}
+                    {agenda.judul.toLowerCase().includes("rtl") && "Evaluasi status tindak lanjut rekomendasi audit semester I bersama unit-unit yang terlibat."}
+                    {!agenda.judul.toLowerCase().includes("tinjauan") && !agenda.judul.toLowerCase().includes("koordinasi") && !agenda.judul.toLowerCase().includes("rtl") && "Kegiatan terjadwal sesuai program kerja SPI tahun 2025."}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -4022,16 +4866,34 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
   );
 }
 
-function SectionA({ subSection }: { subSection: string }) {
+function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHint?: "Masuk" | "Keluar" }) {
   const active = subSection || "Jadwal Rapat";
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
   const { rapatList, addRapat, batalkanRapat } = useContext(RapatCtx);
+  const navigateTo = useContext(NavCtx);
   const [tambahModal, setTambahModal] = useState<string | null>(null);
-  const [suratTab, setSuratTab] = useState<"Masuk" | "Keluar">("Masuk");
+  const [suratTab, setSuratTab] = useState<"Masuk" | "Keluar">(suratTabHint ?? "Masuk");
+  React.useEffect(() => { if (suratTabHint) setSuratTab(suratTabHint); }, [suratTabHint]);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; confirmLabel?: string; fn: () => void } | null>(null);
   const [arsipSearch, setArsipSearch] = useState("");
   const [arsipFilter, setArsipFilter] = useState("Semua");
   const [showRapatForm, setShowRapatForm] = useState(false);
+  const [rapatDetailId, setRapatDetailId] = useState<number | null>(null);
+  const [suratPeriod, setSuratPeriod] = useState<"bulanan" | "triwulanan">("bulanan");
+
+  const suratBulanan = [
+    { period: "Jan", masuk: 8,  keluar: 10 },
+    { period: "Feb", masuk: 12, keluar: 14 },
+    { period: "Mar", masuk: 10, keluar: 12 },
+    { period: "Apr", masuk: 15, keluar: 16 },
+    { period: "Mei", masuk: 22, keluar: 28 },
+  ];
+  const suratTriwulanan = [
+    { period: "Q1 2025", masuk: 30, keluar: 36 },
+    { period: "Q2 2025", masuk: 37, keluar: 44 },
+  ];
+  const suratChartData = suratPeriod === "bulanan" ? suratBulanan : suratTriwulanan;
 
   const [suratMasuk, setSuratMasuk] = useState([
     { no: "001/SPI/V/2025",  tgl: "20 Mei 2025", perihal: "Undangan Rapat Koordinasi",       dari: "Rektorat",          disposisi: "Diproses", link: null as string | null },
@@ -4055,8 +4917,8 @@ function SectionA({ subSection }: { subSection: string }) {
     { nama: "Notulen Rapat 20 Mei 2025",     unit: "SPI",           tahun: "2025", tipe: "Notulen",tipeIcon: "NOTUl", link: "https://drive.google.com/file/notulen-rapat-mei-2025" },
     { nama: "Laporan RTL Sarpras Q1 2025",   unit: "Sarpras",       tahun: "2025", tipe: "RTL",    tipeIcon: "RTL",   link: "https://drive.google.com/file/rtl-sarpras-q1-2025" },
     { nama: "LHA BAAK Audit Kepatuhan 2023", unit: "BAAK",          tahun: "2023", tipe: "LHA",    tipeIcon: "LHA",   link: "https://drive.google.com/file/lha-baak-2023" },
-    { nama: "KKA Keuangan Semester II 2024", unit: "Keuangan",      tahun: "2024", tipe: "KKA",    tipeIcon: "KKA",   link: "https://drive.google.com/file/kka-keuangan-s2-2024" },
-    { nama: "RTL Audit Humas 2024",          unit: "Humas",         tahun: "2024", tipe: "RTL",    tipeIcon: "RTL",   link: "https://drive.google.com/file/rtl-humas-2024" },
+    { nama: "KKA Keuangan Semester II 2024", unit: "BAUK",          tahun: "2024", tipe: "KKA",    tipeIcon: "KKA",   link: "https://drive.google.com/file/kka-keuangan-s2-2024" },
+    { nama: "RTL Audit Humas 2024",          unit: "Marcomm",       tahun: "2024", tipe: "RTL",    tipeIcon: "RTL",   link: "https://drive.google.com/file/rtl-humas-2024" },
     { nama: "Notulen Exit Meeting LPPM",     unit: "LPPM",          tahun: "2025", tipe: "Notulen",tipeIcon: "NOTU",  link: "https://drive.google.com/file/notulen-exit-lppm-2025" },
   ]);
   const arsipDoks = arsipBase.filter(d =>
@@ -4092,7 +4954,7 @@ function SectionA({ subSection }: { subSection: string }) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-100">
-                  {["No", "Judul Rapat", "Tanggal", "Jam", "Peserta", "Status", "Aksi"].map(h => (
+                  {["No", "Judul Rapat", "Tanggal", "Jam", "Tempat", "Peserta", "Status", "Aksi"].map(h => (
                     <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -4101,19 +4963,39 @@ function SectionA({ subSection }: { subSection: string }) {
                 {rapatList.map((r, idx) => (
                   <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="py-2 pr-3 text-gray-400 text-[10px]">{idx + 1}</td>
-                    <td className="py-2 pr-3 font-medium text-gray-700">{r.judul}</td>
+                    <td className="py-2 pr-3 font-medium text-gray-700 max-w-[160px] truncate">{r.judul}</td>
                     <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.tgl}</td>
-                    <td className="py-2 pr-3 text-gray-500">{r.jam}</td>
-                    <td className="py-2 pr-3 text-gray-500 max-w-[140px] truncate">{pesertaLabel(r.peserta)}</td>
+                    <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.jam}</td>
+                    <td className="py-2 pr-3 text-gray-500 max-w-[110px] truncate whitespace-nowrap">{r.tempat || "—"}</td>
+                    <td className="py-2 pr-3 text-gray-500 max-w-[120px] truncate">{pesertaLabel(r.peserta)}</td>
                     <td className="py-2 pr-3">
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusBadge(r.status)}`}>{r.status}</span>
                     </td>
                     <td className="py-2">
-                      <div className="flex gap-1">
-                        <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
+                      <div className="flex items-center gap-1">
+                        {/* Detail / Info */}
+                        <button title="Detail" onClick={() => setRapatDetailId(r.id)}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-500 transition-colors">
+                          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="currentColor"><circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none"/><path d="M8 7v5M8 5.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                        </button>
+                        {/* Edit */}
+                        {canEdit && (
+                          <button title="Edit" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                            <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
+                          </button>
+                        )}
+                        {/* Selesai */}
                         {canEdit && r.status === "Terjadwal" && (
-                          <button onClick={() => batalkanRapat(r.id)} className="text-[9px] px-2 py-1 rounded border border-red-100 text-red-500 hover:bg-red-50">Batalkan</button>
+                          <button title="Tandai Selesai" className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-400 hover:text-green-600 transition-colors">
+                            <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
+                          </button>
+                        )}
+                        {/* Batalkan */}
+                        {canEdit && r.status === "Terjadwal" && (
+                          <button title="Batalkan Rapat" onClick={() => setPendingDelete({ msg: `Batalkan rapat "${r.judul}"?`, confirmLabel: "Ya, Batalkan", fn: () => batalkanRapat(r.id) })}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg border border-red-100 hover:bg-red-50 text-red-300 hover:text-red-500 transition-colors">
+                            <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg>
+                          </button>
                         )}
                       </div>
                     </td>
@@ -4122,28 +5004,108 @@ function SectionA({ subSection }: { subSection: string }) {
               </tbody>
             </table>
           </div>
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <button onClick={() => navigateTo("backoffice", "F", "Siklus Audit")}
+              className="w-full text-[10px] font-semibold py-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex items-center justify-center gap-1.5">
+              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 2v2M11 2v2M2 7h12"/></svg>
+              Lihat Kalender
+            </button>
+          </div>
         </div>
       )}
+
+      {/* Rapat detail popup */}
+      {rapatDetailId !== null && (() => {
+        const r = rapatList.find(x => x.id === rapatDetailId);
+        if (!r) return null;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setRapatDetailId(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="text-sm font-bold text-gray-800">📋 Detail Rapat</div>
+                <button onClick={() => setRapatDetailId(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+              </div>
+              <div className="p-5 flex flex-col gap-3">
+                <div className="text-sm font-bold text-gray-800 leading-snug">{r.judul}</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-xl p-3 bg-blue-50 border border-blue-100">
+                    <div className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mb-1">Tanggal</div>
+                    <div className="text-xs font-bold text-gray-800">{r.tgl}</div>
+                  </div>
+                  <div className="rounded-xl p-3" style={{ background: "#f0fdfa", border: "1px solid #99f6e4" }}>
+                    <div className="text-[8px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--tsu-teal)" }}>Waktu</div>
+                    <div className="text-xs font-bold text-gray-800">{r.jam} WIB</div>
+                  </div>
+                  <div className="rounded-xl p-3 bg-gray-50 border border-gray-100 col-span-2">
+                    <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Tempat / Media</div>
+                    <div className="text-xs font-semibold text-gray-700">📍 {r.tempat || "—"}</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Status</div>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusBadge(r.status)}`}>{r.status}</span>
+                </div>
+                <div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Peserta</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {r.peserta.map(p => (
+                      <span key={p} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{p}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Surat Masuk & Keluar */}
       {active === "Surat Masuk & Keluar" && (
         <div className="flex flex-col gap-4">
-          {/* Chart tren */}
+          {/* Chart tren — same layout as Ringkasan Administrasi card */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📬 Tren Surat per Bulan</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="text-xs font-bold text-gray-700">📬 Tren Aktivitas Surat</h4>
+                <p className="text-[10px] text-gray-400">Surat masuk & keluar per periode</p>
+              </div>
+              <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                {(["bulanan","triwulanan"] as const).map(p => (
+                  <button key={p} onClick={() => setSuratPeriod(p)}
+                    className="text-[9px] font-semibold px-2 py-1 transition-colors"
+                    style={suratPeriod === p
+                      ? { background: "var(--tsu-teal)", color: "#fff" }
+                      : { background: "#fff", color: "#94a3b8" }}>
+                    {p === "bulanan" ? "Bulanan" : "Triwulan"}
+                  </button>
+                ))}
+              </div>
+            </div>
             <ResponsiveContainer width="100%" height={130}>
-              <LineChart data={suratTrend} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="bulan" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} />
-                <Line type="monotone" dataKey="masuk" name="Surat Masuk" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="keluar" name="Surat Keluar" stroke="#0e8080" strokeWidth={2.5} dot={{ r: 3 }} />
+              <LineChart data={suratChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="period" tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} width={28} />
+                <Tooltip
+                  contentStyle={{ fontSize: 9, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
+                  itemStyle={{ padding: "1px 0" }}
+                  formatter={(v: unknown, name: unknown) => [`${v}`, name === "masuk" ? "Surat Masuk" : "Surat Keluar"] as [string, string]}
+                  labelStyle={{ fontWeight: 700, marginBottom: 4, color: "#374151" }}
+                />
+                <Line type="monotone" dataKey="masuk"  stroke="#0e8080" strokeWidth={2} dot={{ r: 3, fill: "#0e8080" }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="keluar" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3, fill: "#3b82f6" }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
-            <div className="flex gap-4 mt-1 justify-center">
-              <div className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-blue-500 rounded inline-block"/><span className="text-[9px] text-gray-400">Surat Masuk</span></div>
-              <div className="flex items-center gap-1.5"><span className="w-3 h-0.5 inline-block rounded" style={{background:"var(--tsu-teal)"}}/><span className="text-[9px] text-gray-400">Surat Keluar</span></div>
+            <div className="flex items-center gap-4 mt-1 justify-center">
+              {[
+                { label: "Surat Masuk",  color: "#0e8080" },
+                { label: "Surat Keluar", color: "#3b82f6" },
+              ].map(l => (
+                <span key={l.label} className="flex items-center gap-1.5 text-[9px] text-gray-400">
+                  <span className="w-4 h-0.5 rounded-full inline-block" style={{ background: l.color }} />
+                  {l.label}
+                </span>
+              ))}
             </div>
           </div>
           {/* Tabel surat */}
@@ -4166,7 +5128,7 @@ function SectionA({ subSection }: { subSection: string }) {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {["No. Surat", "Tanggal", "Perihal", suratTab === "Masuk" ? "Dari" : "Kepada", "Disposisi", "Aksi"].map(h => (
+                    {["No. Surat", "Tanggal", "Perihal", suratTab === "Masuk" ? "Dari" : "Kepada", "Status", "Aksi"].map(h => (
                       <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -4179,12 +5141,63 @@ function SectionA({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3 text-gray-700 max-w-[180px] truncate">{s.perihal}</td>
                       <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{"dari" in s ? s.dari : s.kepada}</td>
                       <td className="py-2 pr-3">
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${s.disposisi === "Selesai" || s.disposisi === "Diterima" ? "bg-green-50 text-green-600" : s.disposisi === "Arsip" ? "bg-gray-100 text-gray-500" : "bg-amber-50 text-amber-600"}`}>{s.disposisi}</span>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                          s.disposisi === "Selesai" || s.disposisi === "Diterima" ? "bg-green-50 text-green-600" :
+                          s.disposisi === "Arsip"   ? "bg-yellow-50 text-yellow-600" :
+                          s.disposisi === "Diproses" || s.disposisi === "Terkirim" ? "bg-blue-50 text-blue-600" :
+                          "bg-gray-100 text-gray-500"}`}>{s.disposisi}</span>
                       </td>
                       <td className="py-2">
-                        <div className="flex gap-1">
-                          <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Lihat</button>
-                          <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Arsip</button>
+                        <div className="flex items-center gap-1">
+                          {/* Edit */}
+                          {canEdit && (
+                            <button title="Edit" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
+                            </button>
+                          )}
+                          {/* Status buttons — Masuk */}
+                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Diproses" && (
+                            <button title="Tandai Diproses" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Diproses"} : x))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-blue-100 hover:bg-blue-50 text-blue-300 hover:text-blue-500 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M13 8A5 5 0 1 1 8 3M13 3v4h-4"/></svg>
+                            </button>
+                          )}
+                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Selesai" && (
+                            <button title="Tandai Selesai" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Selesai"} : x))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-300 hover:text-green-600 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
+                            </button>
+                          )}
+                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Arsip" && (
+                            <button title="Pindah ke Arsip" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Arsip"} : x))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-yellow-100 hover:bg-yellow-50 text-yellow-400 hover:text-yellow-600 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M1 5h14M6 5V3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V5"/><path d="M6 9h4"/></svg>
+                            </button>
+                          )}
+                          {/* Status buttons — Keluar */}
+                          {suratTab === "Keluar" && canEdit && s.disposisi !== "Diterima" && (
+                            <button title="Tandai Diterima" onClick={() => setSuratKeluar(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Diterima"} : x))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-300 hover:text-green-600 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
+                            </button>
+                          )}
+                          {suratTab === "Keluar" && canEdit && s.disposisi !== "Arsip" && (
+                            <button title="Pindah ke Arsip" onClick={() => setSuratKeluar(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Arsip"} : x))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-yellow-100 hover:bg-yellow-50 text-yellow-400 hover:text-yellow-600 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M1 5h14M6 5V3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V5"/><path d="M6 9h4"/></svg>
+                            </button>
+                          )}
+                          {/* Link softfile */}
+                          {s.link ? (
+                            <a href={s.link} target="_blank" rel="noreferrer" title="Lihat Softfile"
+                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-teal-100 hover:bg-teal-50 text-teal-400 hover:text-teal-600 transition-colors">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6.5 9.5a3.5 3.5 0 0 0 4.95 0l1.41-1.41a3.5 3.5 0 0 0-4.95-4.95L7.09 4.5"/><path d="M9.5 6.5a3.5 3.5 0 0 0-4.95 0L3.14 7.91a3.5 3.5 0 0 0 4.95 4.95L9.91 11.5"/></svg>
+                            </a>
+                          ) : (
+                            <button title="Belum ada softfile" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-100 text-gray-300 cursor-not-allowed">
+                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6.5 9.5a3.5 3.5 0 0 0 4.95 0l1.41-1.41a3.5 3.5 0 0 0-4.95-4.95L7.09 4.5"/><path d="M9.5 6.5a3.5 3.5 0 0 0-4.95 0L3.14 7.91a3.5 3.5 0 0 0 4.95 4.95L9.91 11.5"/></svg>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -4236,7 +5249,7 @@ function SectionA({ subSection }: { subSection: string }) {
                     ↗ Buka
                   </a>
                   {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-amber-200 hover:bg-amber-50 text-amber-600">Edit</button>}
-                  {canEdit && <button onClick={() => setArsipBase(prev => prev.filter(a => a.nama !== d.nama))} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
+                  {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus arsip "${d.nama}"?`, fn: () => setArsipBase(prev => prev.filter(a => a.nama !== d.nama)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
                 </div>
               </div>
             ))}
@@ -4245,14 +5258,13 @@ function SectionA({ subSection }: { subSection: string }) {
       )}
       {tambahModal === "Surat Masuk" && (
         <TambahFormModal title="Tambah Surat Masuk" fields={[
-          { key:"no",        label:"No Surat",              type:"text",   placeholder:"001/SPI/VI/2025" },
-          { key:"tgl",       label:"Tanggal",               type:"date" },
-          { key:"perihal",   label:"Perihal",               type:"text" },
-          { key:"dari",      label:"Dari (Pengirim)",       type:"text" },
-          { key:"disposisi", label:"Disposisi",             type:"select", options:["Diproses","Selesai","Arsip"] },
-          { key:"link",      label:"Link Scan Surat (Google Drive)", type:"url", required:false },
+          { key:"no",      label:"No Surat",              type:"text",   placeholder:"001/SPI/VI/2025" },
+          { key:"tgl",     label:"Tanggal",               type:"date" },
+          { key:"perihal", label:"Perihal",               type:"text" },
+          { key:"dari",    label:"Dari (Pengirim)",       type:"text" },
+          { key:"link",    label:"Link Scan Surat (Google Drive)", type:"url", required:false },
         ]}
-        onSave={(v) => setSuratMasuk(prev => [{ no: v.no || "-", tgl: v.tgl || "-", perihal: v.perihal || "-", dari: v.dari || "-", disposisi: v.disposisi || "Diproses", link: v.link || null }, ...prev])}
+        onSave={(v) => setSuratMasuk(prev => [{ no: v.no || "-", tgl: v.tgl || "-", perihal: v.perihal || "-", dari: v.dari || "-", disposisi: "Diterima", link: v.link || null }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Surat Keluar" && (
@@ -4269,13 +5281,21 @@ function SectionA({ subSection }: { subSection: string }) {
       {tambahModal === "Tambah Dokumen Arsip" && (
         <TambahFormModal title="Tambah Dokumen Arsip" fields={[
           { key:"nama",  label:"Nama Dokumen",            type:"text" },
-          { key:"unit",  label:"Unit Kerja",              type:"select", options:["Fak. Teknik","LPPM","BAAK","Sarpras","Keuangan","Kemahasiswaan","SPI","Humas"] },
+          { key:"unit",  label:"Unit Kerja",              type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD","SPI"] },
           { key:"tahun", label:"Tahun",                   type:"select", options:["2025","2024","2023","2022"] },
           { key:"tipe",  label:"Tipe Dokumen",            type:"select", options:["LHA","KKA","RTL","Notulen"] },
           { key:"link",  label:"Link Dokumen (Google Drive)", type:"url" },
         ]}
         onSave={(v) => setArsipBase(prev => [{ nama: v.nama || "-", unit: v.unit || "-", tahun: v.tahun || "-", tipe: v.tipe || "-", tipeIcon: v.tipe || "-", link: v.link || "#" }, ...prev])}
         onClose={() => setTambahModal(null)} />
+      )}
+      {pendingDelete && (
+        <ConfirmModal
+          message={pendingDelete.msg}
+          confirmLabel={pendingDelete.confirmLabel}
+          onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
       )}
     </div>
   );
@@ -4286,6 +5306,7 @@ function SectionB({ subSection }: { subSection: string }) {
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
   const [tambahModal, setTambahModal] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
   const levelBadge = (l: string) =>
     l === "Tinggi" ? "bg-red-50 text-red-600" : l === "Sedang" ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600";
 
@@ -4293,30 +5314,142 @@ function SectionB({ subSection }: { subSection: string }) {
     { no: 1, unit: "BAAK",               kategori: "Layanan Akademik", terakhir: "Apr 2024", frekuensi: "Tahunan",    risiko: "Sedang", status: "Aktif" },
     { no: 2, unit: "LPPM",               kategori: "Penelitian",       terakhir: "Mar 2025", frekuensi: "Tahunan",    risiko: "Rendah", status: "Aktif" },
     { no: 3, unit: "Sarpras",            kategori: "Infrastruktur",    terakhir: "Jan 2025", frekuensi: "Semesteran", risiko: "Tinggi", status: "Aktif" },
-    { no: 4, unit: "Keuangan & Akunt.",  kategori: "Keuangan",         terakhir: "Feb 2025", frekuensi: "Semesteran", risiko: "Tinggi", status: "Aktif" },
-    { no: 5, unit: "Humas & Marketing",  kategori: "Promosi",          terakhir: "Okt 2024", frekuensi: "2 Tahunan",  risiko: "Rendah", status: "Aktif" },
+    { no: 4, unit: "BAUK",               kategori: "Keuangan",         terakhir: "Feb 2025", frekuensi: "Semesteran", risiko: "Tinggi", status: "Aktif" },
+    { no: 5, unit: "Marcomm",            kategori: "Promosi",          terakhir: "Okt 2024", frekuensi: "2 Tahunan",  risiko: "Rendah", status: "Aktif" },
     { no: 6, unit: "Fak. Teknik",        kategori: "Akademik",         terakhir: "Mei 2025", frekuensi: "Tahunan",    risiko: "Sedang", status: "Aktif" },
-    { no: 7, unit: "Fak. Hukum",         kategori: "Akademik",         terakhir: "Des 2024", frekuensi: "Tahunan",    risiko: "Sedang", status: "Aktif" },
-    { no: 8, unit: "Kemahasiswaan",       kategori: "Layanan Mhs",      terakhir: "Sep 2024", frekuensi: "2 Tahunan",  risiko: "Rendah", status: "Tidak Aktif" },
+    { no: 7, unit: "Marcomm",            kategori: "Akademik",         terakhir: "Des 2024", frekuensi: "Tahunan",    risiko: "Sedang", status: "Aktif" },
+    { no: 8, unit: "LPM",                kategori: "Layanan Mhs",      terakhir: "Sep 2024", frekuensi: "2 Tahunan",  risiko: "Rendah", status: "Tidak Aktif" },
   ]);
 
   const [pkptData, setPkptData] = useState([
     { no: 1, program: "Audit Kinerja Akademik",       unit: "BAAK",              periode: "Q1 2025", ketua: "Budi Santoso",  anggaran: 18.5, status: "Selesai"      },
     { no: 2, program: "Audit Kepatuhan LPPM",          unit: "LPPM",              periode: "Q1 2025", ketua: "Ratna Dewi",    anggaran: 12.0, status: "Selesai"      },
     { no: 3, program: "Audit Keuangan Sarpras",        unit: "Sarpras",           periode: "Q2 2025", ketua: "Budi Santoso",  anggaran: 22.0, status: "Berjalan"     },
-    { no: 4, program: "Audit SOP Kemahasiswaan",       unit: "Kemahasiswaan",     periode: "Q2 2025", ketua: "Andi Prasetyo", anggaran: 9.5,  status: "Direncanakan" },
+    { no: 4, program: "Audit SOP Kemahasiswaan",       unit: "LPM",               periode: "Q2 2025", ketua: "Andi Prasetyo", anggaran: 9.5,  status: "Direncanakan" },
     { no: 5, program: "Audit Kinerja Fak. Teknik",    unit: "Fak. Teknik",       periode: "Q3 2025", ketua: "Ratna Dewi",    anggaran: 15.0, status: "Direncanakan" },
-    { no: 6, program: "Audit Kepatuhan Keuangan",      unit: "Keuangan & Akunt.", periode: "Q3 2025", ketua: "Budi Santoso",  anggaran: 20.0, status: "Direncanakan" },
+    { no: 6, program: "Audit Kepatuhan Keuangan",      unit: "BAUK",              periode: "Q3 2025", ketua: "Budi Santoso",  anggaran: 20.0, status: "Direncanakan" },
   ]);
 
   const [riskData, setRiskData] = useState([
-    { no: 1, id: "RSK-001", uraian: "Ketidaksesuaian laporan keuangan",       kategori: "Keuangan",    kemungkinan: 4, dampak: 5, pengendalian: "Rekonsiliasi bulanan", status: "Terbuka"  },
-    { no: 2, id: "RSK-002", uraian: "Pengelolaan aset tidak tercatat",         kategori: "Aset",         kemungkinan: 4, dampak: 4, pengendalian: "Inventarisasi rutin",   status: "Terbuka"  },
-    { no: 3, id: "RSK-003", uraian: "SOP penerimaan mahasiswa tidak dipatuhi", kategori: "Kepatuhan",    kemungkinan: 3, dampak: 4, pengendalian: "Review SOP tahunan",    status: "Proses"   },
-    { no: 4, id: "RSK-004", uraian: "Dokumentasi penelitian tidak lengkap",    kategori: "Operasional",  kemungkinan: 3, dampak: 3, pengendalian: "Checklist dokumen",     status: "Proses"   },
-    { no: 5, id: "RSK-005", uraian: "Keterlambatan pelaporan RTL",             kategori: "Kepatuhan",    kemungkinan: 3, dampak: 3, pengendalian: "Monitoring mingguan",   status: "Proses"   },
-    { no: 6, id: "RSK-006", uraian: "Akses sistem informasi tidak terkontrol", kategori: "Teknologi",    kemungkinan: 2, dampak: 4, pengendalian: "Review hak akses",      status: "Selesai"  },
-    { no: 7, id: "RSK-007", uraian: "Pengelolaan data alumni tidak terstruktur",kategori: "Operasional", kemungkinan: 2, dampak: 2, pengendalian: "SOP pengelolaan data",  status: "Selesai"  },
+    {
+      no: 1, id: "RSK-001", unit: "BAUK", uraian: "Ketidakakuratan pelaporan keuangan",
+      penyebab: "SDM akuntansi terbatas; sistem informasi keuangan belum terintegrasi.",
+      dampakDesc: "Opini audit disclaimer, sanksi BPK/BPKP, kerugian reputasi institusi.",
+      kategori: "Keuangan", kemungkinan: 4, dampak: 5,
+      pengendalian: "Rekonsiliasi bulanan, review 4 mata, validasi laporan oleh kepala bagian.",
+      efektivitas: "Cukup", kemungkinanResidual: 2, dampakResidual: 4,
+      rencanamitigasi: "Implementasi sistem ERP terintegrasi Q3 2025; pelatihan akuntansi triwulanan.",
+      pic: "Budi Santoso", target: "Des 2025", periode: "Q2 2025", status: "Proses",
+      progress: 45, tanggalReview: "15 Mei 2025",
+      catatanSPI: "Rekonsiliasi sudah berjalan rutin, masih ada selisih minor. Perlu peningkatan kompetensi SDM keuangan.",
+      buktiPengendalian: "https://drive.google.com/file/rekonsiliasi-bauk-q2-2025",
+      riwayat: [
+        { tgl: "15 Mei 2025", catatan: "Review Q2 — rekonsiliasi sudah berjalan, selisih berkurang 30%.", pic: "Budi Santoso" },
+        { tgl: "10 Feb 2025", catatan: "Identifikasi awal — selisih laporan ditemukan saat audit Q4 2024.", pic: "Ratna Dewi" },
+      ],
+    },
+    {
+      no: 2, id: "RSK-002", unit: "Sarpras", uraian: "Kerusakan aset tetap tidak terpantau",
+      penyebab: "Tidak ada sistem pemeliharaan preventif; inventaris aset tidak diperbarui.",
+      dampakDesc: "Gangguan operasional perkuliahan, biaya perbaikan darurat tinggi, risiko keselamatan.",
+      kategori: "Aset", kemungkinan: 4, dampak: 4,
+      pengendalian: "Inspeksi fisik semesteran oleh tim Sarpras.",
+      efektivitas: "Kurang", kemungkinanResidual: 3, dampakResidual: 3,
+      rencanamitigasi: "Penerapan CMMS; pembaruan SIMAK-BMN; SOP pemeliharaan preventif bulanan.",
+      pic: "Ratna Dewi", target: "Sep 2025", periode: "Q2 2025", status: "Terlambat",
+      progress: 20, tanggalReview: "10 Apr 2025",
+      catatanSPI: "Target Q1 terlewat. Proses tender CMMS belum dimulai. Perlu eskalasi ke Wakil Rektor II.",
+      buktiPengendalian: null,
+      riwayat: [
+        { tgl: "10 Apr 2025", catatan: "Review Q1 — progress tertinggal dari jadwal, belum ada tindak lanjut konkret.", pic: "Ratna Dewi" },
+        { tgl: "5 Jan 2025",  catatan: "Risiko diidentifikasi dari temuan audit Sarpras 2024.", pic: "Budi Santoso" },
+      ],
+    },
+    {
+      no: 3, id: "RSK-003", unit: "BAAK", uraian: "SOP penerimaan mahasiswa tidak dipatuhi",
+      penyebab: "SOP belum disosialisasikan ke seluruh staf; rotasi pegawai tinggi.",
+      dampakDesc: "Pelanggaran regulasi, komplain mahasiswa, risiko akreditasi program studi.",
+      kategori: "Kepatuhan", kemungkinan: 3, dampak: 4,
+      pengendalian: "Review SOP tahunan dan pelatihan orientasi staf baru.",
+      efektivitas: "Cukup", kemungkinanResidual: 2, dampakResidual: 3,
+      rencanamitigasi: "Revisi dan sosialisasi SOP PMB Q2 2025; monitoring kepatuhan bulanan.",
+      pic: "Andi Prasetyo", target: "Jun 2025", periode: "Q1 2025", status: "Proses",
+      progress: 60, tanggalReview: "20 Mei 2025",
+      catatanSPI: "Revisi SOP sudah selesai; sosialisasi ke staf dijadwalkan 10 Juni 2025.",
+      buktiPengendalian: "https://drive.google.com/file/sop-pmb-revisi-2025",
+      riwayat: [
+        { tgl: "20 Mei 2025", catatan: "Revisi SOP selesai, jadwal sosialisasi ditetapkan.", pic: "Andi Prasetyo" },
+        { tgl: "15 Mar 2025", catatan: "Temuan audit Q1 — 3 dari 10 proses PMB tidak sesuai SOP.", pic: "Ratna Dewi" },
+      ],
+    },
+    {
+      no: 4, id: "RSK-004", unit: "LPPM", uraian: "Dokumentasi penelitian tidak lengkap",
+      penyebab: "Kurangnya pemahaman dosen terhadap standar dokumentasi; sistem pelaporan manual.",
+      dampakDesc: "Risiko saat akreditasi lembaga penelitian; dana penelitian tidak dapat dipertanggungjawabkan.",
+      kategori: "Operasional", kemungkinan: 3, dampak: 3,
+      pengendalian: "Checklist dokumen penelitian & validasi saat pencairan dana.",
+      efektivitas: "Cukup", kemungkinanResidual: 2, dampakResidual: 2,
+      rencanamitigasi: "Pengembangan sistem informasi penelitian terintegrasi; pelatihan dokumentasi.",
+      pic: "Siti Aisyah", target: "Agt 2025", periode: "Q2 2025", status: "Proses",
+      progress: 50, tanggalReview: "5 Mei 2025",
+      catatanSPI: "Checklist sudah diterapkan di 70% penelitian aktif. Sistem informasi masih dalam pengembangan.",
+      buktiPengendalian: "https://drive.google.com/file/checklist-penelitian-lppm-2025",
+      riwayat: [
+        { tgl: "5 Mei 2025",  catatan: "Monitoring tengah tahun — checklist berjalan, cakupan 70%.", pic: "Siti Aisyah" },
+        { tgl: "20 Jan 2025", catatan: "Identifikasi risiko dari evaluasi laporan penelitian 2024.", pic: "Budi Santoso" },
+      ],
+    },
+    {
+      no: 5, id: "RSK-005", unit: "SPI", uraian: "Keterlambatan pelaporan tindak lanjut (RTL)",
+      penyebab: "Koordinasi lintas unit lemah; kurangnya monitoring proaktif oleh SPI.",
+      dampakDesc: "Akumulasi rekomendasi tidak ditindaklanjuti; penilaian negatif dari auditor eksternal.",
+      kategori: "Kepatuhan", kemungkinan: 3, dampak: 3,
+      pengendalian: "Monitoring RTL mingguan via sistem informasi SPI.",
+      efektivitas: "Cukup", kemungkinanResidual: 2, dampakResidual: 2,
+      rencanamitigasi: "Penerapan dashboard RTL real-time; reminder otomatis H-7 sebelum deadline.",
+      pic: "Budi Santoso", target: "Sep 2025", periode: "Q2 2025", status: "Proses",
+      progress: 65, tanggalReview: "18 Mei 2025",
+      catatanSPI: "Dashboard sudah digunakan sejak April. Keterlambatan turun 40% dibanding Q4 2024.",
+      buktiPengendalian: "https://drive.google.com/file/laporan-monitoring-rtl-mei-2025",
+      riwayat: [
+        { tgl: "18 Mei 2025", catatan: "Dashboard RTL aktif; reminder sudah berjalan otomatis.", pic: "Budi Santoso" },
+        { tgl: "10 Feb 2025", catatan: "Diidentifikasi: 8 RTL terlambat dari Q4 2024.", pic: "Ratna Dewi" },
+      ],
+    },
+    {
+      no: 6, id: "RSK-006", unit: "TI/Sistem", uraian: "Akses sistem informasi tidak terkontrol",
+      penyebab: "Tidak ada kebijakan manajemen hak akses; akun ex-pegawai belum dinonaktifkan.",
+      dampakDesc: "Kebocoran data sensitif, manipulasi data akademik/keuangan.",
+      kategori: "Teknologi", kemungkinan: 2, dampak: 4,
+      pengendalian: "Review hak akses semesteran; audit log akses sistem.",
+      efektivitas: "Efektif", kemungkinanResidual: 1, dampakResidual: 3,
+      rencanamitigasi: "Kebijakan IAM formal; otomasi penonaktifan akun saat off-boarding.",
+      pic: "Andi Prasetyo", target: "Jun 2025", periode: "Q1 2025", status: "Selesai",
+      progress: 100, tanggalReview: "30 Apr 2025",
+      catatanSPI: "Review hak akses selesai. 12 akun tidak aktif sudah dinonaktifkan. Kebijakan IAM disahkan.",
+      buktiPengendalian: "https://drive.google.com/file/kebijakan-iam-2025-signed",
+      riwayat: [
+        { tgl: "30 Apr 2025", catatan: "Pengendalian selesai — kebijakan IAM resmi berlaku.", pic: "Andi Prasetyo" },
+        { tgl: "15 Mar 2025", catatan: "Review hak akses — 12 akun tidak aktif ditemukan.", pic: "Andi Prasetyo" },
+        { tgl: "5 Jan 2025",  catatan: "Identifikasi risiko dari audit IT Q4 2024.", pic: "Budi Santoso" },
+      ],
+    },
+    {
+      no: 7, id: "RSK-007", unit: "BAKPU", uraian: "Pengelolaan data kepegawaian tidak akurat",
+      penyebab: "Data ganda dan tidak terkini di SIMPEG; proses validasi manual.",
+      dampakDesc: "Kesalahan penggajian, tunjangan tidak tepat sasaran, risiko hukum ketenagakerjaan.",
+      kategori: "Operasional", kemungkinan: 3, dampak: 3,
+      pengendalian: "Rekonsiliasi data kepegawaian triwulanan.",
+      efektivitas: "Cukup", kemungkinanResidual: 2, dampakResidual: 2,
+      rencanamitigasi: "Integrasi SIMPEG dengan sistem penggajian; validasi data tahunan.",
+      pic: "Siti Aisyah", target: "Des 2025", periode: "Q2 2025", status: "Belum Ditindaklanjuti",
+      progress: 0, tanggalReview: "—",
+      catatanSPI: "Risiko baru diidentifikasi dari temuan audit BAKPU Mei 2025. Rencana tindak lanjut sedang disusun.",
+      buktiPengendalian: null,
+      riwayat: [
+        { tgl: "10 Mei 2025", catatan: "Identifikasi risiko dari temuan audit BAKPU. Menunggu rencana mitigasi formal.", pic: "Ratna Dewi" },
+      ],
+    },
   ]);
 
   const pkptStat = [
@@ -4326,36 +5459,21 @@ function SectionB({ subSection }: { subSection: string }) {
     { label: "Direncanakan",  val: 3,  color: "text-amber-600" },
   ];
 
+  // Risk Register state
+  const [rrSearch,       setRrSearch]       = useState("");
+  const [rrFilterUnit,   setRrFilterUnit]   = useState("Semua");
+  const [rrFilterKat,    setRrFilterKat]    = useState("Semua");
+  const [rrFilterLevel,  setRrFilterLevel]  = useState("Semua");
+  const [rrFilterStatus, setRrFilterStatus] = useState("Semua");
+  const [rrFilterPIC,    setRrFilterPIC]    = useState("Semua");
+  const [rrFilterPeriode,setRrFilterPeriode]= useState("Semua");
+  const [rrDetailId,     setRrDetailId]     = useState<string | null>(null);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Audit Universe */}
       {active === "Audit Universe" && (
         <div className="flex flex-col gap-4">
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <h4 className="text-xs font-bold text-gray-700">🫧 Audit Universe — Risiko × Dampak × Temuan</h4>
-              <span className="text-[10px] text-gray-400">Ukuran = jumlah temuan</span>
-            </div>
-            <ResponsiveContainer width="100%" height={180}>
-              <ScatterChart margin={{ top: 8, right: 16, left: -16, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis type="number" dataKey="risiko" name="Tingkat Risiko" domain={[0, 5]} tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} label={{ value: "Risiko →", position: "insideBottomRight", offset: 0, style: { fontSize: 9, fill: "#94a3b8" } }} />
-                <YAxis type="number" dataKey="dampak" name="Dampak" domain={[0, 6]} tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} label={{ value: "Dampak", angle: -90, position: "insideLeft", style: { fontSize: 9, fill: "#94a3b8" } }} />
-                <ZAxis type="number" dataKey="temuan" range={[40, 400]} name="Temuan" />
-                <Tooltip cursor={{ strokeDasharray: "3 3" }} contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} formatter={((val: unknown, name: unknown) => [`${val}`, `${name ?? ""}`]) as never} />
-                <Scatter data={auditUniverseBubble} fill="var(--tsu-teal)" fillOpacity={0.7}>
-                  {auditUniverseBubble.map((entry, i) => (
-                    <Cell key={i} fill={entry.risiko >= 4 ? "#ef4444" : entry.risiko >= 3 ? "#f5a623" : "#0e8080"} fillOpacity={0.75} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
-            <div className="flex gap-3 justify-center mt-1">
-              {[{c:"#ef4444",l:"Risiko Tinggi (≥4)"},{c:"#f5a623",l:"Risiko Sedang (3)"},{c:"#0e8080",l:"Risiko Rendah (<3)"}].map(lg=>(
-                <div key={lg.l} className="flex items-center gap-1"><span className="w-2 h-2 rounded-full flex-shrink-0" style={{background:lg.c}}/><span className="text-[9px] text-gray-400">{lg.l}</span></div>
-              ))}
-            </div>
-          </div>
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs font-bold text-gray-700">Daftar Audit Universe</h4>
@@ -4382,7 +5500,7 @@ function SectionB({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${u.status === "Aktif" ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>{u.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
                         {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        {canEdit && <button onClick={() => setUniverseData(prev => prev.filter(x => x.no !== u.no))} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
+                        {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus unit "${u.unit}" dari Audit Universe?`, fn: () => setUniverseData(prev => prev.filter(x => x.no !== u.no)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
                       </div></td>
                     </tr>
                   ))}
@@ -4442,52 +5560,341 @@ function SectionB({ subSection }: { subSection: string }) {
       )}
 
       {/* Risk Register */}
-      {active === "Risk Register" && (
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h4 className="text-xs font-bold text-gray-700">Risk Register</h4>
-              <p className="text-[10px] text-gray-400 mt-0.5">Skor = Kemungkinan × Dampak</p>
+      {active === "Risk Register" && (() => {
+        const riskLevel = (k: number, d: number) => { const s = k*d; return s >= 15 ? "Tinggi" : s >= 9 ? "Sedang" : "Rendah"; };
+        const levelColor = (l: string) => l === "Tinggi" ? { dot: "#ef4444", bg: "bg-red-50",   text: "text-red-600"   }
+                                        : l === "Sedang"  ? { dot: "#f59e0b", bg: "bg-amber-50", text: "text-amber-600" }
+                                        :                   { dot: "#22c55e", bg: "bg-green-50", text: "text-green-600" };
+        const statusColor = (s: string) =>
+          s === "Selesai"               ? "bg-green-50 text-green-600" :
+          s === "Proses"                ? "bg-blue-50 text-blue-600"   :
+          s === "Terlambat"             ? "bg-red-50 text-red-600"     :
+          s === "Belum Ditindaklanjuti" ? "bg-gray-100 text-gray-500"  : "bg-amber-50 text-amber-600";
+
+        const allUnits   = ["Semua", ...Array.from(new Set(riskData.map(r => r.unit)))];
+        const allKat     = ["Semua", ...Array.from(new Set(riskData.map(r => r.kategori)))];
+        const allPIC     = ["Semua", ...Array.from(new Set(riskData.map(r => r.pic)))];
+        const allPeriode = ["Semua", ...Array.from(new Set(riskData.map(r => r.periode)))];
+
+        const filtered = riskData.filter(r => {
+          const level = riskLevel(r.kemungkinan, r.dampak);
+          return (
+            (rrFilterUnit   === "Semua" || r.unit     === rrFilterUnit)   &&
+            (rrFilterKat    === "Semua" || r.kategori === rrFilterKat)    &&
+            (rrFilterLevel  === "Semua" || level      === rrFilterLevel)  &&
+            (rrFilterStatus === "Semua" || r.status   === rrFilterStatus) &&
+            (rrFilterPIC    === "Semua" || r.pic      === rrFilterPIC)    &&
+            (rrFilterPeriode=== "Semua" || r.periode  === rrFilterPeriode)&&
+            (rrSearch === "" || r.uraian.toLowerCase().includes(rrSearch.toLowerCase()) || r.id.toLowerCase().includes(rrSearch.toLowerCase()) || r.unit.toLowerCase().includes(rrSearch.toLowerCase()))
+          );
+        });
+
+        const countLevel = (l: string) => riskData.filter(r => riskLevel(r.kemungkinan, r.dampak) === l).length;
+        const detailRisk = rrDetailId ? riskData.find(r => r.id === rrDetailId) : null;
+
+        return (
+          <div className="flex flex-col gap-4">
+            {/* Summary strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Total Risiko",  val: riskData.length, colorTxt: "text-gray-800",   bg: "bg-white" },
+                { label: "Risiko Tinggi", val: countLevel("Tinggi"), colorTxt: "text-red-600",   bg: "bg-red-50",   border: "border-red-100"   },
+                { label: "Risiko Sedang", val: countLevel("Sedang"), colorTxt: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+                { label: "Risiko Rendah", val: countLevel("Rendah"), colorTxt: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
+              ].map(s => (
+                <div key={s.label} className={`rounded-xl border p-3 shadow-sm flex items-center gap-3 ${s.bg} ${(s as any).border ?? "border-gray-100"}`}>
+                  <div className={`text-2xl font-black ${s.colorTxt}`}>{s.val}</div>
+                  <div className="text-[9px] font-semibold text-gray-500 leading-tight">{s.label}</div>
+                </div>
+              ))}
             </div>
-            {canEdit && <button onClick={() => setTambahModal("Tambah Risiko")} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>+ Tambah Risiko</button>}
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  {["No","ID","Uraian Risiko","Kategori","Kemung.","Dampak","Skor","Level","Pengendalian","Status","Aksi"].map(h=>(
-                    <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {riskData.map(r=>{
-                  const skor = r.kemungkinan * r.dampak;
-                  const level = skor >= 15 ? "Tinggi" : skor >= 9 ? "Sedang" : "Rendah";
-                  return (
-                    <tr key={r.no} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                      <td className="py-2 pr-3 text-[10px] text-gray-400">{r.no}</td>
-                      <td className="py-2 pr-3 text-[10px] font-mono text-gray-500">{r.id}</td>
-                      <td className="py-2 pr-3 text-gray-700 max-w-[160px]">{r.uraian}</td>
-                      <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.kategori}</td>
-                      <td className="py-2 pr-3 text-center font-semibold text-gray-700">{r.kemungkinan}</td>
-                      <td className="py-2 pr-3 text-center font-semibold text-gray-700">{r.dampak}</td>
-                      <td className="py-2 pr-3 text-center font-black" style={{ color: level === "Tinggi" ? "#ef4444" : level === "Sedang" ? "#f59e0b" : "#22c55e" }}>{skor}</td>
-                      <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${levelBadge(level)}`}>{level}</span></td>
-                      <td className="py-2 pr-3 text-gray-500 max-w-[140px] truncate">{r.pengendalian}</td>
-                      <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status === "Selesai" ? "bg-green-50 text-green-600" : r.status === "Proses" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"}`}>{r.status}</span></td>
-                      <td className="py-2"><div className="flex gap-1">
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        {canEdit && <button onClick={() => setRiskData(prev => prev.filter(x => x.id !== r.id))} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
-                      </div></td>
+
+            {/* Filters + Search */}
+            <div className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm">
+              <div className="flex flex-wrap gap-2 items-center">
+                <input value={rrSearch} onChange={e => setRrSearch(e.target.value)}
+                  placeholder="Cari ID, uraian, unit…"
+                  className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-teal-400 flex-1 min-w-[160px]" />
+                {[
+                  { label:"Unit",     val: rrFilterUnit,    opts: allUnits,                                          set: setRrFilterUnit   },
+                  { label:"Kategori", val: rrFilterKat,     opts: allKat,                                            set: setRrFilterKat    },
+                  { label:"Level",    val: rrFilterLevel,   opts: ["Semua","Tinggi","Sedang","Rendah"],               set: setRrFilterLevel  },
+                  { label:"Status",   val: rrFilterStatus,  opts: ["Semua","Belum Ditindaklanjuti","Proses","Terlambat","Selesai"], set: setRrFilterStatus },
+                  { label:"PIC",      val: rrFilterPIC,     opts: allPIC,                                            set: setRrFilterPIC    },
+                  { label:"Periode",  val: rrFilterPeriode, opts: allPeriode,                                        set: setRrFilterPeriode},
+                ].map(f => (
+                  <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)}
+                    className="border border-gray-200 rounded-lg px-2 py-1.5 text-[10px] text-gray-600 focus:outline-none focus:border-teal-400 bg-white">
+                    {f.opts.map(o => <option key={o}>{o === "Semua" ? `${f.label}: Semua` : o}</option>)}
+                  </select>
+                ))}
+                {(rrSearch || rrFilterUnit !== "Semua" || rrFilterKat !== "Semua" || rrFilterLevel !== "Semua" || rrFilterStatus !== "Semua" || rrFilterPIC !== "Semua" || rrFilterPeriode !== "Semua") && (
+                  <button onClick={() => { setRrSearch(""); setRrFilterUnit("Semua"); setRrFilterKat("Semua"); setRrFilterLevel("Semua"); setRrFilterStatus("Semua"); setRrFilterPIC("Semua"); setRrFilterPeriode("Semua"); }}
+                    className="text-[10px] font-semibold px-2 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 whitespace-nowrap">
+                    ✕ Reset
+                  </button>
+                )}
+                <div className="ml-auto flex-shrink-0">
+                  {canEdit && (
+                    <button onClick={() => setTambahModal("Tambah Risiko")}
+                      className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white flex items-center gap-1" style={{ background: "var(--tsu-teal)" }}>
+                      + Tambah Risiko
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="text-[9px] text-gray-400 mt-2">{filtered.length} dari {riskData.length} risiko ditampilkan · Skor = Kemungkinan × Dampak (1–5)</div>
+            </div>
+
+            {/* Table */}
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100">
+                      {["ID Risiko","Unit/Bagian","Uraian Risiko","Kategori","Skor Awal","Level","Pengendalian","Skor Residual","PIC","Target","Status","Aksi"].map(h => (
+                        <th key={h} className="text-left text-[10px] font-bold text-gray-400 px-3 py-2.5 whitespace-nowrap">{h}</th>
+                      ))}
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 && (
+                      <tr><td colSpan={12} className="px-4 py-8 text-center text-[10px] text-gray-400">Tidak ada risiko yang cocok dengan filter.</td></tr>
+                    )}
+                    {filtered.map(r => {
+                      const skor    = r.kemungkinan * r.dampak;
+                      const level   = riskLevel(r.kemungkinan, r.dampak);
+                      const lc      = levelColor(level);
+                      const skorRes = r.kemungkinanResidual * r.dampakResidual;
+                      const levelRes= riskLevel(r.kemungkinanResidual, r.dampakResidual);
+                      const lcRes   = levelColor(levelRes);
+                      return (
+                        <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                          <td className="px-3 py-2.5 font-mono text-[10px] text-gray-500 whitespace-nowrap">{r.id}</td>
+                          <td className="px-3 py-2.5 text-gray-600 whitespace-nowrap text-[10px]">{r.unit}</td>
+                          <td className="px-3 py-2.5 text-gray-700 max-w-[180px]">
+                            <div className="flex items-start gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1" style={{ background: lc.dot }} />
+                              <span className="truncate" title={r.uraian}>{r.uraian}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="text-[9px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{r.kategori}</span>
+                          </td>
+                          <td className="px-3 py-2.5 text-center">
+                            <span className="text-xs font-black" style={{ color: lc.dot }}>{skor}</span>
+                            <div className="text-[8px] text-gray-400">{r.kemungkinan}×{r.dampak}</div>
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lc.bg} ${lc.text}`}>{level}</span>
+                          </td>
+                          <td className="px-3 py-2.5 text-gray-500 max-w-[140px] truncate text-[10px]" title={r.pengendalian}>{r.pengendalian}</td>
+                          <td className="px-3 py-2.5 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <span className="text-xs font-black" style={{ color: lcRes.dot }}>{skorRes}</span>
+                              <span className={`text-[8px] font-bold px-1 py-0.5 rounded ${lcRes.bg} ${lcRes.text}`}>{levelRes}</span>
+                            </div>
+                            <div className="text-[8px] text-gray-400">{r.kemungkinanResidual}×{r.dampakResidual}</div>
+                          </td>
+                          <td className="px-3 py-2.5 text-gray-600 whitespace-nowrap text-[10px]">{r.pic.split(" ")[0]}</td>
+                          <td className="px-3 py-2.5 text-gray-500 whitespace-nowrap text-[10px]">{r.target}</td>
+                          <td className="px-3 py-2.5">
+                            <div className="flex flex-col gap-0.5">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full inline-block ${statusColor(r.status)}`}>{r.status}</span>
+                              {r.progress > 0 && (
+                                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden mt-0.5">
+                                  <div className="h-1 rounded-full" style={{ width: `${r.progress}%`, background: r.status === "Selesai" ? "#22c55e" : r.status === "Terlambat" ? "#ef4444" : "var(--tsu-teal)" }} />
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <div className="flex items-center gap-1">
+                              {/* Detail */}
+                              <button title="Lihat Detail" onClick={() => setRrDetailId(r.id)}
+                                className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-500 transition-colors">
+                                <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5"/></svg>
+                              </button>
+                              {/* Edit */}
+                              {canEdit && (
+                                <button title="Edit Risiko" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                                  <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
+                                </button>
+                              )}
+                              {/* Hapus */}
+                              {canEdit && (
+                                <button title="Hapus Risiko" onClick={() => setPendingDelete({ msg: `Hapus risiko "${r.id} — ${r.uraian.slice(0,40)}"?`, fn: () => setRiskData(prev => prev.filter(x => x.id !== r.id)) })}
+                                  className="w-7 h-7 flex items-center justify-center rounded-lg border border-red-100 hover:bg-red-50 hover:border-red-200 text-red-300 hover:text-red-500 transition-colors">
+                                  <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3,4 13,4"/><path d="M5 4V3h6v1"/><path d="M4 4l1 9h6l1-9"/></svg>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Detail Drawer */}
+            {detailRisk && (() => {
+              const skor    = detailRisk.kemungkinan * detailRisk.dampak;
+              const level   = riskLevel(detailRisk.kemungkinan, detailRisk.dampak);
+              const lc      = levelColor(level);
+              const skorRes = detailRisk.kemungkinanResidual * detailRisk.dampakResidual;
+              const levelRes= riskLevel(detailRisk.kemungkinanResidual, detailRisk.dampakResidual);
+              const lcRes   = levelColor(levelRes);
+              const efektivitasColor = detailRisk.efektivitas === "Efektif" ? "bg-green-50 text-green-600" : detailRisk.efektivitas === "Cukup" ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600";
+              return (
+                <div className="fixed inset-0 z-50 flex" style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setRrDetailId(null)}>
+                  <div className="ml-auto bg-white w-full max-w-xl h-full overflow-y-auto shadow-2xl flex flex-col"
+                    onClick={e => e.stopPropagation()}>
+                    {/* Drawer header */}
+                    <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0" style={{ background: lc.dot + "18" }}>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] font-bold text-gray-500">{detailRisk.id}</span>
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lc.bg} ${lc.text}`}>{level}</span>
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColor(detailRisk.status)}`}>{detailRisk.status}</span>
+                        </div>
+                        <div className="text-sm font-bold text-gray-800 leading-snug max-w-xs">{detailRisk.uraian}</div>
+                        <div className="text-[10px] text-gray-500 mt-1">{detailRisk.unit} · {detailRisk.kategori} · {detailRisk.periode}</div>
+                      </div>
+                      <button onClick={() => setRrDetailId(null)} className="text-gray-400 hover:text-gray-600 text-xl flex-shrink-0 ml-3">✕</button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
+                      {/* Skor perbandingan */}
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-2">Profil Risiko</div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className={`rounded-xl p-3 border ${lc.bg}`} style={{ borderColor: lc.dot + "40" }}>
+                            <div className="text-[8px] font-bold uppercase tracking-wider mb-1" style={{ color: lc.dot }}>Risiko Awal</div>
+                            <div className="text-2xl font-black" style={{ color: lc.dot }}>{skor}</div>
+                            <div className="text-[9px] text-gray-600 mt-0.5">K:{detailRisk.kemungkinan} × D:{detailRisk.dampak} · {level}</div>
+                          </div>
+                          <div className={`rounded-xl p-3 border ${lcRes.bg}`} style={{ borderColor: lcRes.dot + "40" }}>
+                            <div className="text-[8px] font-bold uppercase tracking-wider mb-1" style={{ color: lcRes.dot }}>Risiko Residual</div>
+                            <div className="text-2xl font-black" style={{ color: lcRes.dot }}>{skorRes}</div>
+                            <div className="text-[9px] text-gray-600 mt-0.5">K:{detailRisk.kemungkinanResidual} × D:{detailRisk.dampakResidual} · {levelRes}</div>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="text-[9px] text-gray-500">Penurunan skor:</div>
+                          <div className="font-bold text-[10px] text-green-600">−{skor - skorRes} poin ({Math.round((1 - skorRes/skor)*100)}%)</div>
+                        </div>
+                      </div>
+
+                      {/* Identifikasi */}
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-2">Identifikasi Risiko</div>
+                        <div className="flex flex-col gap-2">
+                          <div className="rounded-xl p-3 bg-gray-50 border border-gray-100">
+                            <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Penyebab Risiko</div>
+                            <div className="text-[10px] text-gray-700 leading-relaxed">{detailRisk.penyebab}</div>
+                          </div>
+                          <div className="rounded-xl p-3 bg-red-50 border border-red-100">
+                            <div className="text-[8px] font-bold uppercase tracking-wider text-red-400 mb-1">Dampak Potensial</div>
+                            <div className="text-[10px] text-gray-700 leading-relaxed">{detailRisk.dampakDesc}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Pengendalian */}
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-2">Pengendalian & Mitigasi</div>
+                        <div className="flex flex-col gap-2">
+                          <div className="rounded-xl p-3 bg-teal-50 border border-teal-100">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="text-[8px] font-bold uppercase tracking-wider text-teal-600">Pengendalian Saat Ini</div>
+                              <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${efektivitasColor}`}>{detailRisk.efektivitas}</span>
+                            </div>
+                            <div className="text-[10px] text-gray-700 leading-relaxed">{detailRisk.pengendalian}</div>
+                          </div>
+                          <div className="rounded-xl p-3 bg-blue-50 border border-blue-100">
+                            <div className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mb-1">Rencana Mitigasi</div>
+                            <div className="text-[10px] text-gray-700 leading-relaxed">{detailRisk.rencanamitigasi}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Monitoring SPI */}
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-2">Monitoring SPI</div>
+                        <div className="rounded-xl border border-gray-100 overflow-hidden">
+                          <div className="px-4 py-3 bg-gray-50 flex items-center gap-4 flex-wrap">
+                            <div>
+                              <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">PIC</div>
+                              <div className="text-[10px] font-semibold text-gray-700">{detailRisk.pic}</div>
+                            </div>
+                            <div>
+                              <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Target</div>
+                              <div className="text-[10px] font-semibold text-gray-700">{detailRisk.target}</div>
+                            </div>
+                            <div>
+                              <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Review Terakhir</div>
+                              <div className="text-[10px] font-semibold text-gray-700">{detailRisk.tanggalReview}</div>
+                            </div>
+                            <div>
+                              <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Progress</div>
+                              <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal)" }}>{detailRisk.progress}%</div>
+                            </div>
+                          </div>
+                          {detailRisk.progress > 0 && (
+                            <div className="px-4 py-2 border-t border-gray-100">
+                              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-2 rounded-full transition-all" style={{ width: `${detailRisk.progress}%`, background: detailRisk.status === "Selesai" ? "#22c55e" : detailRisk.status === "Terlambat" ? "#ef4444" : "var(--tsu-teal)" }} />
+                              </div>
+                            </div>
+                          )}
+                          <div className="px-4 py-3 border-t border-gray-100">
+                            <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Catatan SPI</div>
+                            <div className="text-[10px] text-gray-600 leading-relaxed">{detailRisk.catatanSPI}</div>
+                          </div>
+                          {detailRisk.buktiPengendalian && (
+                            <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
+                              <div className="text-[8px] font-bold text-gray-400 uppercase tracking-wider">Bukti Pengendalian</div>
+                              <a href={detailRisk.buktiPengendalian} target="_blank" rel="noreferrer"
+                                className="flex items-center gap-1 text-[9px] font-semibold hover:opacity-80 transition-opacity" style={{ color: "var(--tsu-teal)" }}>
+                                <svg viewBox="0 0 16 16" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6.5 9.5a3.5 3.5 0 0 0 4.95 0l1.41-1.41a3.5 3.5 0 0 0-4.95-4.95L7.09 4.5"/><path d="M9.5 6.5a3.5 3.5 0 0 0-4.95 0L3.14 7.91a3.5 3.5 0 0 0 4.95 4.95L9.91 11.5"/></svg>
+                                Buka Dokumen ↗
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Riwayat tindak lanjut */}
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-2">Riwayat Tindak Lanjut</div>
+                        <div className="relative pl-4">
+                          <div className="absolute left-1 top-2 bottom-2 w-px bg-gray-200" />
+                          <div className="flex flex-col gap-3">
+                            {detailRisk.riwayat.map((h, i) => (
+                              <div key={i} className="relative">
+                                <div className="absolute -left-4 top-1.5 w-2 h-2 rounded-full border-2 border-gray-300 bg-white" style={i === 0 ? { borderColor: "var(--tsu-teal)", background: "var(--tsu-teal)" } : {}} />
+                                <div className="rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-[9px] font-bold text-gray-600">{h.tgl}</span>
+                                    <span className="text-[9px] text-gray-400">{h.pic}</span>
+                                  </div>
+                                  <div className="text-[10px] text-gray-600 leading-relaxed">{h.catatan}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
-        </div>
-      )}
+        );
+      })()}
       {tambahModal === "Tambah Unit Kerja" && (
         <TambahFormModal title="Tambah Unit Kerja" fields={[
           { key:"unit",      label:"Nama Unit Kerja",  type:"text" },
@@ -4501,7 +5908,7 @@ function SectionB({ subSection }: { subSection: string }) {
       {tambahModal === "Tambah Program Audit" && (
         <TambahFormModal title="Tambah Program Audit" fields={[
           { key:"program",  label:"Nama Program Audit", type:"text" },
-          { key:"unit",     label:"Unit Kerja",          type:"select", options:["BAAK","LPPM","Sarpras","Keuangan & Akunt.","Kemahasiswaan","Fak. Teknik","Fak. Hukum"] },
+          { key:"unit",     label:"Unit Kerja",          type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
           { key:"periode",  label:"Periode",             type:"text",   placeholder:"Q1 2025" },
           { key:"ketua",    label:"Ketua Tim Auditor",   type:"text" },
           { key:"anggaran", label:"Anggaran (Rp Jt)",    type:"text",   placeholder:"0.0" },
@@ -4511,15 +5918,52 @@ function SectionB({ subSection }: { subSection: string }) {
       )}
       {tambahModal === "Tambah Risiko" && (
         <TambahFormModal title="Tambah Risiko" fields={[
-          { key:"id",          label:"ID Risiko",            type:"text",   placeholder:"RSK-008" },
-          { key:"uraian",      label:"Uraian Risiko",        type:"textarea" },
-          { key:"kategori",    label:"Kategori",             type:"select", options:["Keuangan","Aset","Kepatuhan","Operasional","Teknologi"] },
-          { key:"kemungkinan", label:"Kemungkinan (1-5)",    type:"text",   placeholder:"1–5" },
-          { key:"dampak",      label:"Dampak (1-5)",         type:"text",   placeholder:"1–5" },
-          { key:"pengendalian",label:"Rencana Pengendalian", type:"text" },
+          { key:"id",                   label:"ID Risiko",                       type:"text",     placeholder:"RSK-008" },
+          { key:"unit",                 label:"Unit / Bagian",                   type:"select",   options:["BAAK","BAKPU","BAUK","Sarpras","SDM","LPPM","LPM","Marcomm","Fak. Teknik","Fak. Sains & Hum.","Fak. Vokasi","SPI","TI/Sistem"] },
+          { key:"uraian",               label:"Uraian Risiko",                   type:"textarea" },
+          { key:"kategori",             label:"Kategori",                        type:"select",   options:["Keuangan","Aset","Kepatuhan","Operasional","Teknologi"] },
+          { key:"kemungkinan",          label:"Kemungkinan Awal (1–5)",          type:"text",     placeholder:"1" },
+          { key:"dampak",               label:"Dampak Awal (1–5)",               type:"text",     placeholder:"1" },
+          { key:"pengendalian",         label:"Pengendalian yang Ada",           type:"text" },
+          { key:"kemungkinanResidual",  label:"Kemungkinan Residual (1–5)",      type:"text",     placeholder:"1" },
+          { key:"dampakResidual",       label:"Dampak Residual (1–5)",           type:"text",     placeholder:"1" },
+          { key:"pic",                  label:"PIC",                             type:"select",   options:["Budi Santoso","Ratna Dewi","Andi Prasetyo","Siti Aisyah"] },
+          { key:"target",               label:"Target Penyelesaian",             type:"text",     placeholder:"Des 2025" },
+          { key:"periode",              label:"Periode",                         type:"text",     placeholder:"Q2 2025" },
         ]}
-        onSave={(v) => setRiskData(prev => [{ no: prev.length + 1, id: v.id || `RSK-${String(prev.length + 1).padStart(3,"0")}`, uraian: v.uraian || "-", kategori: v.kategori || "-", kemungkinan: parseInt(v.kemungkinan) || 1, dampak: parseInt(v.dampak) || 1, pengendalian: v.pengendalian || "-", status: "Terbuka" }, ...prev])}
+        onSave={(v) => setRiskData(prev => [{
+          no: prev.length + 1,
+          id: v.id || `RSK-${String(prev.length + 1).padStart(3,"0")}`,
+          unit: v.unit || "-",
+          uraian: v.uraian || "-",
+          penyebab: "—",
+          dampakDesc: "—",
+          kategori: v.kategori || "-",
+          kemungkinan: Math.min(5, Math.max(1, parseInt(v.kemungkinan) || 1)),
+          dampak: Math.min(5, Math.max(1, parseInt(v.dampak) || 1)),
+          pengendalian: v.pengendalian || "-",
+          efektivitas: "Cukup",
+          kemungkinanResidual: Math.min(5, Math.max(1, parseInt(v.kemungkinanResidual) || 1)),
+          dampakResidual: Math.min(5, Math.max(1, parseInt(v.dampakResidual) || 1)),
+          rencanamitigasi: "—",
+          pic: v.pic || "-",
+          target: v.target || "-",
+          periode: v.periode || "-",
+          status: "Belum Ditindaklanjuti",
+          progress: 0,
+          tanggalReview: "—",
+          catatanSPI: "—",
+          buktiPengendalian: null,
+          riwayat: [],
+        }, ...prev])}
         onClose={() => setTambahModal(null)} />
+      )}
+      {pendingDelete && (
+        <ConfirmModal
+          message={pendingDelete.msg}
+          onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
       )}
     </div>
   );
@@ -4547,7 +5991,7 @@ function SectionC({ subSection }: { subSection: string }) {
     { no: 5, auditor: "Siti Aisyah",   program: "Audit Keuangan Sarpras",    unit: "Sarpras",       peran: "Anggota",   periode: "Apr–Jun 2025", beban: 40, status: "Berjalan" },
     { no: 6, auditor: "Ratna Dewi",    program: "Audit Kinerja Fak. Teknik", unit: "Fak. Teknik",   peran: "Ketua Tim", periode: "Q3 2025",      beban: 50, status: "Rencana"  },
     { no: 7, auditor: "Andi Prasetyo", program: "Audit Kinerja Fak. Teknik", unit: "Fak. Teknik",   peran: "Anggota",   periode: "Q3 2025",      beban: 35, status: "Rencana"  },
-    { no: 8, auditor: "Siti Aisyah",   program: "Audit Kepatuhan Keuangan",  unit: "Keuangan",      peran: "Anggota",   periode: "Q3 2025",      beban: 40, status: "Rencana"  },
+    { no: 8, auditor: "Siti Aisyah",   program: "Audit Kepatuhan Keuangan",  unit: "BAUK",          peran: "Anggota",   periode: "Q3 2025",      beban: 40, status: "Rencana"  },
   ];
 
   const [pelatihanData, setPelatihanData] = useState([
@@ -4911,6 +6355,7 @@ function SectionF({ subSection }: { subSection: string }) {
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
   const { rapatList, addRapat, batalkanRapat } = useContext(RapatCtx);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
   const today = 22;
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const [doneIds, setDoneIds] = useState<number[]>([]);
@@ -4929,9 +6374,9 @@ function SectionF({ subSection }: { subSection: string }) {
     { unit: "BAAK",              start: 1, dur: 2 },
     { unit: "LPPM",              start: 2, dur: 2 },
     { unit: "Sarpras",           start: 4, dur: 3 },
-    { unit: "Keuangan",          start: 5, dur: 3 },
+    { unit: "BAUK",              start: 5, dur: 3 },
     { unit: "Fak. Teknik",       start: 7, dur: 2 },
-    { unit: "Kemahasiswaan",     start: 9, dur: 2 },
+    { unit: "LPM",               start: 9, dur: 2 },
   ];
   const ganttData = siklusData.map(d => ({ name: d.unit, mulai: d.start, durasi: d.dur }));
 
@@ -5011,7 +6456,7 @@ function SectionF({ subSection }: { subSection: string }) {
                   <div className="flex gap-1 flex-shrink-0">
                     <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
                     {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                    {canEdit && <button onClick={() => batalkanRapat(r.id)} className="text-[9px] px-2 py-1 rounded border border-red-100 text-red-500 hover:bg-red-50">Batalkan</button>}
+                    {canEdit && <button onClick={() => setPendingDelete({ msg: `Batalkan rapat "${r.judul}"?`, fn: () => batalkanRapat(r.id) })} className="text-[9px] px-2 py-1 rounded border border-red-100 text-red-500 hover:bg-red-50">Batalkan</button>}
                   </div>
                 </div>
               ))}
@@ -5095,16 +6540,23 @@ function SectionF({ subSection }: { subSection: string }) {
           </div>
         </div>
       )}
-
+      {pendingDelete && (
+        <ConfirmModal
+          message={pendingDelete.msg}
+          confirmLabel="Ya, Batalkan"
+          onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   );
 }
 
-function TabBackoffice({ section, subSection }: { section: string; subSection: string }) {
+function TabBackoffice({ section, subSection, suratTabHint }: { section: string; subSection: string; suratTabHint?: "Masuk" | "Keluar" }) {
   return (
     <div className="flex flex-col gap-4">
       {section === "R" && <SectionRingkasan />}
-      {section === "A" && <SectionA subSection={subSection} />}
+      {section === "A" && <SectionA subSection={subSection} suratTabHint={suratTabHint} />}
       {section === "B" && <SectionB subSection={subSection} />}
       {section === "C" && <SectionC subSection={subSection} />}
       {section === "D" && <SectionD subSection={subSection} />}
@@ -5147,6 +6599,7 @@ function SectionG({ subSection }: { subSection: string }) {
     { no:10, komponen: "Lain-lain",     sub: "Langganan Aplikasi Audit",   jumlah: 15.0, sumber: "Internal", status: "Disetujui" },
   ]);
   const totalRencana = rencanaDetail.reduce((s, d) => s + d.jumlah, 0);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; confirmLabel?: string; fn: () => void } | null>(null);
 
   const realisasiDetail = komponenAnggaran.map(k => {
     const selisih = k.realisasi - k.rencana;
@@ -5212,7 +6665,7 @@ function SectionG({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status === "Disetujui" ? "bg-green-50 text-green-600" : r.status === "Revisi" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-500"}`}>{r.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
                         {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        {canEdit && <button onClick={() => setRencanaDetail(prev => prev.filter(x => x.no !== r.no))} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
+                        {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus "${r.komponen} – ${r.sub}"?`, fn: () => setRencanaDetail(prev => prev.filter(x => x.no !== r.no)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
                       </div></td>
                     </tr>
                   ))}
@@ -5381,6 +6834,14 @@ function SectionG({ subSection }: { subSection: string }) {
         }}
         onClose={() => setTambahModal(null)} />
       )}
+      {pendingDelete && (
+        <ConfirmModal
+          message={pendingDelete.msg}
+          confirmLabel={pendingDelete.confirmLabel}
+          onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   );
 }
@@ -5417,7 +6878,7 @@ const DEMO_USERS_EXT = [
   { id:2, nama:"Budi Santoso, S.E.",         email:"auditor@spi.tsu.ac.id",     role:"pengawasan", unit:"—",       jabatan:"Auditor Internal",    aktif:true },
   { id:3, nama:"Dewi Rahayu, A.Md.",         email:"backoffice@spi.tsu.ac.id",  role:"backoffice", unit:"—",       jabatan:"Staff Back Office",   aktif:true },
   { id:4, nama:"Ahmad Fauzi, S.Pd.",         email:"baak@auditee.tsu.ac.id",    role:"auditee",    unit:"BAAK",    jabatan:"Kabag BAAK",          aktif:true },
-  { id:5, nama:"Rina Kusuma, S.E.",          email:"keuangan@auditee.tsu.ac.id",role:"auditee",    unit:"Keuangan",jabatan:"Kabag Keuangan",      aktif:true },
+  { id:5, nama:"Rina Kusuma, S.E.",          email:"keuangan@auditee.tsu.ac.id",role:"auditee",    unit:"BAUK",    jabatan:"Kabag BAUK",          aktif:true },
   { id:6, nama:"Hendra Wijaya, S.T.",        email:"sarpras@auditee.tsu.ac.id", role:"auditee",    unit:"Sarpras", jabatan:"Kabag Sarpras",       aktif:true },
   { id:7, nama:"Siti Nurhaliza, M.Pd.",      email:"akademik@auditee.tsu.ac.id",role:"auditee",    unit:"Akademik",jabatan:"Kabag Akademik",      aktif:false },
 ];
@@ -5479,17 +6940,32 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
   const [profilSaved, setProfilSaved]   = useState(false);
   const [pwSaved, setPwSaved]           = useState(false);
   const [prefSaved, setPrefSaved]       = useState(false);
+  const [fotoPreview, setFotoPreview]   = useState<string | null>(null);
 
   function saveProfilHandler() {
     setProfilSaved(true);
     setTimeout(() => setProfilSaved(false), 2000);
   }
+  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => setFotoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  // Profil — jabatan & unit editable for full
+  const [jabatanEdit, setJabatanEdit] = useState(user.jabatan);
+  const [unitEdit, setUnitEdit]       = useState(user.unit ?? "");
 
   // Manajemen User
   const [userList, setUserList]           = useState(DEMO_USERS_EXT);
   const [showAddForm, setShowAddForm]     = useState(false);
   const [userFilter, setUserFilter]       = useState("semua");
   const [newUser, setNewUser]             = useState({ nama:"", email:"", role:"auditee", unit:"", jabatan:"" });
+  const [editUserId, setEditUserId]       = useState<number | null>(null);
+  const [editUserData, setEditUserData]   = useState({ nama:"", email:"", jabatan:"", unit:"", role:"" });
 
   const filteredUsers = userFilter === "semua" ? userList : userList.filter(u => u.role === userFilter);
 
@@ -5501,6 +6977,14 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
     setUserList(prev => [...prev, { ...newUser, id: prev.length + 1, aktif: true }]);
     setNewUser({ nama:"", email:"", role:"auditee", unit:"", jabatan:"" });
     setShowAddForm(false);
+  }
+  function startEditUser(u: typeof DEMO_USERS_EXT[0]) {
+    setEditUserId(u.id);
+    setEditUserData({ nama: u.nama, email: u.email, jabatan: u.jabatan, unit: u.unit, role: u.role });
+  }
+  function saveEditUser() {
+    setUserList(prev => prev.map(u => u.id === editUserId ? { ...u, ...editUserData } : u));
+    setEditUserId(null);
   }
 
   // Konfigurasi
@@ -5524,13 +7008,32 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className="fixed inset-0 z-50 flex items-center justify-center md:p-4"
       style={{ background:"rgba(15,23,42,0.65)", backdropFilter:"blur(6px)" }}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full flex overflow-hidden"
-        style={{ maxWidth:"900px", height:"min(90vh,640px)" }}>
+      <div className="bg-white md:rounded-2xl shadow-2xl w-full flex flex-col md:flex-row overflow-hidden h-dvh md:h-auto md:max-h-[640px] md:max-w-[900px]">
 
-        {/* Sidebar kiri */}
-        <div className="w-56 flex-shrink-0 flex flex-col border-r border-white/10"
+        {/* Mobile top tab bar — hidden on desktop */}
+        <div className="md:hidden flex-shrink-0 flex border-b border-gray-100"
+          style={{ background:"linear-gradient(90deg,var(--tsu-teal-dark) 0%,var(--tsu-teal) 100%)" }}>
+          <div className="flex overflow-x-auto flex-1">
+            {tabs.map(t => (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                className={`flex-shrink-0 px-4 py-3 text-xs font-semibold transition-colors border-b-2 ${
+                  tab === t.id
+                    ? "border-white text-white"
+                    : "border-transparent text-white/60 hover:text-white"
+                }`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={onClose} className="flex-shrink-0 px-4 py-3 text-white/70 hover:text-white text-lg leading-none">
+            ✕
+          </button>
+        </div>
+
+        {/* Desktop sidebar kiri — hidden on mobile */}
+        <div className="hidden md:flex w-56 flex-shrink-0 flex-col border-r border-white/10"
           style={{ background:"linear-gradient(180deg,var(--tsu-teal-dark) 0%,var(--tsu-teal) 100%)" }}>
           <div className="px-4 py-5 border-b border-white/10">
             <div className="text-sm font-black text-white">⚙️ Pengaturan</div>
@@ -5577,11 +7080,17 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
               </div>
 
               <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white ${user.avatarColor}`}>
-                  {user.initials}
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white flex-shrink-0 overflow-hidden ${user.avatarColor}`}>
+                  {fotoPreview
+                    ? <img src={fotoPreview} alt="foto" className="w-full h-full object-cover" />
+                    : user.initials}
                 </div>
                 <div>
-                  <button className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                  <input id="foto-upload-input" type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                    onChange={handleFotoChange} />
+                  <button
+                    onClick={() => (document.getElementById("foto-upload-input") as HTMLInputElement)?.click()}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-700 cursor-pointer transition-colors">
                     Ganti Foto
                   </button>
                   <p className="text-[10px] text-gray-400 mt-1">JPG, PNG — maks 2 MB</p>
@@ -5607,13 +7116,25 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">Jabatan</label>
-                  <input value={user.jabatan} disabled
-                    className="w-full border border-gray-100 rounded-xl px-3 py-2 text-sm text-gray-400 bg-gray-50 cursor-not-allowed" />
+                  <input value={user.role === "full" ? jabatanEdit : user.jabatan}
+                    onChange={e => setJabatanEdit(e.target.value)}
+                    disabled={user.role !== "full"}
+                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${
+                      user.role === "full"
+                        ? "border-gray-200 text-gray-700 focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
+                        : "border-gray-100 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    }`} />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">Unit Kerja</label>
-                  <input value={user.unit ?? "—"} disabled
-                    className="w-full border border-gray-100 rounded-xl px-3 py-2 text-sm text-gray-400 bg-gray-50 cursor-not-allowed" />
+                  <input value={user.role === "full" ? unitEdit : (user.unit ?? "—")}
+                    onChange={e => setUnitEdit(e.target.value)}
+                    disabled={user.role !== "full"}
+                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none transition-all ${
+                      user.role === "full"
+                        ? "border-gray-200 text-gray-700 focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
+                        : "border-gray-100 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    }`} />
                 </div>
               </div>
 
@@ -5747,6 +7268,50 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                   </thead>
                   <tbody>
                     {filteredUsers.map(u => (
+                      editUserId === u.id ? (
+                        <tr key={u.id} className="border-b border-teal-100 bg-teal-50/40">
+                          <td colSpan={5} className="px-4 py-3">
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                              {([
+                                { label:"Nama",    key:"nama",    ph:"Nama lengkap" },
+                                { label:"Email",   key:"email",   ph:"email@tsu.ac.id" },
+                                { label:"Jabatan", key:"jabatan", ph:"Jabatan" },
+                                { label:"Unit",    key:"unit",    ph:"Unit kerja" },
+                              ] as { label:string; key: keyof typeof editUserData; ph:string }[]).map(({ label, key, ph }) => (
+                                <div key={key}>
+                                  <label className="block text-[9px] font-semibold text-gray-500 mb-0.5">{label}</label>
+                                  <input value={editUserData[key]}
+                                    onChange={e => setEditUserData(p => ({ ...p, [key]: e.target.value }))}
+                                    placeholder={ph}
+                                    className="w-full border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-teal-400 transition-all" />
+                                </div>
+                              ))}
+                              <div>
+                                <label className="block text-[9px] font-semibold text-gray-500 mb-0.5">Role</label>
+                                <select value={editUserData.role}
+                                  onChange={e => setEditUserData(p => ({ ...p, role: e.target.value }))}
+                                  className="w-full border border-gray-200 rounded-lg px-2 py-1 text-xs bg-white focus:outline-none focus:border-teal-400 transition-all">
+                                  <option value="full">Akses Penuh</option>
+                                  <option value="pengawasan">Pengawasan</option>
+                                  <option value="backoffice">Back Office</option>
+                                  <option value="auditee">Auditee</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button onClick={saveEditUser}
+                                className="text-[9px] font-bold px-3 py-1 rounded-lg text-white"
+                                style={{ background:"var(--tsu-teal)" }}>
+                                ✓ Simpan
+                              </button>
+                              <button onClick={() => setEditUserId(null)}
+                                className="text-[9px] font-semibold px-3 py-1 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
+                                Batal
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
                       <tr key={u.id} className={`border-b border-gray-50 transition-colors ${u.aktif ? "hover:bg-gray-50" : "opacity-50 bg-gray-50/60"}`}>
                         <td className="px-4 py-3">
                           <div className="font-semibold text-gray-800">{u.nama}</div>
@@ -5768,7 +7333,8 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex gap-1">
-                            <button className="text-[9px] font-semibold px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
+                            <button onClick={() => startEditUser(u)}
+                              className="text-[9px] font-semibold px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
                               Edit
                             </button>
                             <button onClick={() => toggleAktif(u.id)}
@@ -5782,6 +7348,7 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                           </div>
                         </td>
                       </tr>
+                      )
                     ))}
                   </tbody>
                 </table>
@@ -5917,7 +7484,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
     { unit: "Sarpras",       temuan: "Belanja Modal Tanpa BA",              level: "Tinggi",  status: "Terlambat", batas: "6 Sep 2025"  },
     { unit: "Sarpras",       temuan: "Aset Gedung Belum di SIMAK",          level: "Tinggi",  status: "Dalam Proses","batas": "11 Sep 2025" },
     { unit: "BAAK",          temuan: "SOP Penerimaan Mahasiswa Belum Revisi",level: "Sedang", status: "Dalam Proses","batas": "9 Sep 2025"  },
-    { unit: "Keuangan",      temuan: "Laporan Keuangan Q2 Terlambat",       level: "Tinggi",  status: "Dalam Proses","batas": "20 Sep 2025" },
+    { unit: "BAUK",          temuan: "Laporan Keuangan Q2 Terlambat",       level: "Tinggi",  status: "Dalam Proses","batas": "20 Sep 2025" },
     { unit: "BAAK",          temuan: "Arsip Mahasiswa Keluar Tidak Lengkap", level: "Sedang", status: "Selesai",    batas: "—"           },
   ];
 
@@ -5926,8 +7493,8 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
     { unit: "Sarpras",       program: "Audit Keuangan Sarpras",    status: "Berjalan", temuan: 8, rtlSelesai: 3, rtlTotal: 8,  lha: false },
     { unit: "LPPM",          program: "Audit Kepatuhan LPPM",      status: "Selesai",  temuan: 3, rtlSelesai: 3, rtlTotal: 3,  lha: true  },
     { unit: "Fak. Teknik",   program: "Audit Kinerja Fak. Teknik", status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
-    { unit: "Keuangan",      program: "Audit Kepatuhan Keuangan",  status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
-    { unit: "Kemahasiswaan", program: "Audit Kinerja Mhs",         status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
+    { unit: "BAUK",          program: "Audit Kepatuhan Keuangan",  status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
+    { unit: "LPM",           program: "Audit Kinerja Mhs",         status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
   ];
 
   const lhaList = [
@@ -5969,35 +7536,35 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ fontFamily: "'Inter', sans-serif", background: "#f1f5f9" }}>
+    <div className="min-h-dvh flex flex-col" style={{ fontFamily: "'Inter', sans-serif", background: "#f1f5f9" }}>
       {/* Top bar */}
-      <header className="flex-shrink-0 flex items-center justify-between px-6 py-3 shadow-sm"
+      <header className="flex-shrink-0 flex items-center justify-between px-3 md:px-6 py-3 shadow-sm"
         style={{ background: "linear-gradient(90deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
-        <div className="flex items-center gap-3">
-          <img src={logoTSU} alt="TSU" className="h-8 bg-white rounded-lg px-2 py-1 object-contain" />
-          <div>
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <img src={logoTSU} alt="TSU" className="h-7 md:h-8 flex-shrink-0 bg-white rounded-lg px-2 py-1 object-contain" />
+          <div className="hidden sm:block">
             <div className="text-[10px] font-bold text-white leading-tight tracking-widest uppercase">Sistem Informasi SPI</div>
             <div className="text-[9px] text-blue-300">Universitas Tiga Serangkai</div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="text-right hidden md:block">
             <div className="text-xs font-bold text-white">{user.name}</div>
             <div className="text-[10px] text-blue-300">{user.jabatan}</div>
           </div>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white ${user.avatarColor}`}>
+          <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-black text-white ${user.avatarColor}`}>
             {user.initials}
           </div>
           <div className="h-4 w-px bg-white/20" />
           <button onClick={() => setShowLogout(true)}
-            className="text-[10px] font-semibold text-white/80 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors">
+            className="text-[10px] font-semibold text-white/80 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0">
             Keluar
           </button>
         </div>
       </header>
 
       {/* Page body */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <main className="flex-1 overflow-y-auto p-3 sm:p-6">
         {/* Page title */}
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -6074,9 +7641,19 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
           <div className="lg:col-span-2 flex flex-col gap-4">
             {/* Temuan kritis per unit */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-700">⚠️ Rekap Temuan Kritis Per Unit</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Temuan dengan level risiko Tinggi & Sedang yang masih terbuka</p>
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
+                <div className="flex-1">
+                  <h2 className="text-sm font-bold text-gray-700">⚠️ Rekap Temuan Kritis Per Unit</h2>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Temuan dengan level risiko Tinggi & Sedang yang masih terbuka</p>
+                </div>
+                <svg width={64} height={36} style={{ flexShrink: 0 }}>
+                  {[{h:28,c:"#ef4444",l:"T"},{h:18,c:"#f59e0b",l:"S"},{h:10,c:"#22c55e",l:"X"}].map((b, i) => (
+                    <g key={i}>
+                      <rect x={i * 22 + 2} y={36 - b.h} width={16} height={b.h} rx={3} fill={b.c} opacity={0.85} />
+                      <text x={i * 22 + 10} y={34} textAnchor="middle" fontSize={7} fill={b.c} fontWeight={700}>{b.l}</text>
+                    </g>
+                  ))}
+                </svg>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -6108,9 +7685,24 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* Riwayat Audit Keseluruhan */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-700">🗂️ Riwayat Audit Keseluruhan</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Seluruh program audit yang pernah dilaksanakan</p>
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
+                <div className="flex-1">
+                  <h2 className="text-sm font-bold text-gray-700">🗂️ Riwayat Audit Keseluruhan</h2>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Seluruh program audit yang pernah dilaksanakan</p>
+                </div>
+                {/* Mini sparkline: audit selesai per tahun */}
+                <svg width={72} height={36} style={{ flexShrink: 0 }}>
+                  {[{y:"23",v:3},{y:"24",v:4},{y:"25",v:2}].map((d, i) => {
+                    const bH = d.v * 7;
+                    return (
+                      <g key={i}>
+                        <rect x={i * 24 + 2} y={28 - bH} width={18} height={bH} rx={3} fill="#0e8080" opacity={0.75 + i * 0.1} />
+                        <text x={i * 24 + 11} y={36} textAnchor="middle" fontSize={7} fill="#94a3b8">{d.y}</text>
+                        <text x={i * 24 + 11} y={28 - bH - 3} textAnchor="middle" fontSize={7} fill="#0e8080" fontWeight={700}>{d.v}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -6127,9 +7719,9 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
                       { tahun:"2025", unit:"LPPM",           jenis:"Kepatuhan",  ketua:"Ratna Dewi",    temuan:3,  rtl:"3/3",  status:"Selesai",  lha:true  },
                       { tahun:"2025", unit:"Sarpras",        jenis:"Keuangan",   ketua:"Budi Santoso",  temuan:8,  rtl:"3/8",  status:"Berjalan", lha:false },
                       { tahun:"2024", unit:"BAAK",           jenis:"Kepatuhan",  ketua:"Ratna Dewi",    temuan:4,  rtl:"4/4",  status:"Selesai",  lha:true  },
-                      { tahun:"2024", unit:"Keuangan",       jenis:"Keuangan",   ketua:"Budi Santoso",  temuan:7,  rtl:"7/7",  status:"Selesai",  lha:true  },
+                      { tahun:"2024", unit:"BAUK",           jenis:"Keuangan",   ketua:"Budi Santoso",  temuan:7,  rtl:"7/7",  status:"Selesai",  lha:true  },
                       { tahun:"2024", unit:"Fak. Teknik",    jenis:"Kinerja",    ketua:"Andi Prasetyo", temuan:3,  rtl:"2/3",  status:"Selesai",  lha:true  },
-                      { tahun:"2024", unit:"Kemahasiswaan",  jenis:"Kinerja",    ketua:"Siti Aisyah",   temuan:2,  rtl:"2/2",  status:"Selesai",  lha:true  },
+                      { tahun:"2024", unit:"LPM",             jenis:"Kinerja",    ketua:"Siti Aisyah",   temuan:2,  rtl:"2/2",  status:"Selesai",  lha:true  },
                       { tahun:"2023", unit:"LPPM",           jenis:"Kepatuhan",  ketua:"Ratna Dewi",    temuan:5,  rtl:"5/5",  status:"Selesai",  lha:true  },
                       { tahun:"2023", unit:"Sarpras",        jenis:"Keuangan",   ketua:"Budi Santoso",  temuan:9,  rtl:"8/9",  status:"Selesai",  lha:true  },
                       { tahun:"2023", unit:"BAAK",           jenis:"Kinerja",    ketua:"Andi Prasetyo", temuan:3,  rtl:"3/3",  status:"Selesai",  lha:true  },
@@ -6158,9 +7750,31 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* Audit per unit */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-700">📊 Status Audit Per Unit Kerja</h2>
-                <p className="text-[10px] text-gray-400 mt-0.5">Program audit tahun 2025</p>
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
+                <div className="flex-1">
+                  <h2 className="text-sm font-bold text-gray-700">📊 Status Audit Per Unit Kerja</h2>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Program audit tahun 2025</p>
+                </div>
+                {/* Mini donut: Selesai/Berjalan/Rencana */}
+                {(() => {
+                  const slices = [{c:2,col:"#22c55e"},{c:1,col:"#3b82f6"},{c:3,col:"#cbd5e1"}];
+                  const total = 6; const r = 14; const cx = 18; const cy = 18;
+                  const circ = 2 * Math.PI * r;
+                  let cum = 0;
+                  return (
+                    <svg width={36} height={36} style={{ flexShrink: 0 }}>
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={6} />
+                      {slices.map((s, i) => {
+                        const dash = (s.c / total) * circ;
+                        const el = <circle key={i} cx={cx} cy={cy} r={r} fill="none" stroke={s.col} strokeWidth={6}
+                          strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ / 4 - cum} />;
+                        cum += dash;
+                        return el;
+                      })}
+                      <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={8} fontWeight={800} fill="#1e293b">{total}</text>
+                    </svg>
+                  );
+                })()}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -6205,8 +7819,16 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* LHA Terbaru */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-700">📄 Laporan Hasil Audit (LHA) Terbaru</h2>
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center gap-3">
+                <h2 className="text-sm font-bold text-gray-700 flex-1">📄 Laporan Hasil Audit (LHA) Terbaru</h2>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {[{label:"Final",count:2,color:"#0e8080",bg:"#f0fdfa"},{label:"Draft",count:1,color:"#f59e0b",bg:"#fffbeb"}].map(s => (
+                    <div key={s.label} className="flex flex-col items-center px-2.5 py-1 rounded-lg" style={{ background: s.bg }}>
+                      <span className="text-base font-black leading-none" style={{ color: s.color }}>{s.count}</span>
+                      <span className="text-[8px] font-semibold mt-0.5" style={{ color: s.color }}>{s.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="divide-y divide-gray-50">
                 {lhaList.map((l, i) => (
@@ -6233,51 +7855,143 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             </div>
           </div>
 
-          {/* Right column */}
+          {/* Right column — Charts */}
           <div className="flex flex-col gap-4">
-            {/* Rapat mendatang */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-700">📅 Rapat Mendatang</h2>
-              </div>
-              <div className="divide-y divide-gray-50">
-                {rapatMendatang.length === 0 && (
-                  <p className="text-[10px] text-gray-400 text-center py-6">Belum ada jadwal rapat.</p>
-                )}
-                {rapatMendatang.map((r) => (
-                  <div key={r.id} className="px-4 py-3">
-                    <div className="text-xs font-semibold text-gray-700 truncate">{r.judul}</div>
-                    <div className="text-[9px] text-gray-400 mt-1">{r.tgl} · {r.jam}</div>
-                    <div className="text-[9px] text-gray-400 mt-0.5 truncate">{r.tempat}</div>
+
+            {/* Chart 1: Distribusi Level Temuan */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <h2 className="text-sm font-bold text-gray-700 mb-3">🔴 Distribusi Level Temuan</h2>
+              {(() => {
+                const items = [
+                  { label: "Tinggi",  count: 3, color: "#ef4444" },
+                  { label: "Sedang",  count: 2, color: "#f59e0b" },
+                  { label: "Selesai", count: 1, color: "#22c55e" },
+                ];
+                const total = items.reduce((s, d) => s + d.count, 0);
+                const r = 30, cx = 40, cy = 40;
+                const circ = 2 * Math.PI * r;
+                let cum = 0;
+                const segs = items.map(d => {
+                  const dash = (d.count / total) * circ;
+                  const seg = { ...d, dash, offset: cum };
+                  cum += dash;
+                  return seg;
+                });
+                return (
+                  <div className="flex items-center gap-4">
+                    <svg width={80} height={80} style={{ flexShrink: 0 }}>
+                      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f1f5f9" strokeWidth={11} />
+                      {segs.map((s, i) => (
+                        <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                          stroke={s.color} strokeWidth={11}
+                          strokeDasharray={`${s.dash} ${circ - s.dash}`}
+                          strokeDashoffset={circ / 4 - s.offset} />
+                      ))}
+                      <text x={cx} y={cy - 4} textAnchor="middle" dominantBaseline="middle" fontSize={14} fontWeight={800} fill="#1e293b">{total}</text>
+                      <text x={cx} y={cy + 9} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#94a3b8">temuan</text>
+                    </svg>
+                    <div className="flex flex-col gap-2 flex-1">
+                      {items.map(d => (
+                        <div key={d.label} className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: d.color }} />
+                          <span className="text-[10px] text-gray-600 flex-1">{d.label}</span>
+                          <span className="text-xs font-bold text-gray-800">{d.count}</span>
+                          <span className="text-[9px] text-gray-400">{Math.round(d.count / total * 100)}%</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </div>
 
-            {/* Anggaran progress */}
+            {/* Chart 2: Temuan Audit per Tahun */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">💰 Realisasi Anggaran Q2</h2>
-              {[
-                { label: "SDM & Pelatihan",    real: 82 },
-                { label: "Operasional Audit",  real: 71 },
-                { label: "Teknologi & Sistem", real: 55 },
-                { label: "Lain-lain",          real: 30 },
-              ].map((a) => (
-                <div key={a.label} className="mb-2.5">
-                  <div className="flex justify-between text-[10px] mb-1">
-                    <span className="text-gray-600">{a.label}</span>
-                    <span className={`font-semibold ${a.real >= 70 ? "text-green-600" : a.real >= 50 ? "text-amber-600" : "text-red-500"}`}>{a.real}%</span>
+              <h2 className="text-sm font-bold text-gray-700 mb-1">📊 Temuan Audit per Tahun</h2>
+              <p className="text-[9px] text-gray-400 mb-3">Total temuan vs RTL selesai</p>
+              {(() => {
+                const data = [
+                  { tahun: "2023", temuan: 17, rtl: 14 },
+                  { tahun: "2024", temuan: 16, rtl: 16 },
+                  { tahun: "2025", temuan: 16, rtl: 7  },
+                ];
+                const maxVal = 20;
+                const bW = 16, gap = 14, chartH = 56;
+                const svgW = data.length * (bW * 2 + gap) + gap;
+                return (
+                  <div>
+                    <svg width="100%" viewBox={`0 0 ${svgW} ${chartH + 20}`} preserveAspectRatio="xMidYMid meet">
+                      {data.map((d, i) => {
+                        const x = gap + i * (bW * 2 + gap);
+                        const h1 = (d.temuan / maxVal) * chartH;
+                        const h2 = (d.rtl / maxVal) * chartH;
+                        return (
+                          <g key={d.tahun}>
+                            <rect x={x} y={chartH - h1} width={bW} height={h1} rx={3} fill="#e2e8f0" />
+                            <rect x={x + bW + 2} y={chartH - h2} width={bW} height={h2} rx={3} fill="#0e8080" />
+                            <text x={x + bW} y={chartH + 13} textAnchor="middle" fontSize={8} fill="#94a3b8">{d.tahun}</text>
+                            <text x={x + bW / 2} y={chartH - h1 - 3} textAnchor="middle" fontSize={7} fill="#64748b">{d.temuan}</text>
+                            <text x={x + bW + 2 + bW / 2} y={chartH - h2 - 3} textAnchor="middle" fontSize={7} fill="#0e8080">{d.rtl}</text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                    <div className="flex items-center gap-4 mt-0.5">
+                      <span className="flex items-center gap-1.5 text-[9px] text-gray-400">
+                        <span className="w-2.5 h-2 rounded-sm bg-slate-200 inline-block" />Temuan
+                      </span>
+                      <span className="flex items-center gap-1.5 text-[9px] text-gray-400">
+                        <span className="w-2.5 h-2 rounded-sm inline-block" style={{ background: "#0e8080" }} />RTL Selesai
+                      </span>
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-1.5 rounded-full transition-all"
-                      style={{ width: `${a.real}%`, background: a.real >= 70 ? "#22c55e" : a.real >= 50 ? "#f59e0b" : "#ef4444" }} />
+                );
+              })()}
+            </div>
+
+            {/* Chart 3: Status Program Audit 2025 */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+              <h2 className="text-sm font-bold text-gray-700 mb-3">🎯 Status Program Audit 2025</h2>
+              {(() => {
+                const statuses = [
+                  { label: "Selesai",  count: 2, color: "#22c55e" },
+                  { label: "Berjalan", count: 1, color: "#3b82f6" },
+                  { label: "Rencana",  count: 3, color: "#cbd5e1" },
+                ];
+                const total = statuses.reduce((s, d) => s + d.count, 0);
+                const totalRTLSelesai = auditUnits.reduce((s, u) => s + u.rtlSelesai, 0);
+                const totalRTL = auditUnits.reduce((s, u) => s + u.rtlTotal, 0);
+                const rtlPct = totalRTL > 0 ? Math.round(totalRTLSelesai / totalRTL * 100) : 0;
+                return (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-0.5 h-3 rounded-full overflow-hidden">
+                      {statuses.map(s => (
+                        <div key={s.label} style={{ flex: s.count, background: s.color }} />
+                      ))}
+                    </div>
+                    <div className="flex flex-col gap-1.5 mt-1">
+                      {statuses.map(s => (
+                        <div key={s.label} className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: s.color }} />
+                          <span className="text-[10px] text-gray-600 flex-1">{s.label}</span>
+                          <span className="text-xs font-bold text-gray-800">{s.count}</span>
+                          <span className="text-[9px] text-gray-400">dari {total} prog</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-gray-100">
+                      <div className="flex justify-between text-[10px] mb-1">
+                        <span className="text-gray-500">Progres RTL keseluruhan</span>
+                        <span className="font-bold text-gray-700">{rtlPct}%</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-1.5 rounded-full transition-all" style={{ width: `${rtlPct}%`, background: "#0e8080" }} />
+                      </div>
+                      <div className="text-[9px] text-gray-400 mt-1">{totalRTLSelesai} / {totalRTL} rekomendasi selesai</div>
+                    </div>
                   </div>
-                </div>
-              ))}
-              <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between text-[10px] text-gray-400">
-                <span>Total realisasi</span>
-                <span className="font-bold text-gray-600">Rp 127,8 Jt / Rp 191 Jt</span>
-              </div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -6312,6 +8026,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
 export default function Dashboard({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen]             = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showNotifModal, setShowNotifModal]       = useState(false);
   const [showSettings, setShowSettings]           = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -6371,6 +8086,7 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
   const [activeModule, setActiveModule]     = useState(defaultModule);
   const [activeSection, setActiveSection]   = useState(defaultSection);
   const [activeSubSection, setActiveSubSection] = useState(defaultItem?.children?.[0] ?? "");
+  const [suratTabHint, setSuratTabHint] = useState<"Masuk" | "Keluar">("Masuk");
 
   const canAccess = (key: string) => {
     if (user.role === "full")       return true;
@@ -6381,12 +8097,29 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
     return false;
   };
 
+  function toggleSidebar() {
+    if (window.innerWidth < 768) {
+      setMobileSidebarOpen(v => !v);
+    } else {
+      setSidebarOpen(v => !v);
+    }
+  }
+
   function navigate(module: string, section: string) {
     setActiveModule(module);
     setActiveSection(section);
     const firstChild = navGroups.find(g => g.key === module)?.items.find(i => i.sectionKey === section)?.children?.[0] ?? "";
     setActiveSubSection(firstChild);
+    setMobileSidebarOpen(false);
   }
+
+  const navigateFull: NavFn = (module, section, subSection, suratTab) => {
+    setActiveModule(module);
+    setActiveSection(section);
+    setActiveSubSection(subSection);
+    if (suratTab) setSuratTabHint(suratTab);
+    setMobileSidebarOpen(false);
+  };
 
   const activeNavItem = navGroups.find(g => g.key === activeModule)?.items.find(i => i.sectionKey === activeSection);
   const activeChildren = activeNavItem?.children ?? [];
@@ -6414,13 +8147,27 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
   }
 
   return (
+    <NavCtx.Provider value={navigateFull}>
     <RapatCtx.Provider value={{ rapatList, addRapat, batalkanRapat }}>
     <UserCtx.Provider value={user}>
-    <div className="flex h-full overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", background: "#f1f5f9" }}>
+    <div className="flex h-dvh overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", background: "#f1f5f9" }}>
+      {/* Mobile sidebar backdrop */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={() => setMobileSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
       <aside
-        className="flex-shrink-0 flex flex-col overflow-y-auto transition-all duration-300"
-        style={{ width: sidebarOpen ? "240px" : "0px", minWidth: sidebarOpen ? "240px" : "0px", background: "linear-gradient(180deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}
+        className={[
+          "flex-shrink-0 flex flex-col overflow-y-auto transition-all duration-300",
+          // Mobile: fixed overlay, translate in/out
+          "fixed top-0 left-0 z-40 w-60 h-dvh",
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: in-flow, width-based collapse
+          "md:relative md:h-auto md:z-auto md:translate-x-0",
+          sidebarOpen ? "md:w-60 md:min-w-[240px]" : "md:w-0 md:min-w-0 md:overflow-hidden",
+        ].join(" ")}
+        style={{ background: "linear-gradient(180deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}
       >
         <div className="flex flex-col px-4 py-4 border-b border-white/10 gap-2">
           <div className="bg-white rounded-xl px-3 py-2">
@@ -6483,20 +8230,20 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Topbar */}
-        <header className="flex-shrink-0 bg-white border-b border-gray-200 flex items-center gap-4 px-6 py-3">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-500 hover:text-gray-700 transition-colors">
+        <header className="flex-shrink-0 bg-white border-b border-gray-200 flex items-center gap-2 md:gap-4 px-3 md:px-6 py-3">
+          <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0">
             <IconMenu className="w-5 h-5" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{activeLabel}</h1>
-            <p className="text-xs text-gray-400">{activeModule === "pengawasan" ? "Modul Pengawasan SPI" : "Modul Back Office SPI"}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base md:text-xl font-bold text-gray-800 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{activeLabel}</h1>
+            <p className="hidden md:block text-xs text-gray-400">{activeModule === "pengawasan" ? "Modul Pengawasan SPI" : "Modul Back Office SPI"}</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-2">
+          <div className="hidden md:flex items-center gap-2 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-2 flex-shrink-0">
             <span>Periode:</span>
             <span className="font-semibold text-gray-700">Tahun 2025</span>
             <IconCalendar className="w-4 h-4 text-gray-400" />
           </div>
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <button onClick={() => setShowNotifModal(true)}
               className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
               <IconBell className="w-5 h-5" />
@@ -6507,17 +8254,17 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
               )}
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs ${user.avatarColor}`}>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 ${user.avatarColor}`}>
               {user.initials}
             </div>
-            <div>
+            <div className="hidden md:block">
               <div className="text-xs font-semibold text-gray-700 leading-tight">{user.name}</div>
               <div className="flex items-center gap-1">
                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={roleBadge.style}>{roleBadge.label}</span>
               </div>
             </div>
-            <IconChevron className="w-4 h-4 text-gray-400" />
+            <IconChevron className="hidden md:block w-4 h-4 text-gray-400" />
           </div>
         </header>
 
@@ -6541,13 +8288,13 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-5">
+        <main className="flex-1 overflow-y-auto p-3 md:p-5">
           {/* Indeks komposit shown for full-access & rektor on pengawasan ringkasan */}
           {user.role === "full" && activeModule === "pengawasan" && activeSection === "ringkasan" && (
             <div className="mb-4"><IndeksKomposit /></div>
           )}
           {activeModule === "pengawasan" && <TabPengawasan section={activeSection} subSection={activeSubSection} />}
-          {activeModule === "backoffice" && <TabBackoffice section={activeSection} subSection={activeSubSection} />}
+          {activeModule === "backoffice" && <TabBackoffice section={activeSection} subSection={activeSubSection} suratTabHint={suratTabHint} />}
         </main>
       </div>
 
@@ -6679,5 +8426,6 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
     )}
     </UserCtx.Provider>
     </RapatCtx.Provider>
+    </NavCtx.Provider>
   );
 }
