@@ -1,7 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { ACCOUNTS, User } from "@/types/auth";
-import { login } from "@/lib/auth";
-const logoTSU = "/LOGO_TSU.png";
+import logoTSU from "@/imports/LOGO_TSU_png.png";
 
 const IconEye = ({ className = "" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -29,27 +28,22 @@ export default function Login({ onLogin }: { onLogin: (user: User) => void }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    try {
-      const loggedInUser = await login(email.trim(), password);
-      // Construct user object since API might not have all frontend fields initially (like avatarColor).
-      const mockAcc = ACCOUNTS.find(a => a.email === email.trim()) || ACCOUNTS[0];
-      const user: User = {
-        ...mockAcc, // Use mock for static UI props
-        name: loggedInUser.username || loggedInUser.email,
-        email: loggedInUser.email,
-        role: loggedInUser.groups?.[0] || 'auditee',
-      };
-      onLogin(user);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Email atau password salah. Coba lagi.");
-    } finally {
-      setLoading(false);
-    }
+    setTimeout(() => {
+      const user = ACCOUNTS.find(
+        (a) => a.email === email.trim() && a.password === password
+      );
+      if (user) {
+        onLogin(user);
+      } else {
+        setError("Email atau password salah. Coba lagi.");
+        setLoading(false);
+      }
+    }, 600);
   }
 
   function quickLogin(acc: User) {
