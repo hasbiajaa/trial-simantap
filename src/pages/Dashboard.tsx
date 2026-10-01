@@ -9,7 +9,7 @@ import {
   LineChart, Line, Legend,
   CartesianGrid, ReferenceLine,
 } from "recharts";
-import { User } from "@/types/auth";
+import { User, ACCOUNTS } from "@/types/auth";
 
 const UserCtx = createContext<User | null>(null);
 
@@ -350,7 +350,7 @@ const agendaList = [
 
 const kpiData = [
   {
-    kategori: "1", label: "Audit & Assurance", icon: "📋",
+    kategori: "1", label: "Audit & Assurance", icon: "",
     accent: "#3b82f6", lightBg: "#eff6ff", textCls: "text-blue-600",
     items: [
       { kode:"1a", label:"Realisasi Program Audit Tahunan",       target:90,  bobot:4, real:87, arah:"atas"  },
@@ -360,7 +360,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "2", label: "Kepatuhan & Tata Kelola", icon: "🏛️",
+    kategori: "2", label: "Kepatuhan & Tata Kelola", icon: "",
     accent: "#0e8080", lightBg: "#f0fdfa", textCls: "text-teal-600",
     items: [
       { kode:"2a", label:"Unit Memenuhi Ketentuan Tata Kelola",   target:85,  bobot:4, real:82, arah:"atas"  },
@@ -370,7 +370,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "3", label: "Pengendalian Internal", icon: "🔒",
+    kategori: "3", label: "Pengendalian Internal", icon: "",
     accent: "#7c3aed", lightBg: "#f5f3ff", textCls: "text-purple-600",
     items: [
       { kode:"3a", label:"Unit dengan Pengendalian Memadai",      target:80,  bobot:4, real:78, arah:"atas"  },
@@ -379,7 +379,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "4", label: "Manajemen Risiko", icon: "🛡️",
+    kategori: "4", label: "Manajemen Risiko", icon: "",
     accent: "#f59e0b", lightBg: "#fffbeb", textCls: "text-amber-600",
     items: [
       { kode:"4a", label:"Unit Memiliki Risk Register",           target:100, bobot:4, real:100, arah:"atas" },
@@ -389,7 +389,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "5", label: "Tindak Lanjut Audit", icon: "✅",
+    kategori: "5", label: "Tindak Lanjut Audit", icon: "",
     accent: "#22c55e", lightBg: "#f0fdf4", textCls: "text-green-600",
     items: [
       { kode:"5a", label:"Rekomendasi Audit Ditindaklanjuti",    target:80,  bobot:5, real:83, arah:"atas"  },
@@ -399,7 +399,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "6", label: "Pengawasan Keuangan & Aset", icon: "💰",
+    kategori: "6", label: "Pengawasan Keuangan & Aset", icon: "",
     accent: "#0ea5e9", lightBg: "#f0f9ff", textCls: "text-sky-600",
     items: [
       { kode:"6a", label:"LPJ Lengkap dan Tepat Waktu",          target:90,  bobot:3, real:88, arah:"atas"  },
@@ -409,7 +409,7 @@ const kpiData = [
     ],
   },
   {
-    kategori: "7", label: "Kinerja & Efektivitas Organisasi", icon: "📈",
+    kategori: "7", label: "Kinerja & Efektivitas Organisasi", icon: "",
     accent: "#ec4899", lightBg: "#fdf2f8", textCls: "text-pink-600",
     items: [
       { kode:"7a", label:"Unit Mencapai Target Kinerja",         target:80,  bobot:2, real:76, arah:"atas"  },
@@ -436,7 +436,7 @@ const navGroups = [
       { label: "Audit",                  sectionKey: "audit",     icon: <IconClipboard  className="w-4 h-4" />, children: ["Rencana & Laporan Audit", "Entry Meeting – Draft – Exit", "Kertas Kerja Audit (KKA)"] },
       { label: "RTL",                    sectionKey: "rtl",       icon: <IconCheck      className="w-4 h-4" />, children: ["Tindak Lanjut (RTL)", "Verifikasi RTL"] },
       { label: "Riwayat Audit per Unit", sectionKey: "riwayat",   icon: <IconFolder     className="w-4 h-4" />, children: ["Riwayat per Unit", "Temuan Berulang"] },
-      { label: "Kalender Pengawasan",    sectionKey: "kalender",  icon: <IconCalendar   className="w-4 h-4" />, children: ["Kalender Pengawasan", "Deadline & Reminder"] },
+      { label: "Kalender Pengawasan",    sectionKey: "kalender",  icon: <IconCalendar   className="w-4 h-4" />, children: ["Kalender Pengawasan", "Siklus Audit"] },
     ],
   },
   {
@@ -449,7 +449,7 @@ const navGroups = [
       { label: "Manajemen SDM",     sectionKey: "C", icon: <IconGroup     className="w-4 h-4" />, children: ["Kompetensi Auditor", "Riwayat Penugasan", "Jadwal Pelatihan"] },
       { label: "Regulasi & SOP",    sectionKey: "D", icon: <IconFolder    className="w-4 h-4" />, children: ["Pedoman Audit", "Peraturan Internal"] },
       { label: "Perencanaan Anggaran",   sectionKey: "G", icon: <IconWallet    className="w-4 h-4" />, children: ["Rencana Anggaran", "Realisasi Anggaran", "Laporan Keuangan"] },
-      { label: "Kalender",               sectionKey: "F", icon: <IconCalendar  className="w-4 h-4" />, children: ["Jadwal Rapat", "Siklus Audit"] },
+      { label: "Kalender",               sectionKey: "F", icon: <IconCalendar  className="w-4 h-4" />, children: ["Jadwal Rapat", "Deadline & Reminder"] },
     ],
   },
 ];
@@ -484,7 +484,7 @@ function ConfirmModal({ message, confirmLabel = "Ya, Hapus", onConfirm, onCancel
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }}
       onClick={onCancel}>
       <div className="bg-white rounded-2xl shadow-2xl w-72 mx-4 p-6 text-center" onClick={e => e.stopPropagation()}>
-        <div className="text-3xl mb-3">⚠️</div>
+        <div className="text-3xl mb-3"></div>
         <div className="text-sm font-bold text-gray-800 mb-1">{message}</div>
         <div className="text-xs text-gray-400 mb-5">Tindakan ini tidak dapat dibatalkan.</div>
         <div className="flex gap-2">
@@ -557,12 +557,12 @@ function StatCard({ icon, iconBg, label, value, sub }: { icon: React.ReactNode; 
 // ── Pengawasan section data ───────────────────────────────────────────────────
 
 const pwSections = [
-  { key: "ringkasan", label: "Ringkasan",              icon: "📊" },
-  { key: "risiko",    label: "Risiko",                 icon: "🛡️" },
-  { key: "audit",     label: "Audit",                  icon: "📋" },
-  { key: "rtl",       label: "RTL",                    icon: "✅" },
-  { key: "riwayat",   label: "Riwayat Audit per Unit", icon: "📁" },
-  { key: "kalender",  label: "Kalender Pengawasan",    icon: "📅" },
+  { key: "ringkasan", label: "Ringkasan",              icon: "" },
+  { key: "risiko",    label: "Risiko",                 icon: "" },
+  { key: "audit",     label: "Audit",                  icon: "" },
+  { key: "rtl",       label: "RTL",                    icon: "" },
+  { key: "riwayat",   label: "Riwayat Audit per Unit", icon: "" },
+  { key: "kalender",  label: "Kalender Pengawasan",    icon: "" },
 ];
 
 // ── Pengawasan sub-sections ───────────────────────────────────────────────────
@@ -698,32 +698,18 @@ function PwRingkasan() {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
+  const [chartDetail, setChartDetail] = useState<string|null>(null);
   return (
     <div className="flex flex-col gap-4">
       {myUnit && (
         <div className="rounded-xl border border-purple-100 p-4 flex items-start gap-3" style={{ background: "#f5f3ff" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}>🏛️</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}></div>
           <div>
             <div className="text-sm font-black text-purple-800">Unit: {myUnit}</div>
             <div className="text-xs text-purple-500 mt-0.5">Anda masuk sebagai auditee. Hanya data yang berkaitan dengan unit <strong>{myUnit}</strong> yang ditampilkan.</div>
           </div>
         </div>
       )}
-      {/* ── Urgent-alerts strip (non-auditee only) ── */}
-      {!myUnit && (
-        <div className="flex gap-2 flex-wrap">
-          {[
-            { icon: "🔴", label: "3 RTL Terlambat",                  color: "bg-red-50 border-red-200 text-red-700"    },
-            { icon: "⏰", label: "2 Deadline ≤7 Hari",               color: "bg-amber-50 border-amber-200 text-amber-700" },
-            { icon: "⚠️", label: "3 Risiko Tinggi Belum Ditindak",   color: "bg-orange-50 border-orange-200 text-orange-700" },
-          ].map(a => (
-            <div key={a.label} className={`flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-full border ${a.color}`}>
-              <span>{a.icon}</span><span>{a.label}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* ── KPI 7 Kategori (non-auditee only) ── */}
       {!myUnit && <KpiPengawasanPanel />}
 
@@ -733,9 +719,9 @@ function PwRingkasan() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             {/* Chart 1 — Risiko */}
-            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => setChartDetail("risiko")}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-gray-700">🛡️ Risiko — Sebaran Tingkat</h3>
+                <h3 className="text-xs font-bold text-gray-700">Risiko — Sebaran Tingkat</h3>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>8 Temuan</span>
               </div>
               <div className="flex items-center gap-3 mb-4">
@@ -801,9 +787,9 @@ function PwRingkasan() {
             </div>
 
             {/* Chart 2 — Audit */}
-            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => setChartDetail("audit")}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-gray-700">📋 Audit — Progress Berjalan</h3>
+                <h3 className="text-xs font-bold text-gray-700">Audit — Progress Berjalan</h3>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>4 Unit</span>
               </div>
               <div className="flex items-center gap-3 mb-4">
@@ -858,9 +844,9 @@ function PwRingkasan() {
                 { key: "terlambat" as const,  label: "Terlambat", color: "#ef4444" },
               ];
               return (
-                <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => setChartDetail("rtl")}>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xs font-bold text-gray-700">✅ RTL — Status per Unit Kerja</h3>
+                    <h3 className="text-xs font-bold text-gray-700">RTL — Status per Unit Kerja</h3>
                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-gold-light)", color: "#a0620a" }}>38 Total</span>
                   </div>
 
@@ -938,9 +924,9 @@ function PwRingkasan() {
               ];
               const totalAudit = riwayatDonut.reduce((s, d) => s + d.value, 0);
               return (
-                <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => setChartDetail("riwayat")}>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xs font-bold text-gray-700">📁 Riwayat Audit per Unit</h3>
+                    <h3 className="text-xs font-bold text-gray-700">Riwayat Audit per Unit</h3>
                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>6 Unit</span>
                   </div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1051,7 +1037,7 @@ function PwRingkasan() {
             {/* Audit berjalan */}
             <div className="bg-white rounded-xl border border-purple-100 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-gray-700">🔍 Audit Sedang Berjalan</h4>
+                <h4 className="text-xs font-bold text-gray-700">Audit Sedang Berjalan</h4>
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">Tahap: {auditBerjalan.tahap}</span>
               </div>
               <div className="flex flex-col gap-2 p-3 rounded-xl border border-purple-100" style={{ background: "#f5f3ff" }}>
@@ -1075,7 +1061,7 @@ function PwRingkasan() {
             {/* Risiko & temuan unit */}
             {auditeeRisiko.length > 0 && (
               <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                <h4 className="text-xs font-bold text-gray-700 mb-3">⚠ Temuan Risiko Unit {myUnit}</h4>
+                <h4 className="text-xs font-bold text-gray-700 mb-3">Temuan Risiko Unit {myUnit}</h4>
                 <div className="flex flex-col gap-2">
                   {auditeeRisiko.map(r => (
                     <div key={r.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:bg-gray-50">
@@ -1094,7 +1080,7 @@ function PwRingkasan() {
 
             {/* RTL unit */}
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-              <h4 className="text-xs font-bold text-gray-700 mb-3">📋 Tindak Lanjut Rekomendasi (RTL) — {myUnit}</h4>
+              <h4 className="text-xs font-bold text-gray-700 mb-3">Tindak Lanjut Rekomendasi (RTL) — {myUnit}</h4>
               <div className="flex flex-col gap-3">
                 {rtlAuditee.map(r => (
                   <div key={r.no} className="flex flex-col gap-1.5 p-3 rounded-xl border border-gray-100">
@@ -1117,11 +1103,11 @@ function PwRingkasan() {
 
             {/* Riwayat audit selesai */}
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-              <h4 className="text-xs font-bold text-gray-700 mb-3">📁 Riwayat Audit Unit {myUnit}</h4>
+              <h4 className="text-xs font-bold text-gray-700 mb-3">Riwayat Audit Unit {myUnit}</h4>
               <div className="flex flex-col gap-2">
                 {auditSelesai.map((a, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50">
-                    <span className="text-xl">✅</span>
+                    <span className="text-xl"></span>
                     <div className="flex-1">
                       <div className="text-xs font-semibold text-gray-700">{a.nama}</div>
                       <div className="text-[10px] text-gray-400 mt-0.5">Ketua: {a.ketua} · Selesai: {a.selesai}</div>
@@ -1137,6 +1123,118 @@ function PwRingkasan() {
           </div>
         );
       })()}
+
+      {chartDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
+          onClick={() => setChartDetail(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4"
+              style={{ background: "linear-gradient(135deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
+              <div className="text-sm font-black text-white">
+                {chartDetail === "risiko"  && "Detail Sebaran Risiko"}
+                {chartDetail === "audit"   && "Detail Progress Audit"}
+                {chartDetail === "rtl"     && "Detail Status RTL"}
+                {chartDetail === "riwayat" && "Detail Riwayat Audit per Unit"}
+              </div>
+              <button onClick={() => setChartDetail(null)} className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center text-white text-sm font-bold">✕</button>
+            </div>
+            <div className="p-5">
+              {chartDetail === "risiko" && (
+                <div className="flex flex-col gap-3">
+                  {[
+                    { unit:"BAUK",    tinggi:2, sedang:1, rendah:0 },
+                    { unit:"BAAK",    tinggi:1, sedang:1, rendah:1 },
+                    { unit:"Sarpras", tinggi:1, sedang:1, rendah:0 },
+                  ].map(r => {
+                    const total = r.tinggi + r.sedang + r.rendah;
+                    return (
+                      <div key={r.unit} className="bg-gray-50 rounded-xl p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-gray-700">{r.unit}</span>
+                          <span className="text-[9px] text-gray-400">{total} risiko</span>
+                        </div>
+                        <div className="flex gap-2 text-[9px]">
+                          {r.tinggi > 0 && <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-semibold">{r.tinggi} Tinggi</span>}
+                          {r.sedang > 0 && <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold">{r.sedang} Sedang</span>}
+                          {r.rendah > 0 && <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold">{r.rendah} Rendah</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="bg-red-50 rounded-xl p-3 border border-red-100 text-[10px] text-red-700">3 risiko tinggi memerlukan tindak lanjut segera</div>
+                </div>
+              )}
+              {chartDetail === "audit" && (
+                <div className="flex flex-col gap-3">
+                  {[
+                    { unit:"BAAK",    tahap:"Laporan",      progress:90, color:"#22c55e" },
+                    { unit:"Sarpras", tahap:"Lapangan",     progress:60, color:"#3b82f6" },
+                    { unit:"BAUK",    tahap:"Entry Meeting", progress:20, color:"#3b82f6" },
+                    { unit:"LPPM",    tahap:"Selesai",      progress:100,color:"#22c55e" },
+                  ].map(a => (
+                    <div key={a.unit} className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-gray-700">{a.unit}</span>
+                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{ background:`${a.color}18`, color:a.color }}>{a.tahap}</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all" style={{ width:`${a.progress}%`, background:a.color }} />
+                      </div>
+                      <div className="text-right text-[9px] text-gray-400 mt-1">{a.progress}%</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {chartDetail === "rtl" && (
+                <div className="flex flex-col gap-3">
+                  {[
+                    { unit:"BAAK",    selesai:4, proses:2, terlambat:1 },
+                    { unit:"Sarpras", selesai:3, proses:1, terlambat:2 },
+                    { unit:"LPPM",    selesai:5, proses:0, terlambat:0 },
+                    { unit:"BAUK",    selesai:0, proses:3, terlambat:0 },
+                  ].map(r => (
+                    <div key={r.unit} className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-gray-700">{r.unit}</span>
+                        <span className="text-[9px] text-gray-400">{r.selesai+r.proses+r.terlambat} RTL</span>
+                      </div>
+                      <div className="flex gap-2 text-[9px]">
+                        {r.selesai > 0 && <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold">{r.selesai} Selesai</span>}
+                        {r.proses > 0 && <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-semibold">{r.proses} Proses</span>}
+                        {r.terlambat > 0 && <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-semibold">{r.terlambat} Terlambat</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {chartDetail === "riwayat" && (
+                <div className="flex flex-col gap-3">
+                  {[
+                    { unit:"BAAK",       selesai:2, berjalan:1, rencana:0 },
+                    { unit:"Sarpras",    selesai:1, berjalan:1, rencana:0 },
+                    { unit:"LPPM",       selesai:2, berjalan:0, rencana:0 },
+                    { unit:"Fak.Teknik", selesai:0, berjalan:0, rencana:1 },
+                    { unit:"BAUK",       selesai:0, berjalan:0, rencana:1 },
+                    { unit:"LPM",        selesai:0, berjalan:0, rencana:1 },
+                  ].map(r => (
+                    <div key={r.unit} className="bg-gray-50 rounded-xl p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-gray-700">{r.unit}</span>
+                        <div className="flex gap-2 text-[9px]">
+                          {r.selesai > 0 && <span className="px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold">{r.selesai} Selesai</span>}
+                          {r.berjalan > 0 && <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-semibold">{r.berjalan} Berjalan</span>}
+                          {r.rencana > 0 && <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold">{r.rencana} Rencana</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1201,7 +1299,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
       {!myUnit && (
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-bold text-gray-700">🛡️ Diagram Risiko — Sebaran per Unit Kerja</h4>
+            <h4 className="text-xs font-bold text-gray-700">Diagram Risiko — Sebaran per Unit Kerja</h4>
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>8 Temuan</span>
           </div>
           <div className="flex items-center gap-4 mb-4">
@@ -1268,7 +1366,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
       {/* ── Auditee: header + stat khusus unit ── */}
       {myUnit && (
         <div className="rounded-xl border border-purple-100 p-4 flex items-start gap-3" style={{ background: "#f5f3ff" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}>🛡️</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}></div>
           <div>
             <div className="text-sm font-black text-purple-800">Manajemen Risiko — Unit {myUnit}</div>
             <div className="text-xs text-purple-500 mt-0.5">Menampilkan seluruh temuan risiko dan status tindak lanjut untuk unit <strong>{myUnit}</strong>.</div>
@@ -1323,7 +1421,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
         };
         return (
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📋 Detail RTL per Temuan Risiko</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Detail RTL per Temuan Risiko</h4>
             <div className="flex flex-col gap-3">
               {visibleTemuan.map(r => {
                 const rtls = rtlPerTemuan[r.id] ?? [];
@@ -1376,7 +1474,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
           {!myUnit && (
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-gray-700">📊 Temuan Risiko per Unit & Dimensi</h4>
+                <h4 className="text-xs font-bold text-gray-700">Temuan Risiko per Unit & Dimensi</h4>
                 <div className="flex gap-2">
                   {[{c:"#8b5cf6",l:"Keuangan"},{c:"#f5a623",l:"Operasional"},{c:"#0e8080",l:"Kepatuhan"},{c:"#3b82f6",l:"Teknologi"}].map(d=>(
                     <div key={d.l} className="flex items-center gap-1">
@@ -1468,7 +1566,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
           {!myUnit && (
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-xs font-bold text-gray-700">📋 Matriks Risiko per Unit & Dimensi</h4>
+                <h4 className="text-xs font-bold text-gray-700">Matriks Risiko per Unit & Dimensi</h4>
                 <div className="flex gap-2">
                   {[{bg:"#fef2f2",c:"#ef4444",l:"Tinggi (≥3)"},{bg:"#fffbeb",c:"#f59e0b",l:"Sedang (1-2)"},{bg:"#f0fdf4",c:"#22c55e",l:"Rendah (0)"}].map(s=>(
                     <div key={s.l} className="flex items-center gap-1">
@@ -1512,7 +1610,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
           )}
           {/* color-coding info card */}
           <div className="rounded-xl border border-blue-100 p-3 flex items-start gap-3" style={{ background: "#eff6ff" }}>
-            <span className="text-base flex-shrink-0">ℹ️</span>
+            <span className="text-base flex-shrink-0">ℹ</span>
             <div className="text-[10px] text-blue-800 leading-relaxed">
               <span className="font-bold">Panduan Warna Pemetaan Risiko: </span>
               <span className="font-semibold text-red-600">Merah</span> = risiko ekstrem/tinggi, perlu tindakan segera. &nbsp;
@@ -1602,13 +1700,15 @@ function AuditPageRencana() {
   const [lhaSaved, setLhaSaved] = useState(false);
   const [lhaStep, setLhaStep] = useState<"form" | "confirm" | "saved">("form");
   const [lhaForm, setLhaForm] = useState({ noLHA: "", unit: "", tanggal: "", linkDokumen: "", catatan: "" });
+  const [revisiLHANo, setRevisiLHANo] = useState<string|null>(null);
+  const [revisiCatatan, setRevisiCatatan] = useState("");
   const proses = [
-    { key: "rencana", label: "Rencana Audit", icon: "📝" },
-    { key: "entry",   label: "Entry Meeting",  icon: "🤝" },
-    { key: "kka",     label: "KKA",            icon: "🗃️" },
-    { key: "draft",   label: "Draft & Konfirmasi", icon: "📨" },
-    { key: "exit",    label: "Exit Meeting",   icon: "🏁" },
-    { key: "laporan", label: "Laporan (LHA)",  icon: "📄" },
+    { key: "rencana", label: "Rencana Audit", icon: "" },
+    { key: "entry",   label: "Entry Meeting",  icon: "" },
+    { key: "kka",     label: "KKA",            icon: "" },
+    { key: "draft",   label: "Draft & Konfirmasi", icon: "" },
+    { key: "exit",    label: "Exit Meeting",   icon: "" },
+    { key: "laporan", label: "Laporan (LHA)",  icon: "" },
   ];
   const tahapIndex: Record<string, number> = { rencana:0, entry:1, kka:2, draft:3, exit:4, laporan:5 };
 
@@ -1634,7 +1734,7 @@ function AuditPageRencana() {
       {/* Auditee header */}
       {myUnit && (
         <div className="rounded-xl border border-purple-100 p-4 flex items-start gap-3" style={{ background: "#f5f3ff" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}>📋</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}></div>
           <div>
             <div className="text-sm font-black text-purple-800">Modul Audit — Unit {myUnit}</div>
             <div className="text-xs text-purple-500 mt-0.5">Hanya menampilkan rencana, proses, dan laporan audit yang berkaitan dengan unit <strong>{myUnit}</strong>.</div>
@@ -1678,7 +1778,7 @@ function AuditPageRencana() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Funnel */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">🔻 Funnel Alur Audit</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Funnel Alur Audit</h4>
             <div className="flex flex-col gap-1.5">
               {auditFunnelData.map((d) => {
                 const maxVal = auditFunnelData[0].value;
@@ -1700,7 +1800,7 @@ function AuditPageRencana() {
 
           {/* Gantt timeline */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📅 Gantt — Jadwal Audit (Hari ke-)</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Gantt — Jadwal Audit (Hari ke-)</h4>
             <div className="flex flex-col gap-2">
               {auditGanttData.map(row => (
                 <div key={row.unit} className="flex items-center gap-2">
@@ -1742,9 +1842,6 @@ function AuditPageRencana() {
                       style={{ background: pi < idx ? "var(--tsu-teal)" : pi === idx ? "var(--tsu-gold)" : "#e2e8f0" }} />
                   ))}
                 </div>
-                <div className="flex justify-between text-[9px] text-gray-400 px-0.5">
-                  {proses.map(p => <span key={p.key} className="text-center flex-1 truncate">{p.icon}</span>)}
-                </div>
                 <div className="text-[10px] mt-1 font-semibold" style={{ color: "var(--tsu-teal)" }}>
                   Tahap saat ini: {proses.find(p=>p.key===a.tahap)?.label}
                 </div>
@@ -1757,7 +1854,7 @@ function AuditPageRencana() {
       {/* Rencana Audit */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <h4 className="text-xs font-bold text-gray-700">📝 Rencana Audit (Program Audit){myUnit ? ` — ${myUnit}` : ""}</h4>
+          <h4 className="text-xs font-bold text-gray-700">Rencana Audit (Program Audit){myUnit ? ` — ${myUnit}` : ""}</h4>
           {!myUnit && canEdit && <button onClick={() => setTambahModal("Tambah Rencana Audit")} className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white flex items-center gap-1.5"
             style={{ background: "var(--tsu-teal)" }}>
             + Tambah Rencana
@@ -1827,7 +1924,7 @@ function AuditPageRencana() {
       {/* Laporan Audit */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <h4 className="text-xs font-bold text-gray-700">📄 Laporan Hasil Audit (LHA){myUnit ? ` — ${myUnit}` : ""}</h4>
+          <h4 className="text-xs font-bold text-gray-700">Laporan Hasil Audit (LHA){myUnit ? ` — ${myUnit}` : ""}</h4>
           {!myUnit && canEdit && <button onClick={() => setShowLHAModal(true)}
             className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white flex items-center gap-1.5"
             style={{ background: "var(--tsu-teal)" }}>
@@ -1874,7 +1971,7 @@ function AuditPageRencana() {
                       )}
                       {!myUnit && canEdit && (
                         <button
-                          onClick={() => setLaporanList(prev => prev.map(x => x.no === l.no ? { ...x, status: "Revisi" } : x))}
+                          onClick={() => { setRevisiLHANo(l.no); setRevisiCatatan(""); }}
                           className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors whitespace-nowrap">
                           ↩ Revisi
                         </button>
@@ -1897,7 +1994,7 @@ function AuditPageRencana() {
           onClick={() => { if (lhaStep !== "saved") { setShowLHAModal(false); setLhaStep("form"); } }}>
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 my-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-bold text-gray-800">📄 Buat Laporan Hasil Audit (LHA)</h4>
+              <h4 className="text-sm font-bold text-gray-800">Buat Laporan Hasil Audit (LHA)</h4>
               <button onClick={() => { setShowLHAModal(false); setLhaSaved(false); setLhaStep("form"); }} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
             </div>
             {lhaStep === "form" && (
@@ -1953,7 +2050,7 @@ function AuditPageRencana() {
             {lhaStep === "confirm" && (
               <>
                 <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4">
-                  <span className="text-lg flex-shrink-0">⚠️</span>
+                  <span className="text-lg flex-shrink-0"></span>
                   <div>
                     <p className="text-xs font-bold text-amber-800 mb-1">Cek link sebelum menyimpan</p>
                     <p className="text-[11px] text-amber-700 leading-relaxed">Pastikan link Google Drive LHA sudah diatur ke <strong>publik (anyone with the link)</strong> agar bisa dibuka tanpa login. Kalau belum, klik <strong>Kembali</strong> dan perbaiki dulu.</p>
@@ -1974,7 +2071,7 @@ function AuditPageRencana() {
             {lhaStep === "saved" && (
               <>
                 <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 mb-4">
-                  <span className="text-base">✅</span>
+                  <span className="text-base"></span>
                   <p className="text-xs font-semibold text-green-700">LHA berhasil disimpan!</p>
                 </div>
                 <div className="flex justify-end">
@@ -1991,12 +2088,13 @@ function AuditPageRencana() {
 
       {tambahModal === "Tambah Rencana Audit" && (
         <TambahFormModal title="Tambah Rencana Audit" fields={[
-          { key:"unit",   label:"Unit Kerja",         type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
-          { key:"jenis",  label:"Jenis Audit",        type:"select", options:["Kinerja","Kepatuhan","Keuangan","Investigatif"] },
-          { key:"periode",label:"Periode Rencana",    type:"text",   placeholder:"Q3 2025" },
-          { key:"ketua",  label:"Ketua Tim Auditor",  type:"text" },
+          { key:"unit",     label:"Unit Kerja",         type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
+          { key:"jenis",    label:"Jenis Audit",        type:"select", options:["Kinerja","Kepatuhan","Keuangan","Investigatif"] },
+          { key:"periode",  label:"Periode Rencana",    type:"text",   placeholder:"Q3 2025" },
+          { key:"ketua",    label:"Ketua Tim Auditor",  type:"text" },
+          { key:"anggaran", label:"Anggaran (Rp)",      type:"text",   placeholder:"Contoh: Rp 4.500.000" },
         ]}
-        onSave={(v) => setRencanaList(prev => [{ no: `PA-${String(prev.length + 1).padStart(3,"0")}`, unit: v.unit || "-", jenis: v.jenis || "-", tim: v.ketua || "-", anggaran: "-", tglMulai: v.periode || "-", status: "Draft" }, ...prev])}
+        onSave={(v) => setRencanaList(prev => [{ no: `PA-${String(prev.length + 1).padStart(3,"0")}`, unit: v.unit || "-", jenis: v.jenis || "-", tim: v.ketua || "-", anggaran: v.anggaran || "-", tglMulai: v.periode || "-", status: "Draft" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {pendingDelete && (
@@ -2005,6 +2103,47 @@ function AuditPageRencana() {
           onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
           onCancel={() => setPendingDelete(null)}
         />
+      )}
+      {revisiLHANo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
+          onClick={() => setRevisiLHANo(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ background: "linear-gradient(135deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
+              <div className="text-sm font-black text-white">↩ Form Revisi LHA</div>
+              <button onClick={() => setRevisiLHANo(null)} className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center text-white text-sm font-bold">✕</button>
+            </div>
+            <div className="p-5 flex flex-col gap-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[10px] text-amber-700">
+                <span className="font-bold">No LHA: </span>{revisiLHANo} akan dikembalikan untuk direvisi.
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Catatan Revisi / Alasan</label>
+                <textarea
+                  value={revisiCatatan}
+                  onChange={e => setRevisiCatatan(e.target.value)}
+                  placeholder="Tuliskan catatan atau alasan revisi..."
+                  rows={3}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition-all resize-none" />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setLaporanList(prev => prev.map(x => x.no === revisiLHANo ? { ...x, status: "Revisi" } : x));
+                    setRevisiLHANo(null);
+                    setRevisiCatatan("");
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors">
+                  ↩ Konfirmasi Revisi
+                </button>
+                <button onClick={() => setRevisiLHANo(null)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -2017,11 +2156,13 @@ function AuditPageLapangan() {
   const canEdit = user?.role !== "rektor";
   const [activeStep, setActiveStep] = useState<"entry"|"draft"|"exit">("entry");
   const [tambahModal, setTambahModal] = useState<string | null>(null);
+  const [editEntryState, setEditEntryState] = useState<{ idx: number; field: "notulen"|"ba"|"presensi" } | null>(null);
+  const [editEntryLink, setEditEntryLink] = useState("");
 
   const steps = [
-    { key: "entry" as const, label: "Entry Meeting",              icon: "🤝", desc: "Rapat pembukaan sebelum kerja lapangan" },
-    { key: "draft" as const, label: "Draft Temuan & Konfirmasi", icon: "📨", desc: "Klarifikasi temuan kepada auditee" },
-    { key: "exit"  as const, label: "Exit Meeting",               icon: "🏁", desc: "Rapat penutupan & kesepakatan temuan" },
+    { key: "entry" as const, label: "Entry Meeting",              icon: "", desc: "Rapat pembukaan sebelum kerja lapangan" },
+    { key: "draft" as const, label: "Draft Temuan & Konfirmasi", icon: "", desc: "Klarifikasi temuan kepada auditee" },
+    { key: "exit"  as const, label: "Exit Meeting",               icon: "", desc: "Rapat penutupan & kesepakatan temuan" },
   ];
 
   const [entryList, setEntryList] = useState<{
@@ -2032,18 +2173,20 @@ function AuditPageLapangan() {
     { unit: "BAUK",     tgl: "20 Mei 2025", notulen: "Ada",    ba: "Proses",statusEntry: "Dijadwalkan", linkNotulen: "https://drive.google.com/file/notulen-entry-bauk",    linkBA: null,                                              linkPresensi: "https://drive.google.com/file/presensi-entry-bauk"    },
     { unit: "BAAK",     tgl: "2 Apr 2025",  notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana",  linkNotulen: "https://drive.google.com/file/notulen-entry-baak",    linkBA: "https://drive.google.com/file/ba-entry-baak",     linkPresensi: "https://drive.google.com/file/presensi-entry-baak"   },
   ]);
+  const [exitEdit, setExitEdit] = useState<{ idx: number; linkPresensi: string; linkBA: string; temuanSepakat: string; tindakLanjut: string } | null>(null);
+  const [dispoModal, setDispoModal] = useState<{ no: string; status: "Setuju"|"Keberatan"; catatan: string } | null>(null);
   const [draftList, setDraftList] = useState([
-    { unit: "BAAK", no: "DT-001", temuan: "SOP Penerimaan Mahasiswa Tidak Diperbarui", tglKirim: "15 Mei 2025", disposisi: "Setuju",     catatan: "Akan diperbarui pada Q3 2025" },
-    { unit: "BAAK", no: "DT-002", temuan: "Arsip Mahasiswa Keluar Tidak Terstruktur",  tglKirim: "15 Mei 2025", disposisi: "Keberatan",  catatan: "Mengajukan klarifikasi data tambahan" },
-    { unit: "Sarpras", no: "DT-003", temuan: "Aset Gedung Tidak Tercatat di SIMAK",    tglKirim: "18 Mei 2025", disposisi: "Menunggu",   catatan: "—" },
-    { unit: "Sarpras", no: "DT-004", temuan: "Belanja Modal Tanpa Berita Acara",       tglKirim: "18 Mei 2025", disposisi: "Setuju",     catatan: "BA sedang disiapkan" },
+    { unit: "BAAK", no: "DT-001", temuan: "SOP Penerimaan Mahasiswa Tidak Diperbarui", tglKirim: "15 Mei 2025", disposisi: "Setuju",     catatanAuditor: "Mohon SOP direvisi sesuai regulasi terbaru", catatanAuditee: "Akan diperbarui pada Q3 2025" },
+    { unit: "BAAK", no: "DT-002", temuan: "Arsip Mahasiswa Keluar Tidak Terstruktur",  tglKirim: "15 Mei 2025", disposisi: "Keberatan",  catatanAuditor: "Arsip perlu ditata ulang per angkatan", catatanAuditee: "Mengajukan klarifikasi data tambahan" },
+    { unit: "Sarpras", no: "DT-003", temuan: "Aset Gedung Tidak Tercatat di SIMAK",    tglKirim: "18 Mei 2025", disposisi: "Menunggu",   catatanAuditor: "Segera lengkapi pencatatan aset", catatanAuditee: "—" },
+    { unit: "Sarpras", no: "DT-004", temuan: "Belanja Modal Tanpa Berita Acara",       tglKirim: "18 Mei 2025", disposisi: "Setuju",     catatanAuditor: "Lampirkan berita acara setiap belanja modal", catatanAuditee: "BA sedang disiapkan" },
   ]);
   const [exitList, setExitList] = useState<{
-    unit: string; tgl: string; linkPresensi: string | null; temuanSepakat: number;
+    unit: string; tgl: string; linkPresensi: string | null; linkBA: string | null; temuanSepakat: number;
     ba: string; tindakLanjut: string; catatan: string;
   }[]>([
-    { unit: "BAAK",        tgl: "19 Mei 2025", linkPresensi: "https://drive.google.com/file/presensi-exit-baak",      temuanSepakat: 2, ba: "Ditandatangani", tindakLanjut: "Unit menyepakati perbaikan SOP penerimaan mhs paling lambat Q3 2025. Arsip mahasiswa keluar akan distrukturisasi dalam 30 hari.", catatan: "Semua pihak hadir, proses berjalan lancar." },
-    { unit: "Fak. Teknik", tgl: "2 Apr 2025",  linkPresensi: "https://drive.google.com/file/presensi-exit-fak-teknik", temuanSepakat: 3, ba: "Ditandatangani", tindakLanjut: "Tiga temuan disepakati dengan RTL: rekonsiliasi aset (14 hari), pembaruan SOP (30 hari), dan pelatihan staf (60 hari).",       catatan: "Dekan menyetujui seluruh rekomendasi." },
+    { unit: "BAAK",        tgl: "19 Mei 2025", linkPresensi: "https://drive.google.com/file/presensi-exit-baak", linkBA: "https://drive.google.com/file/ba-exit-baak", temuanSepakat: 2, ba: "Ditandatangani", tindakLanjut: "Unit menyepakati perbaikan SOP penerimaan mhs paling lambat Q3 2025. Arsip mahasiswa keluar akan distrukturisasi dalam 30 hari.", catatan: "Semua pihak hadir, proses berjalan lancar." },
+    { unit: "Fak. Teknik", tgl: "2 Apr 2025",  linkPresensi: "https://drive.google.com/file/presensi-exit-fak-teknik", linkBA: "https://drive.google.com/file/ba-exit-fak-teknik", temuanSepakat: 3, ba: "Ditandatangani", tindakLanjut: "Tiga temuan disepakati dengan RTL: rekonsiliasi aset (14 hari), pembaruan SOP (30 hari), dan pelatihan staf (60 hari).",       catatan: "Dekan menyetujui seluruh rekomendasi." },
   ]);
 
   const visibleEntry = myUnit ? entryList.filter(e => e.unit === myUnit) : entryList;
@@ -2123,22 +2266,34 @@ function AuditPageLapangan() {
                   {e.linkNotulen ? (
                     <a href={e.linkNotulen} target="_blank" rel="noreferrer"
                       className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors">
-                      📋 Notulen ↗
+                      Notulen ↗
                     </a>
                   ) : (
-                    <span className="text-[9px] font-bold px-2 py-1 rounded-lg bg-gray-50 text-gray-400">
-                      📋 Notulen: Belum
-                    </span>
+                    !myUnit && canEdit ? (
+                      <button onClick={() => { setEditEntryState({ idx: i, field: "notulen" }); setEditEntryLink(""); }}
+                        className="text-[9px] font-bold px-2 py-1 rounded-lg bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-300 transition-colors">
+                        Notulen: Belum — Isi ↗
+                      </button>
+                    ) : (
+                      <span className="text-[9px] font-bold px-2 py-1 rounded-lg bg-gray-50 text-gray-400">Notulen: Belum</span>
+                    )
                   )}
                   {e.linkBA ? (
                     <a href={e.linkBA} target="_blank" rel="noreferrer"
                       className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 transition-colors">
-                      📄 Berita Acara ↗
+                      Berita Acara ↗
                     </a>
                   ) : (
-                    <span className={`text-[9px] font-bold px-2 py-1 rounded-lg ${e.ba === "Proses" ? "bg-amber-50 text-amber-600 border border-amber-200" : "bg-gray-50 text-gray-400"}`}>
-                      📄 Berita Acara: {e.ba}
-                    </span>
+                    !myUnit && canEdit ? (
+                      <button onClick={() => { setEditEntryState({ idx: i, field: "ba" }); setEditEntryLink(""); }}
+                        className={`text-[9px] font-bold px-2 py-1 rounded-lg transition-colors ${e.ba === "Proses" ? "bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100" : "bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-amber-50 hover:text-amber-600"}`}>
+                        Berita Acara: {e.ba} — Isi ↗
+                      </button>
+                    ) : (
+                      <span className={`text-[9px] font-bold px-2 py-1 rounded-lg ${e.ba === "Proses" ? "bg-amber-50 text-amber-600 border border-amber-200" : "bg-gray-50 text-gray-400"}`}>
+                        Berita Acara: {e.ba}
+                      </span>
+                    )
                   )}
                 </div>
               </div>
@@ -2147,10 +2302,17 @@ function AuditPageLapangan() {
                   <a href={e.linkPresensi} target="_blank" rel="noreferrer"
                     className="font-semibold hover:opacity-80 transition-opacity flex items-center gap-1"
                     style={{ color: "var(--tsu-teal)" }}>
-                    🖨 Scan Presensi ↗ Buka Dokumen
+                    Scan Presensi ↗ Buka Dokumen
                   </a>
                 ) : (
-                  <span className="text-gray-400 italic">🖨 Scan Presensi: Belum diunggah</span>
+                  !myUnit && canEdit ? (
+                    <button onClick={() => { setEditEntryState({ idx: i, field: "presensi" }); setEditEntryLink(""); }}
+                      className="font-semibold hover:opacity-80 transition-opacity text-amber-500 italic">
+                      Scan Presensi: Belum — Isi ↗
+                    </button>
+                  ) : (
+                    <span className="text-gray-400 italic">Scan Presensi: Belum diunggah</span>
+                  )
                 )}
               </div>
             </div>
@@ -2170,7 +2332,7 @@ function AuditPageLapangan() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-gray-50 text-left">
-                  {["No","Unit","Temuan","Tgl Kirim","Respons Auditee","Catatan Auditee"].map(h=>(
+                  {["No","Unit","Temuan","Tgl Kirim","Catatan Auditor","Respons Auditee","Catatan Auditee",...(myUnit && canEdit ? ["Aksi"] : [])].map(h=>(
                     <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -2182,13 +2344,26 @@ function AuditPageLapangan() {
                     <td className="px-4 py-3 font-semibold text-gray-700 whitespace-nowrap">{d.unit}</td>
                     <td className="px-4 py-3 text-gray-600 max-w-[200px]">{d.temuan}</td>
                     <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{d.tglKirim}</td>
+                    <td className="px-4 py-3 text-gray-500 text-[10px] italic max-w-[180px]">{d.catatanAuditor}</td>
                     <td className="px-4 py-3">
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap
                         ${d.disposisi==="Setuju"?"bg-green-50 text-green-600":
                           d.disposisi==="Keberatan"?"bg-red-50 text-red-600":
                           "bg-gray-100 text-gray-500"}`}>{d.disposisi}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-[10px] italic">{d.catatan}</td>
+                    <td className="px-4 py-3 text-gray-500 text-[10px] italic max-w-[180px]">{d.catatanAuditee}</td>
+                    {myUnit && canEdit && (
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {d.disposisi === "Menunggu" ? (
+                          <div className="flex gap-1.5">
+                            <button onClick={() => setDispoModal({ no: d.no, status: "Setuju", catatan: "" })}
+                              className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100">Setuju</button>
+                            <button onClick={() => setDispoModal({ no: d.no, status: "Keberatan", catatan: "" })}
+                              className="text-[9px] font-bold px-2 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100">Keberatan</button>
+                          </div>
+                        ) : <span className="text-[9px] text-gray-300 italic">Sudah direspons</span>}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -2212,14 +2387,29 @@ function AuditPageLapangan() {
                   <div className="text-sm font-bold text-gray-800">{e.unit}</div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{e.tgl}</div>
                 </div>
+                <div className="flex items-center gap-2">
+                {!myUnit && canEdit && !(e.linkPresensi && e.linkBA && e.tindakLanjut !== "-" && e.temuanSepakat > 0) && (
+                  <button onClick={() => { const idx = exitList.indexOf(e); setExitEdit({ idx, linkPresensi: e.linkPresensi ?? "", linkBA: e.linkBA ?? "", temuanSepakat: String(e.temuanSepakat), tindakLanjut: e.tindakLanjut === "-" ? "" : e.tindakLanjut }); }}
+                    className="text-[9px] font-bold px-2 py-1 rounded-lg border border-dashed hover:opacity-80"
+                    style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>Lengkapi</button>
+                )}
                 <span className={`text-[9px] font-bold px-2 py-1 rounded-lg border
                   ${e.ba==="Ditandatangani"?"bg-green-50 text-green-600 border-green-200":"bg-amber-50 text-amber-600 border-amber-200"}`}>
-                  ✍ BA: {e.ba}
+                  BA: {e.ba}
                 </span>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-[10px] mb-2">
+              <div className="grid grid-cols-3 gap-2 text-[10px] mb-2">
                 <div className="bg-gray-50 rounded-lg px-3 py-2">
-                  <span className="text-gray-400 block mb-0.5">🖨 Scan Presensi:</span>
+                  <span className="text-gray-400 block mb-0.5">Berita Acara:</span>
+                  {e.linkBA ? (
+                    <a href={e.linkBA} target="_blank" rel="noreferrer" className="font-semibold hover:opacity-80 transition-opacity" style={{ color: "var(--tsu-teal)" }}>↗ Buka Dokumen</a>
+                  ) : (
+                    <span className="text-gray-400 italic">Belum diunggah</span>
+                  )}
+                </div>
+                <div className="bg-gray-50 rounded-lg px-3 py-2">
+                  <span className="text-gray-400 block mb-0.5">Scan Presensi:</span>
                   {e.linkPresensi ? (
                     <a href={e.linkPresensi} target="_blank" rel="noreferrer"
                       className="font-semibold hover:opacity-80 transition-opacity flex items-center gap-1"
@@ -2236,12 +2426,12 @@ function AuditPageLapangan() {
                 </div>
               </div>
               <div className="rounded-lg p-3 text-[10px] mb-2" style={{ background: "var(--tsu-teal-light)" }}>
-                <div className="font-bold mb-1" style={{ color: "var(--tsu-teal-dark)" }}>🤝 Tindak Lanjut yang Disepakati:</div>
-                <div style={{ color: "var(--tsu-teal-dark)" }}>{e.tindakLanjut}</div>
+                <div className="font-bold mb-1" style={{ color: "var(--tsu-teal-dark)" }}>Tindak Lanjut yang Disepakati:</div>
+                <div style={{ color: "var(--tsu-teal-dark)" }}>{e.tindakLanjut === "-" ? "Belum diisi" : e.tindakLanjut}</div>
               </div>
               {e.catatan && e.catatan !== "—" && (
                 <div className="bg-gray-50 rounded-lg px-3 py-2 text-[10px]">
-                  <span className="text-gray-400 font-semibold">📝 Catatan Auditor: </span>
+                  <span className="text-gray-400 font-semibold">Catatan Auditor: </span>
                   <span className="text-gray-600">{e.catatan}</span>
                 </div>
               )}
@@ -2270,6 +2460,74 @@ function AuditPageLapangan() {
         }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
+      {editEntryState && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
+          onClick={() => setEditEntryState(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ background: "linear-gradient(135deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
+              <div className="text-sm font-black text-white">
+                {editEntryState.field === "notulen"  && "Isi Link Notulen"}
+                {editEntryState.field === "ba"       && "Isi Link Berita Acara"}
+                {editEntryState.field === "presensi" && "Isi Link Scan Presensi"}
+              </div>
+              <button onClick={() => setEditEntryState(null)} className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center text-white text-sm font-bold">✕</button>
+            </div>
+            <div className="p-5 flex flex-col gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Link Google Drive</label>
+                <input
+                  type="url"
+                  value={editEntryLink}
+                  onChange={e => setEditEntryLink(e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all" />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (!editEntryLink.trim()) return;
+                    const { idx, field } = editEntryState;
+                    setEntryList(prev => prev.map((e, i) => {
+                      if (i !== idx) return e;
+                      if (field === "notulen")  return { ...e, notulen: "Ada",   linkNotulen: editEntryLink };
+                      if (field === "ba")       return { ...e, ba: "Ada",        linkBA: editEntryLink };
+                      if (field === "presensi") return { ...e, linkPresensi: editEntryLink };
+                      return e;
+                    }));
+                    setEditEntryState(null);
+                    setEditEntryLink("");
+                  }}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-colors"
+                  style={{ background: "var(--tsu-teal)" }}>
+                  ✓ Simpan Link
+                </button>
+                <button onClick={() => setEditEntryState(null)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {dispoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,23,42,0.55)" }} onClick={() => setDispoModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+            <div className="text-sm font-black text-gray-800 mb-1">Disposisi {dispoModal.status} — {dispoModal.no}</div>
+            <p className="text-[10px] text-gray-400 mb-3">Tuliskan catatan auditee untuk draft temuan ini.</p>
+            <textarea rows={4} value={dispoModal.catatan} onChange={e => setDispoModal(m => m ? { ...m, catatan: e.target.value } : m)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-teal-400" placeholder="Catatan auditee" />
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => {
+                setDraftList(prev => prev.map(x => x.no === dispoModal.no ? { ...x, disposisi: dispoModal.status, catatanAuditee: dispoModal.catatan.trim() || "—" } : x));
+                setDispoModal(null);
+              }} className="flex-1 text-xs font-bold py-2 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>Kirim Disposisi</button>
+              <button onClick={() => setDispoModal(null)} className="text-xs font-semibold px-4 py-2 rounded-lg bg-gray-100 text-gray-600">Batal</button>
+            </div>
+          </div>
+        </div>
+      )}
       {tambahModal === "Tambah Draft Temuan" && (
         <TambahFormModal title="Tambah Draft Temuan" fields={[
           { key:"no",       label:"No Draft Temuan",                        type:"text",     placeholder:"DT-005" },
@@ -2279,7 +2537,7 @@ function AuditPageLapangan() {
           { key:"link",     label:"Link Dokumen Konfirmasi (Google Drive)", type:"url",      required:false },
           { key:"catatan",  label:"Catatan Auditor",                        type:"textarea", required:false },
         ]}
-        onSave={(v) => setDraftList(prev => [{ unit: v.unit || "-", no: v.no || `DT-${String(prev.length + 1).padStart(3,"0")}`, temuan: v.temuan || "-", tglKirim: v.tglKirim || "-", disposisi: "Menunggu", catatan: v.catatan || "—" }, ...prev])}
+        onSave={(v) => setDraftList(prev => [{ unit: v.unit || "-", no: v.no || `DT-${String(prev.length + 1).padStart(3,"0")}`, temuan: v.temuan || "-", tglKirim: v.tglKirim || "-", disposisi: "Menunggu", catatanAuditor: v.catatan || "—", catatanAuditee: "—" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Exit Meeting" && (
@@ -2288,18 +2546,67 @@ function AuditPageLapangan() {
           { key:"tgl",          label:"Tanggal Pelaksanaan",                     type:"date" },
           { key:"linkPresensi", label:"Link Scan Presensi (Google Drive)",       type:"url",      required:false },
           { key:"link",         label:"Link BA Exit Meeting (Google Drive)",      type:"url",      required:false },
+          { key:"temuanSepakat",label:"Jumlah Temuan yang Disepakati",           type:"text",     placeholder:"0", required:false },
+          { key:"tindakLanjut", label:"Tindak Lanjut yang Disepakati",           type:"textarea", required:false },
           { key:"catatan",      label:"Catatan Auditor",                         type:"textarea", required:false },
         ]}
         onSave={(v) => setExitList(prev => [{
           unit: v.unit || "-",
           tgl: v.tgl || "-",
           linkPresensi: v.linkPresensi || null,
-          temuanSepakat: 0,
+          linkBA: v.link || null,
+          temuanSepakat: parseInt(v.temuanSepakat) || 0,
           ba: v.link ? "Ditandatangani" : "Proses",
-          tindakLanjut: "-",
+          tindakLanjut: v.tindakLanjut?.trim() || "-",
           catatan: v.catatan || "—",
         }, ...prev])}
         onClose={() => setTambahModal(null)} />
+      )}
+      {exitEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }} onClick={() => setExitEdit(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4" style={{ background: "linear-gradient(135deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
+              <div className="text-sm font-black text-white">Lengkapi Exit Meeting — {exitList[exitEdit.idx]?.unit}</div>
+              <button onClick={() => setExitEdit(null)} className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center text-white text-sm font-bold">✕</button>
+            </div>
+            <div className="p-5 flex flex-col gap-3">
+              {([
+                { k: "linkPresensi", label: "Link Scan Presensi (Google Drive)", ph: "https://drive.google.com/..." },
+                { k: "linkBA", label: "Link BA Exit Meeting (Google Drive)", ph: "https://drive.google.com/..." },
+                { k: "temuanSepakat", label: "Jumlah Temuan yang Disepakati", ph: "0" },
+              ] as const).map(f => (
+                <div key={f.k}>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">{f.label}</label>
+                  <input value={exitEdit[f.k]} onChange={e => setExitEdit(m => m ? { ...m, [f.k]: e.target.value } : m)} placeholder={f.ph}
+                    disabled={f.k === "temuanSepakat" ? exitList[exitEdit.idx].temuanSepakat > 0 : !!exitList[exitEdit.idx][f.k]}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400 disabled:bg-gray-50 disabled:text-gray-400" />
+                </div>
+              ))}
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Tindak Lanjut yang Disepakati</label>
+                <textarea rows={3} value={exitEdit.tindakLanjut} onChange={e => setExitEdit(m => m ? { ...m, tindakLanjut: e.target.value } : m)}
+                  disabled={exitList[exitEdit.idx].tindakLanjut !== "-"}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400 disabled:bg-gray-50 disabled:text-gray-400" />
+              </div>
+              <p className="text-[10px] text-gray-400">Hanya isian yang belum terisi yang dapat diisi; data yang sudah terisi tidak dapat diubah. Status BA otomatis menjadi Ditandatangani setelah link BA terisi.</p>
+              <div className="flex gap-2">
+                <button onClick={() => {
+                  const m = exitEdit;
+                  setExitList(prev => prev.map((x, i) => i !== m.idx ? x : {
+                    ...x,
+                    linkPresensi: m.linkPresensi.trim() || null,
+                    linkBA: m.linkBA.trim() || null,
+                    ba: m.linkBA.trim() ? "Ditandatangani" : "Proses",
+                    temuanSepakat: parseInt(m.temuanSepakat) || 0,
+                    tindakLanjut: m.tindakLanjut.trim() || "-",
+                  }));
+                  setExitEdit(null);
+                }} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "var(--tsu-teal)" }}>Simpan</button>
+                <button onClick={() => setExitEdit(null)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -2347,7 +2654,7 @@ function AuditPageKKA() {
           <button onClick={() => setEditingLink({ key, value: savedLink ?? "" })}
             className="text-[9px] font-bold px-2 py-1 rounded-lg border border-dashed flex items-center gap-1 w-fit hover:opacity-80 transition-opacity"
             style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
-            🔗 {savedLink ? "Ganti Link" : "Isi Link"}
+            {savedLink ? "Ganti Link" : "Isi Link"}
           </button>
         )}
       </div>
@@ -2390,18 +2697,18 @@ function AuditPageKKA() {
         )}
         {myUnit && (
           <div className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: "#f5f3ff", color: "#7c3aed" }}>
-            🏛️ Unit: {myUnit}
+            Unit: {myUnit}
           </div>
         )}
         <div className="text-[10px] text-gray-400 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5">
-          ⚠ Dokumen Auditor = file kertas kerja internal. Dokumen Auditee = bukti/data dari unit yang diaudit.
+          Dokumen Auditor = file kertas kerja internal. Dokumen Auditee = bukti/data dari unit yang diaudit.
         </div>
       </div>
 
       {/* KKA table */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-          <h4 className="text-xs font-bold text-gray-700">🗃️ Kertas Kerja Audit — {myUnit ?? filterUnit}</h4>
+          <h4 className="text-xs font-bold text-gray-700">Kertas Kerja Audit — {myUnit ?? filterUnit}</h4>
           {!myUnit && canEdit && <button onClick={() => setTambahModal("Tambah KKA")} className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>
             + Tambah KKA
           </button>}
@@ -2437,7 +2744,7 @@ function AuditPageKKA() {
                     <LinkCell id={k.id} role="auditor" existingLink={k.linkAuditor} canEdit={!myUnit && canEdit} locked={k.statusAudit === "Selesai"} />
                   </td>
                   <td className="px-4 py-3">
-                    <LinkCell id={k.id} role="auditee" existingLink={k.linkAuditee} canEdit={canEdit} locked={k.statusAudit === "Selesai"} />
+                    <LinkCell id={k.id} role="auditee" existingLink={k.linkAuditee} canEdit={!!myUnit} locked={k.statusAudit === "Selesai"} />
                   </td>
                   {!myUnit && canEdit && (
                     <td className="px-4 py-3">
@@ -2563,7 +2870,7 @@ function PwRTL({ subSection }: { subSection: string }) {
       {/* Auditee header */}
       {myUnit && (
         <div className="rounded-xl border border-purple-100 p-4 flex items-start gap-3" style={{ background: "#f5f3ff" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}>📌</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}></div>
           <div className="flex-1">
             <div className="text-sm font-black text-purple-800">Tindak Lanjut Rekomendasi (RTL) — Unit {myUnit}</div>
             <div className="text-xs text-purple-500 mt-0.5">Selesaikan setiap rekomendasi sebelum batas waktu dan upload bukti penyelesaian.</div>
@@ -2586,7 +2893,7 @@ function PwRTL({ subSection }: { subSection: string }) {
       )}
       {myUnit && !showVerif && (
         <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] text-blue-700">
-          💡 <strong>Cara menyelesaikan RTL:</strong> Klik <em>Isi Link Bukti</em> pada baris RTL yang sedang berjalan, tempel link Google Drive atau tautan dokumen bukti tindak lanjut, lalu tunggu verifikasi dari SPI.
+          <strong>Cara menyelesaikan RTL:</strong> Klik <em>Isi Link Bukti</em> pada baris RTL yang sedang berjalan, tempel link Google Drive atau tautan dokumen bukti tindak lanjut, lalu tunggu verifikasi dari SPI.
         </div>
       )}
 
@@ -2595,7 +2902,7 @@ function PwRTL({ subSection }: { subSection: string }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Area chart trend */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📈 Tren RTL per Bulan</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Tren RTL per Bulan</h4>
             <ResponsiveContainer width="100%" height={150}>
               <AreaChart data={rtlTrendBulanan} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
                 <defs>
@@ -2621,7 +2928,7 @@ function PwRTL({ subSection }: { subSection: string }) {
           {/* Grouped bar — RTL per unit */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">📊 Status RTL per Unit Kerja</h4>
+              <h4 className="text-xs font-bold text-gray-700">Status RTL per Unit Kerja</h4>
               <div className="flex gap-2">
                 {[{c:"#22c55e",l:"Selesai"},{c:"#3b82f6",l:"Proses"},{c:"#ef4444",l:"Terlambat"}].map(s=>(
                   <div key={s.l} className="flex items-center gap-1">
@@ -2722,7 +3029,7 @@ function PwRTL({ subSection }: { subSection: string }) {
                             <button onClick={() => setEditingBukti({ no: r.no, value: "" })}
                               className="text-[9px] font-bold px-2 py-1 rounded-lg border border-dashed whitespace-nowrap"
                               style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
-                              🔗 Isi Link Bukti
+                              Isi Link Bukti
                             </button>
                           ) : null}
                         </>
@@ -2735,7 +3042,7 @@ function PwRTL({ subSection }: { subSection: string }) {
                       {!myUnit && buktiLinks[r.no] && (
                         <a href={buktiLinks[r.no]} target="_blank" rel="noreferrer"
                           className="text-[9px] text-teal-600 hover:underline flex items-center gap-0.5">
-                          🔗 Lihat Bukti
+                          Lihat Bukti
                         </a>
                       )}
                     </div>
@@ -2798,9 +3105,9 @@ function PwRTL({ subSection }: { subSection: string }) {
                     </div>
                     <div className="text-[10px] font-semibold text-gray-700 mb-2">{v.temuan}</div>
                     <div className="flex flex-wrap gap-3 text-[10px] text-gray-400">
-                      <span>📎 Bukti: <strong className="text-gray-600">{v.bukti}</strong></span>
-                      <span>👤 Verifikator: <strong className="text-gray-600">{v.verifikator}</strong></span>
-                      {v.tglSelesai !== "—" && <span>📅 {v.tglSelesai}</span>}
+                      <span>Bukti: <strong className="text-gray-600">{v.bukti}</strong></span>
+                      <span>Verifikator: <strong className="text-gray-600">{v.verifikator}</strong></span>
+                      {v.tglSelesai !== "—" && <span>{v.tglSelesai}</span>}
                     </div>
                   </div>
 
@@ -2826,7 +3133,7 @@ function PwRTL({ subSection }: { subSection: string }) {
                   {/* Hasil sudah diputuskan — tampilkan info efek ke Daftar Tindak Lanjut */}
                   {!myUnit && !isMenunggu && (
                     <div className="flex-shrink-0 text-[9px] text-gray-400 italic self-center">
-                      {currentHasil === "Diterima" ? "✅ RTL otomatis Selesai" : currentHasil === "Ditolak" ? "🔄 RTL kembali ke Proses" : ""}
+                      {currentHasil === "Diterima" ? "RTL otomatis Selesai" : currentHasil === "Ditolak" ? "RTL kembali ke Proses" : ""}
                     </div>
                   )}
                 </div>
@@ -2895,7 +3202,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
       {/* Auditee: header + ringkasan khusus unit */}
       {myUnit && (
         <div className="rounded-xl border border-purple-100 p-4 flex items-start gap-3" style={{ background: "#f5f3ff" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}>📁</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#7c3aed", color: "#fff" }}></div>
           <div>
             <div className="text-sm font-black text-purple-800">Riwayat Audit — Unit {myUnit}</div>
             <div className="text-xs text-purple-500 mt-0.5">Rekam jejak seluruh audit yang pernah dilaksanakan di unit <strong>{myUnit}</strong>, termasuk temuan berulang.</div>
@@ -2926,7 +3233,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
                 {unitRiwayat.map((r, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${r.status==="Selesai"?"bg-green-100":r.status==="Berjalan"?"bg-amber-100":"bg-gray-100"}`}>
-                      {r.status==="Selesai"?"✅":r.status==="Berjalan"?"🔍":"📋"}
+                      {r.status==="Selesai"?"":r.status==="Berjalan"?"":""}
                     </div>
                     <div className="flex-1">
                       <div className="text-xs font-semibold text-gray-700">Audit {r.jenis} {r.tahun}</div>
@@ -2943,7 +3250,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
             </div>
             {unitBerulang.length > 0 && (
               <div className="bg-white rounded-xl border border-amber-100 p-4 shadow-sm">
-                <h4 className="text-xs font-bold text-amber-700 mb-3">⚠ Temuan Berulang di Unit {myUnit}</h4>
+                <h4 className="text-xs font-bold text-amber-700 mb-3">Temuan Berulang di Unit {myUnit}</h4>
                 <div className="flex flex-col gap-3">
                   {unitBerulang.map((b, i) => (
                     <div key={i} className="p-3 rounded-xl border border-amber-100 bg-amber-50">
@@ -2952,7 +3259,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-auto ${b.tren==="Meningkat"?"bg-red-100 text-red-600":"bg-gray-100 text-gray-500"}`}>{b.tren}</span>
                         <span className="text-[9px] text-gray-400">{b.frekuensi}× muncul</span>
                       </div>
-                      <div className="text-[10px] text-gray-600 mt-1 leading-relaxed">💡 {b.rekomendasi}</div>
+                      <div className="text-[10px] text-gray-600 mt-1 leading-relaxed">{b.rekomendasi}</div>
                     </div>
                   ))}
                 </div>
@@ -2973,7 +3280,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
         return (
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">📁 Diagram Riwayat Audit per Unit Kerja</h4>
+              <h4 className="text-xs font-bold text-gray-700">Diagram Riwayat Audit per Unit Kerja</h4>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>{totalAudit} Audit Total</span>
             </div>
             <div className="flex items-center gap-4 mb-4">
@@ -3034,7 +3341,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Multi-line trend */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-1">📈 Tren Temuan per Unit (per Tahun)</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-1">Tren Temuan per Unit (per Tahun)</h4>
             <div className="flex flex-wrap gap-2 mb-2">
               {riwayatLineUnits.map((u, i) => (
                 <div key={u.key} className="flex items-center gap-1">
@@ -3060,7 +3367,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
 
           {/* Heatmap unit × tahun */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">🔥 Heatmap Intensitas Audit</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Heatmap Intensitas Audit</h4>
             {(() => {
               const tahuns = ["2022","2023","2024","2025"];
               const heatData: Record<string, Record<string, number>> = {
@@ -3124,7 +3431,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
               const a = document.createElement("a"); a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv); a.download = "riwayat-audit.csv"; a.click();
             }} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 hover:opacity-80 transition-opacity"
               style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
-              ⬇ Export Riwayat
+              Export Riwayat
             </button>
           </div>
         </div>
@@ -3215,7 +3522,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
                 {b.units.map(u=><span key={u} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background:"var(--tsu-teal-light)", color:"var(--tsu-teal)" }}>{u}</span>)}
               </div>
               <div className="rounded-lg px-3 py-2 text-[10px]" style={{ background: "#fffbeb" }}>
-                <span className="font-bold text-amber-700">💡 Rekomendasi: </span>
+                <span className="font-bold text-amber-700">Rekomendasi: </span>
                 <span className="text-amber-800">{b.rekomendasi}</span>
               </div>
             </div>
@@ -3227,341 +3534,64 @@ function PwRiwayat({ subSection }: { subSection: string }) {
   );
 }
 
-function PwKalender({ subSection }: { subSection: string }) {
-  const user = useContext(UserCtx);
-  const myUnit = user?.role === "auditee" ? user.unit : null;
-  const canEdit = user?.role !== "rektor";
+const pwEvents: Record<number, { label: string; type: string }[]> = {
+  5:  [{ label:"Audit Sarpras mulai",      type:"audit"    }],
+  10: [{ label:"Deadline RTL Fak. Hukum",  type:"deadline" }],
+  15: [{ label:"Deadline RTL LPPM",        type:"deadline" }],
+  18: [{ label:"Deadline RTL Sarpras",     type:"deadline" }],
+  19: [{ label:"Exit Meeting BAAK",        type:"meeting"  }],
+  20: [{ label:"Entry Meeting Keuangan",   type:"meeting"  }],
+  22: [{ label:"Rapat Tinjauan Manajemen", type:"rapat"    }],
+  26: [{ label:"Audit Pendahuluan LPPM",   type:"audit"    }],
+  28: [{ label:"Koordinasi Program Audit", type:"rapat"    }],
+  31: [{ label:"Target LHA Sarpras",       type:"deadline" }],
+};
 
-  const [agendaFilter, setAgendaFilter]   = useState("Semua");
-  const [deadlineFilter, setDeadlineFilter] = useState("Semua");
-  const [doneDeadlines, setDoneDeadlines] = useState<Record<string, boolean>>({});
+const siklusData = [
+  { unit: "BAAK",              start: 1, dur: 2 },
+  { unit: "LPPM",              start: 2, dur: 2 },
+  { unit: "Sarpras",           start: 4, dur: 3 },
+  { unit: "BAUK",              start: 5, dur: 3 },
+  { unit: "Fak. Teknik",       start: 7, dur: 2 },
+  { unit: "LPM",               start: 9, dur: 2 },
+];
 
-  const events: Record<number, { label: string; type: string }[]> = {
-    5:  [{ label:"Audit Sarpras mulai",      type:"audit"    }],
-    10: [{ label:"Deadline RTL Fak. Hukum",  type:"deadline" }],
-    15: [{ label:"Deadline RTL LPPM",        type:"deadline" }],
-    18: [{ label:"Deadline RTL Sarpras",     type:"deadline" }],
-    19: [{ label:"Exit Meeting BAAK",        type:"meeting"  }],
-    20: [{ label:"Entry Meeting Keuangan",   type:"meeting"  }],
-    22: [{ label:"Rapat Tinjauan Manajemen", type:"rapat"    }],
-    26: [{ label:"Audit Pendahuluan LPPM",   type:"audit"    }],
-    28: [{ label:"Koordinasi Program Audit", type:"rapat"    }],
-    31: [{ label:"Target LHA Sarpras",       type:"deadline" }],
-  };
-  const typeStyle: Record<string, { dot: string; badge: string }> = {
-    audit:    { dot:"bg-teal-500",  badge:"bg-teal-50 text-teal-700"  },
-    deadline: { dot:"bg-red-500",   badge:"bg-red-50 text-red-600"    },
-    meeting:  { dot:"bg-amber-400", badge:"bg-amber-50 text-amber-700"},
-    rapat:    { dot:"bg-purple-500",badge:"bg-purple-50 text-purple-700"},
-  };
-  const today = 22;
-
-  const agenda = Object.entries(events).sort(([a],[b])=>+a-+b).map(([day, evs])=>({ day:+day, evs }));
-
-  const showDeadline = subSection === "Deadline & Reminder";
-
-  // Auditee-specific events per unit
-  const unitEvents: Record<string, { day: number; label: string; type: string }[]> = {
-    BAAK: [
-      { day: 8,  label: "Entry Meeting Audit BAAK",       type: "meeting"  },
-      { day: 12, label: "Pengumpulan Dokumen BAAK",        type: "audit"    },
-      { day: 19, label: "Exit Meeting BAAK",               type: "meeting"  },
-      { day: 26, label: "Deadline Respons RTL #1",         type: "deadline" },
-      { day: 30, label: "Deadline Respons RTL #2",         type: "deadline" },
-    ],
-    Sarpras: [
-      { day: 5,  label: "Audit Sarpras Mulai",             type: "audit"    },
-      { day: 10, label: "Pengumpulan Data Sarpras",        type: "audit"    },
-      { day: 18, label: "Deadline RTL Sarpras",            type: "deadline" },
-      { day: 23, label: "Klarifikasi Temuan Sarpras",      type: "meeting"  },
-      { day: 31, label: "Target Selesai LHA Sarpras",      type: "deadline" },
-    ],
-    Keuangan: [
-      { day: 3,  label: "Persiapan Dokumen Keuangan",      type: "audit"    },
-      { day: 20, label: "Entry Meeting Keuangan",          type: "meeting"  },
-      { day: 25, label: "Penyerahan Laporan Keuangan",     type: "deadline" },
-      { day: 28, label: "Rapat Pembahasan Temuan",         type: "rapat"    },
-    ],
-    LPPM: [
-      { day: 10, label: "Deadline RTL LPPM",               type: "deadline" },
-      { day: 15, label: "Verifikasi Dokumen LPPM",         type: "audit"    },
-      { day: 26, label: "Audit Pendahuluan LPPM",          type: "audit"    },
-      { day: 29, label: "Koordinasi Riset & Pengabdian",   type: "rapat"    },
-    ],
-  };
-
-  if (myUnit) {
-    const myEvs = unitEvents[myUnit] ?? [];
-    const todayRef = 22;
-    type AuditeeEv = typeof myEvs[number] & { sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
-    const enriched: AuditeeEv[] = myEvs.map(ev => {
-      const sisa = ev.day - todayRef;
-      const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
-        sisa < 0  ? "Kritis" :
-        sisa <= 3 ? "Tinggi" :
-        sisa <= 7 ? "Sedang" : "Normal";
-      return { ...ev, sisa, priority };
-    }).sort((a, b) => a.sisa - b.sisa);
-
-    const priorityCls: Record<string, string> = {
-      Kritis: "bg-red-50 border-red-200 text-red-700",
-      Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
-      Sedang: "bg-amber-50 border-amber-200 text-amber-700",
-      Normal: "bg-teal-50 border-teal-200 text-teal-700",
-    };
-
-    const upcoming  = enriched.filter(e => e.sisa >= 0);
-    const overdue   = enriched.filter(e => e.sisa < 0);
-    const nextEvent = upcoming[0];
-
-    return (
-      <div className="flex flex-col gap-4">
-        {/* Unit banner */}
-        <div className="rounded-xl border border-purple-100 bg-gradient-to-r from-purple-50 to-white p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: "var(--tsu-teal-light)" }}>📅</div>
-          <div>
-            <div className="text-xs font-bold text-gray-800">Kalender Audit — Unit {myUnit}</div>
-            <div className="text-[10px] text-gray-500 mt-0.5">
-              {upcoming.length} jadwal mendatang · {overdue.length} sudah lewat · Mei 2025
-            </div>
-          </div>
-          {nextEvent && (
-            <div className="ml-auto text-right">
-              <div className="text-[9px] text-gray-400">Jadwal terdekat</div>
-              <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal)" }}>{nextEvent.label}</div>
-              <div className="text-[9px] text-gray-500">
-                {nextEvent.sisa === 0 ? "Hari ini!" : `${nextEvent.sisa} hari lagi`}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Mini calendar grid for unit */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-3">🗓️ Kalender Unit {myUnit} — Mei 2025</h4>
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
-              <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
-            {Array.from({length:31},(_,i)=>i+1).map(d => {
-              const dayEvs = myEvs.filter(e => e.day === d);
-              const isToday = d === todayRef;
-              return (
-                <div key={d} className={`rounded-lg p-1 min-h-[42px] ${isToday ? "outline outline-2 outline-teal-500" : ""}`}
-                  style={isToday ? { background: "var(--tsu-teal-light)" } : {}}>
-                  <div className={`text-[10px] font-semibold text-center ${isToday ? "font-black" : "text-gray-500"}`}
-                    style={isToday ? { color: "var(--tsu-teal)" } : {}}>{d}</div>
-                  <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
-                    {dayEvs.map((ev,i) => (
-                      <span key={i} className={`w-2 h-2 rounded-full ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} title={ev.label} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Jadwal list */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-3">📋 Daftar Jadwal — Unit {myUnit}</h4>
-          <div className="flex flex-col gap-2">
-            {enriched.map((ev, i) => {
-              const key = `unit-${ev.day}-${i}`;
-              const done = doneDeadlines[key];
-              return (
-                <div key={key} className={`flex items-center gap-3 rounded-xl border p-3 transition-opacity ${done ? "opacity-40" : ""} ${priorityCls[ev.priority]}`}>
-                  <div className="flex-shrink-0 text-center w-10">
-                    <div className="text-sm font-black leading-none" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
-                    <div className="text-[9px] opacity-70">Mei</div>
-                  </div>
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
-                  <div className="flex-1">
-                    <div className="text-[10px] font-semibold leading-tight">{ev.label}</div>
-                    <div className="text-[9px] mt-0.5 opacity-70">
-                      {ev.sisa < 0 ? `${Math.abs(ev.sisa)} hari lalu · ${ev.priority}` :
-                       ev.sisa === 0 ? "Hari ini!" :
-                       `${ev.sisa} hari lagi · ${ev.priority}`}
-                      {" · "}<span className="capitalize">{ev.type}</span>
-                    </div>
-                  </div>
-                  {canEdit && <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
-                    className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
-                    {done ? "✓ Selesai" : "Tandai Selesai"}
-                  </button>}
-                </div>
-              );
-            })}
-            {enriched.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Belum ada jadwal untuk unit ini.</p>}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Shared helpers ──
-  type PriItem = { day: number; label: string; type: string; sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
-  const todayDay = 22;
-  const allDl: PriItem[] = Object.entries(events)
-    .flatMap(([day, evs]) => evs.map(ev => {
-      const sisa = +day - todayDay;
-      const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
-        sisa < 0  ? "Kritis" :
-        sisa <= 3 ? "Tinggi" :
-        sisa <= 7 ? "Sedang" : "Normal";
-      return { day: +day, ...ev, sisa, priority };
-    }))
-    .sort((a, b) => a.sisa - b.sisa);
-
-  const priorityCls: Record<string, string> = {
-    Kritis: "bg-red-50 border-red-200 text-red-700",
-    Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
-    Sedang: "bg-amber-50 border-amber-200 text-amber-700",
-    Normal: "bg-gray-50 border-gray-200 text-gray-600",
-  };
-
+function SiklusAuditPanel({ onlyUnit }: { onlyUnit: string | null }) {
+  const rows = onlyUnit ? siklusData.filter(d => d.unit === onlyUnit) : siklusData;
+  const ganttData = rows.map(d => ({ name: d.unit, mulai: d.start, durasi: d.dur }));
+  if (rows.length === 0) return <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-xs text-gray-400 text-center">Unit {onlyUnit} belum masuk siklus audit tahun ini.</div>;
   return (
-    <div className="flex flex-col gap-4">
-
-      {/* ── Kalender Pengawasan (formerly Jadwal Audit) ── */}
-      {!showDeadline && (
-        <>
-          {/* 1. Kalender grid */}
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">🗓️ Kalender Pengawasan — Mei 2025</h4>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(typeStyle).map(([t,s])=>(
-                  <div key={t} className="flex items-center gap-1 text-[9px]">
-                    <span className={`w-2 h-2 rounded-full ${s.dot}`}/>
-                    <span className="text-gray-500 capitalize">{t}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-7 gap-1 mb-1">
-              {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
-                <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
-              {Array.from({length:31},(_,i)=>i+1).map(d=>(
-                <div key={d} className={`rounded-lg p-1 min-h-[42px] ${d===today?"outline outline-2 outline-teal-500":""}`} style={d===today?{background:"var(--tsu-teal-light)"}:{}}>
-                  <div className={`text-[10px] font-semibold text-center ${d===today?"font-black":"text-gray-500"}`} style={d===today?{color:"var(--tsu-teal)"}:{}}>{d}</div>
-                  <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
-                    {events[d]?.map((ev,ei)=>(
-                      <span key={ei} className={`w-2 h-2 rounded-full ${typeStyle[ev.type].dot}`} title={ev.label}/>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+    <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+      <h4 className="text-xs font-bold text-gray-700 mb-1">Siklus Audit Tahunan 2025 — Timeline per Unit</h4>
+      <p className="text-[10px] text-gray-400 mb-3">Setiap bar menunjukkan periode pelaksanaan audit (dalam bulan)</p>
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={ganttData} layout="vertical" margin={{ top: 4, right: 16, left: 72, bottom: 4 }} barSize={18}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+          <XAxis type="number" domain={[0, 12]} tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false}
+            tickFormatter={(v) => ["","Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][v] || ""} />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#374151" }} axisLine={false} tickLine={false} width={68} />
+          <Tooltip contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
+            formatter={(v: unknown, name: unknown) => [name === "mulai" ? `Mulai bulan ke-${v}` : `${v} bulan`, name === "mulai" ? "Mulai" : "Durasi"]} />
+          <Bar dataKey="mulai" stackId="a" fill="transparent" radius={0} />
+          <Bar dataKey="durasi" stackId="a" fill="var(--tsu-teal)" radius={[4,4,4,4]} />
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {rows.map((d, i) => (
+          <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 text-xs">
+            <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: "var(--tsu-teal)" }} />
+            <span className="font-medium text-gray-700">{d.unit}</span>
+            <span className="text-gray-400 ml-auto">{["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][d.start - 1]}–{["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][d.start + d.dur - 2]}</span>
           </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-          {/* 2. Agenda Bulan Ini */}
-          {(() => {
-            const agendaItems = Object.entries(events)
-              .sort(([a],[b]) => +a - +b)
-              .flatMap(([day, evs]) => evs.map(ev => ({ day: +day, ...ev })));
-            const filteredAgenda = agendaFilter === "Semua" ? agendaItems
-              : agendaItems.filter(a => {
-                  if (agendaFilter === "Audit")    return a.type === "audit";
-                  if (agendaFilter === "Rapat")    return a.type === "rapat" || a.type === "meeting";
-                  if (agendaFilter === "Deadline") return a.type === "deadline";
-                  return true;
-                });
-            return (
-              <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-bold text-gray-700">📋 Agenda Bulan Ini — Mei 2025</h4>
-                  <div className="flex gap-1.5">
-                    {["Semua","Audit","Rapat","Deadline"].map(f => (
-                      <button key={f} onClick={() => setAgendaFilter(f)}
-                        className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
-                        style={agendaFilter === f
-                          ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
-                          : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {filteredAgenda.map((ev, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="flex-shrink-0 text-center w-8">
-                        <div className="text-sm font-black leading-none" style={{ color:"var(--tsu-teal)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
-                        <div className="text-[9px] text-gray-400">Mei</div>
-                      </div>
-                      <div className="flex-1 flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
-                        <span className={`flex-1 text-[10px] font-medium px-2 py-1 rounded-lg ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-600"}`}>{ev.label}</span>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full capitalize ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-500"}`}>{ev.type}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {filteredAgenda.length === 0 && <p className="text-[10px] text-gray-400 py-2 text-center">Tidak ada agenda untuk filter ini.</p>}
-                </div>
-              </div>
-            );
-          })()}
+function DeadlineReminderPanel() {
+  const events = pwEvents;
 
-          {/* 3. Deadline & Reminder list */}
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">⏰ Deadline & Reminder — Mei 2025</h4>
-              <div className="flex gap-1.5">
-                {["Semua","Kritis","Tinggi","Sedang","Normal"].map(f => (
-                  <button key={f} onClick={() => setDeadlineFilter(f)}
-                    className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
-                    style={deadlineFilter === f
-                      ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
-                      : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
-                    {f}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              {(deadlineFilter === "Semua" ? allDl : allDl.filter(d => d.priority === deadlineFilter)).map((item, i) => {
-                const key = `dl-${item.day}-${i}`;
-                const done = doneDeadlines[key];
-                return (
-                  <div key={key} className={`flex items-center gap-3 rounded-xl border p-2 transition-opacity ${done ? "opacity-40" : ""} ${priorityCls[item.priority]}`}>
-                    <div className="flex-shrink-0 text-center w-10">
-                      <div className="text-base font-black leading-none" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{item.day}</div>
-                      <div className="text-[8px] opacity-70">Mei</div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-[10px] font-semibold leading-tight">{item.label}</div>
-                      <div className="text-[9px] mt-0.5 opacity-70">
-                        {item.sisa < 0 ? `${Math.abs(item.sisa)} hari lalu` :
-                         item.sisa === 0 ? "Hari ini!" :
-                         `${item.sisa} hari lagi`}
-                        {" · "}<span className="font-bold">{item.priority}</span>
-                      </div>
-                    </div>
-                    {canEdit && (
-                      <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
-                        className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
-                        {done ? "✓ Selesai" : "Tandai"}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-              {allDl.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Tidak ada item.</p>}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ── Heatmap Aktivitas (Deadline & Reminder tab) ── */}
-      {showDeadline && (() => {
         const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
         const monthShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
         const monthDays  = [31,28,31,30,31,30,31,31,30,31,30,31];
@@ -3590,13 +3620,12 @@ function PwKalender({ subSection }: { subSection: string }) {
             {/* Stats */}
             <div className="grid grid-cols-4 gap-3">
               {[
-                { label:"Total Kegiatan", value:totalYear,        icon:"📊", cls:"bg-teal-50 border-teal-100 text-teal-700"   },
-                { label:"Audit",          value:auditEvts * 4,   icon:"🔍", cls:"bg-blue-50 border-blue-100 text-blue-700"   },
-                { label:"Rapat",          value:rapatEvts * 4,   icon:"🗣️", cls:"bg-purple-50 border-purple-100 text-purple-700" },
-                { label:"Deadline",       value:dlEvts * 4,      icon:"⏰", cls:"bg-red-50 border-red-100 text-red-700"      },
+                { label:"Total Kegiatan", value:totalYear,        icon:"", cls:"bg-teal-50 border-teal-100 text-teal-700"   },
+                { label:"Audit",          value:auditEvts * 4,   icon:"", cls:"bg-blue-50 border-blue-100 text-blue-700"   },
+                { label:"Rapat",          value:rapatEvts * 4,   icon:"", cls:"bg-purple-50 border-purple-100 text-purple-700" },
+                { label:"Deadline",       value:dlEvts * 4,      icon:"", cls:"bg-red-50 border-red-100 text-red-700"      },
               ].map(s => (
                 <div key={s.label} className={`rounded-xl border p-3 flex flex-col gap-1 ${s.cls}`}>
-                  <div className="text-lg leading-none">{s.icon}</div>
                   <div className="text-2xl font-black leading-none">{s.value}</div>
                   <div className="text-[9px] font-semibold opacity-80">{s.label}</div>
                 </div>
@@ -3607,7 +3636,7 @@ function PwKalender({ subSection }: { subSection: string }) {
             <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h4 className="text-xs font-bold text-gray-700">🔥 Heatmap Aktivitas Pengawasan — 2025</h4>
+                  <h4 className="text-xs font-bold text-gray-700">Heatmap Aktivitas Pengawasan — 2025</h4>
                   <p className="text-[9px] text-gray-400 mt-0.5">Intensitas kegiatan per hari sepanjang tahun</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -3680,7 +3709,331 @@ function PwKalender({ subSection }: { subSection: string }) {
             </div>
           </div>
         );
-      })()}
+}
+
+function PwKalender({ subSection }: { subSection: string }) {
+  const user = useContext(UserCtx);
+  const myUnit = user?.role === "auditee" ? user.unit : null;
+  const canEdit = user?.role !== "rektor";
+
+  const [agendaFilter, setAgendaFilter]   = useState("Semua");
+  const [deadlineFilter, setDeadlineFilter] = useState("Semua");
+  const [doneDeadlines, setDoneDeadlines] = useState<Record<string, boolean>>({});
+
+  const events = pwEvents;
+  const typeStyle: Record<string, { dot: string; badge: string }> = {
+    audit:    { dot:"bg-teal-500",  badge:"bg-teal-50 text-teal-700"  },
+    deadline: { dot:"bg-red-500",   badge:"bg-red-50 text-red-600"    },
+    meeting:  { dot:"bg-amber-400", badge:"bg-amber-50 text-amber-700"},
+    rapat:    { dot:"bg-purple-500",badge:"bg-purple-50 text-purple-700"},
+  };
+  const today = 22;
+
+  const agenda = Object.entries(events).sort(([a],[b])=>+a-+b).map(([day, evs])=>({ day:+day, evs }));
+
+
+  // Auditee-specific events per unit
+  const unitEvents: Record<string, { day: number; label: string; type: string }[]> = {
+    BAAK: [
+      { day: 8,  label: "Entry Meeting Audit BAAK",       type: "meeting"  },
+      { day: 12, label: "Pengumpulan Dokumen BAAK",        type: "audit"    },
+      { day: 19, label: "Exit Meeting BAAK",               type: "meeting"  },
+      { day: 26, label: "Deadline Respons RTL #1",         type: "deadline" },
+      { day: 30, label: "Deadline Respons RTL #2",         type: "deadline" },
+    ],
+    Sarpras: [
+      { day: 5,  label: "Audit Sarpras Mulai",             type: "audit"    },
+      { day: 10, label: "Pengumpulan Data Sarpras",        type: "audit"    },
+      { day: 18, label: "Deadline RTL Sarpras",            type: "deadline" },
+      { day: 23, label: "Klarifikasi Temuan Sarpras",      type: "meeting"  },
+      { day: 31, label: "Target Selesai LHA Sarpras",      type: "deadline" },
+    ],
+    Keuangan: [
+      { day: 3,  label: "Persiapan Dokumen Keuangan",      type: "audit"    },
+      { day: 20, label: "Entry Meeting Keuangan",          type: "meeting"  },
+      { day: 25, label: "Penyerahan Laporan Keuangan",     type: "deadline" },
+      { day: 28, label: "Rapat Pembahasan Temuan",         type: "rapat"    },
+    ],
+    LPPM: [
+      { day: 10, label: "Deadline RTL LPPM",               type: "deadline" },
+      { day: 15, label: "Verifikasi Dokumen LPPM",         type: "audit"    },
+      { day: 26, label: "Audit Pendahuluan LPPM",          type: "audit"    },
+      { day: 29, label: "Koordinasi Riset & Pengabdian",   type: "rapat"    },
+    ],
+  };
+
+  if (subSection === "Siklus Audit") return <SiklusAuditPanel onlyUnit={myUnit ?? null} />;
+
+  if (myUnit) {
+    const myEvs = unitEvents[myUnit] ?? [];
+    const todayRef = 22;
+    type AuditeeEv = typeof myEvs[number] & { sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
+    const enriched: AuditeeEv[] = myEvs.map(ev => {
+      const sisa = ev.day - todayRef;
+      const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
+        sisa < 0  ? "Kritis" :
+        sisa <= 3 ? "Tinggi" :
+        sisa <= 7 ? "Sedang" : "Normal";
+      return { ...ev, sisa, priority };
+    }).sort((a, b) => a.sisa - b.sisa);
+
+    const priorityCls: Record<string, string> = {
+      Kritis: "bg-red-50 border-red-200 text-red-700",
+      Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
+      Sedang: "bg-amber-50 border-amber-200 text-amber-700",
+      Normal: "bg-teal-50 border-teal-200 text-teal-700",
+    };
+
+    const upcoming  = enriched.filter(e => e.sisa >= 0);
+    const overdue   = enriched.filter(e => e.sisa < 0);
+    const nextEvent = upcoming[0];
+
+    return (
+      <div className="flex flex-col gap-4">
+        {/* Unit banner */}
+        <div className="rounded-xl border border-purple-100 bg-gradient-to-r from-purple-50 to-white p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: "var(--tsu-teal-light)" }}></div>
+          <div>
+            <div className="text-xs font-bold text-gray-800">Kalender Audit — Unit {myUnit}</div>
+            <div className="text-[10px] text-gray-500 mt-0.5">
+              {upcoming.length} jadwal mendatang · {overdue.length} sudah lewat · Mei 2025
+            </div>
+          </div>
+          {nextEvent && (
+            <div className="ml-auto text-right">
+              <div className="text-[9px] text-gray-400">Jadwal terdekat</div>
+              <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal)" }}>{nextEvent.label}</div>
+              <div className="text-[9px] text-gray-500">
+                {nextEvent.sisa === 0 ? "Hari ini!" : `${nextEvent.sisa} hari lagi`}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mini calendar grid for unit */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-xs font-bold text-gray-700 mb-3">Kalender Unit {myUnit} — Mei 2025</h4>
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
+              <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
+            {Array.from({length:31},(_,i)=>i+1).map(d => {
+              const dayEvs = myEvs.filter(e => e.day === d);
+              const isToday = d === todayRef;
+              return (
+                <div key={d} className={`rounded-lg p-1 min-h-[42px] ${isToday ? "outline outline-2 outline-teal-500" : ""}`}
+                  style={isToday ? { background: "var(--tsu-teal-light)" } : {}}>
+                  <div className={`text-[10px] font-semibold text-center ${isToday ? "font-black" : "text-gray-500"}`}
+                    style={isToday ? { color: "var(--tsu-teal)" } : {}}>{d}</div>
+                  <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
+                    {dayEvs.map((ev,i) => (
+                      <span key={i} className={`w-2 h-2 rounded-full ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} title={ev.label} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Jadwal list */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <h4 className="text-xs font-bold text-gray-700 mb-3">Daftar Jadwal — Unit {myUnit}</h4>
+          <div className="flex flex-col gap-2">
+            {enriched.map((ev, i) => {
+              const key = `unit-${ev.day}-${i}`;
+              const done = doneDeadlines[key];
+              return (
+                <div key={key} className={`flex items-center gap-3 rounded-xl border p-3 transition-opacity ${done ? "opacity-40" : ""} ${priorityCls[ev.priority]}`}>
+                  <div className="flex-shrink-0 text-center w-10">
+                    <div className="text-sm font-black leading-none" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
+                    <div className="text-[9px] opacity-70">Mei</div>
+                  </div>
+                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
+                  <div className="flex-1">
+                    <div className="text-[10px] font-semibold leading-tight">{ev.label}</div>
+                    <div className="text-[9px] mt-0.5 opacity-70">
+                      {ev.sisa < 0 ? `${Math.abs(ev.sisa)} hari lalu · ${ev.priority}` :
+                       ev.sisa === 0 ? "Hari ini!" :
+                       `${ev.sisa} hari lagi · ${ev.priority}`}
+                      {" · "}<span className="capitalize">{ev.type}</span>
+                    </div>
+                  </div>
+                  {canEdit && <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
+                    className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
+                    {done ? "✓ Selesai" : "Tandai Selesai"}
+                  </button>}
+                </div>
+              );
+            })}
+            {enriched.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Belum ada jadwal untuk unit ini.</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Shared helpers ──
+  type PriItem = { day: number; label: string; type: string; sisa: number; priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" };
+  const todayDay = 22;
+  const allDl: PriItem[] = Object.entries(events)
+    .flatMap(([day, evs]) => evs.map(ev => {
+      const sisa = +day - todayDay;
+      const priority: "Kritis"|"Tinggi"|"Sedang"|"Normal" =
+        sisa < 0  ? "Kritis" :
+        sisa <= 3 ? "Tinggi" :
+        sisa <= 7 ? "Sedang" : "Normal";
+      return { day: +day, ...ev, sisa, priority };
+    }))
+    .sort((a, b) => a.sisa - b.sisa);
+
+  const priorityCls: Record<string, string> = {
+    Kritis: "bg-red-50 border-red-200 text-red-700",
+    Tinggi: "bg-orange-50 border-orange-200 text-orange-700",
+    Sedang: "bg-amber-50 border-amber-200 text-amber-700",
+    Normal: "bg-gray-50 border-gray-200 text-gray-600",
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+
+      {/* ── Kalender Pengawasan (formerly Jadwal Audit) ── */}
+      {(
+        <>
+          {/* 1. Kalender grid */}
+          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-bold text-gray-700">Kalender Pengawasan — Mei 2025</h4>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(typeStyle).map(([t,s])=>(
+                  <div key={t} className="flex items-center gap-1 text-[9px]">
+                    <span className={`w-2 h-2 rounded-full ${s.dot}`}/>
+                    <span className="text-gray-500 capitalize">{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(d=>(
+                <div key={d} className="text-center text-[9px] font-bold text-gray-400 py-1">{d}</div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({length:3}).map((_,i)=><div key={`e${i}`}/>)}
+              {Array.from({length:31},(_,i)=>i+1).map(d=>(
+                <div key={d} className={`rounded-lg p-1 min-h-[42px] ${d===today?"outline outline-2 outline-teal-500":""}`} style={d===today?{background:"var(--tsu-teal-light)"}:{}}>
+                  <div className={`text-[10px] font-semibold text-center ${d===today?"font-black":"text-gray-500"}`} style={d===today?{color:"var(--tsu-teal)"}:{}}>{d}</div>
+                  <div className="flex flex-wrap justify-center gap-0.5 mt-0.5">
+                    {events[d]?.map((ev,ei)=>(
+                      <span key={ei} className={`w-2 h-2 rounded-full ${typeStyle[ev.type].dot}`} title={ev.label}/>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Agenda Bulan Ini */}
+          {(() => {
+            const agendaItems = Object.entries(events)
+              .sort(([a],[b]) => +a - +b)
+              .flatMap(([day, evs]) => evs.map(ev => ({ day: +day, ...ev })));
+            const filteredAgenda = agendaFilter === "Semua" ? agendaItems
+              : agendaItems.filter(a => {
+                  if (agendaFilter === "Audit")    return a.type === "audit";
+                  if (agendaFilter === "Rapat")    return a.type === "rapat" || a.type === "meeting";
+                  if (agendaFilter === "Deadline") return a.type === "deadline";
+                  return true;
+                });
+            return (
+              <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-xs font-bold text-gray-700">Agenda Bulan Ini — Mei 2025</h4>
+                  <div className="flex gap-1.5">
+                    {["Semua","Audit","Rapat","Deadline"].map(f => (
+                      <button key={f} onClick={() => setAgendaFilter(f)}
+                        className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
+                        style={agendaFilter === f
+                          ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
+                          : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {filteredAgenda.map((ev, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="flex-shrink-0 text-center w-8">
+                        <div className="text-sm font-black leading-none" style={{ color:"var(--tsu-teal)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{ev.day}</div>
+                        <div className="text-[9px] text-gray-400">Mei</div>
+                      </div>
+                      <div className="flex-1 flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${typeStyle[ev.type]?.dot ?? "bg-gray-400"}`} />
+                        <span className={`flex-1 text-[10px] font-medium px-2 py-1 rounded-lg ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-600"}`}>{ev.label}</span>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full capitalize ${typeStyle[ev.type]?.badge ?? "bg-gray-50 text-gray-500"}`}>{ev.type}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredAgenda.length === 0 && <p className="text-[10px] text-gray-400 py-2 text-center">Tidak ada agenda untuk filter ini.</p>}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 3. Deadline & Reminder list */}
+          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-xs font-bold text-gray-700">Deadline & Reminder — Mei 2025</h4>
+              <div className="flex gap-1.5">
+                {["Semua","Kritis","Tinggi","Sedang","Normal"].map(f => (
+                  <button key={f} onClick={() => setDeadlineFilter(f)}
+                    className="text-[9px] font-semibold px-2 py-0.5 rounded-full border transition-all"
+                    style={deadlineFilter === f
+                      ? { background:"var(--tsu-teal)", color:"#fff", borderColor:"var(--tsu-teal)" }
+                      : { background:"#f8fafc", color:"#64748b", borderColor:"#e2e8f0" }}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              {(deadlineFilter === "Semua" ? allDl : allDl.filter(d => d.priority === deadlineFilter)).map((item, i) => {
+                const key = `dl-${item.day}-${i}`;
+                const done = doneDeadlines[key];
+                return (
+                  <div key={key} className={`flex items-center gap-3 rounded-xl border p-2 transition-opacity ${done ? "opacity-40" : ""} ${priorityCls[item.priority]}`}>
+                    <div className="flex-shrink-0 text-center w-10">
+                      <div className="text-base font-black leading-none" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{item.day}</div>
+                      <div className="text-[8px] opacity-70">Mei</div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-[10px] font-semibold leading-tight">{item.label}</div>
+                      <div className="text-[9px] mt-0.5 opacity-70">
+                        {item.sisa < 0 ? `${Math.abs(item.sisa)} hari lalu` :
+                         item.sisa === 0 ? "Hari ini!" :
+                         `${item.sisa} hari lagi`}
+                        {" · "}<span className="font-bold">{item.priority}</span>
+                      </div>
+                    </div>
+                    {canEdit && (
+                      <button onClick={() => setDoneDeadlines(p => ({ ...p, [key]: !p[key] }))}
+                        className={`text-[9px] font-bold px-2 py-1 rounded-lg border flex-shrink-0 transition-colors ${done ? "bg-green-50 text-green-600 border-green-200" : "bg-white border-gray-200 text-gray-500 hover:bg-green-50 hover:text-green-600"}`}>
+                        {done ? "✓ Selesai" : "Tandai"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+              {allDl.length === 0 && <p className="text-[10px] text-gray-400 py-4 text-center">Tidak ada item.</p>}
+            </div>
+          </div>
+        </>
+      )}
+
     </div>
   );
 }
@@ -3707,13 +4060,13 @@ function TabPengawasan({ section, subSection }: { section: string; subSection: s
 // ── Back Office section data ──────────────────────────────────────────────────
 
 const boSections = [
-  { key: "R", label: "Ringkasan Back Office",           icon: "📊", color: "bg-teal-600" },
-  { key: "A", label: "Administrasi & Kesekretariatan", icon: "📬", color: "bg-teal-500" },
-  { key: "B", label: "Perencanaan Audit",               icon: "📋", color: "bg-blue-500" },
-  { key: "C", label: "Manajemen SDM Auditor",           icon: "👥", color: "bg-purple-500" },
-  { key: "D", label: "Perpustakaan Regulasi & SOP",     icon: "📚", color: "bg-amber-500" },
-  { key: "F", label: "Kalender Terintegrasi",           icon: "📅", color: "bg-indigo-500" },
-  { key: "G", label: "Perencanaan Anggaran",            icon: "💰", color: "bg-emerald-600" },
+  { key: "R", label: "Ringkasan Back Office",           icon: "", color: "bg-teal-600" },
+  { key: "A", label: "Administrasi & Kesekretariatan", icon: "", color: "bg-teal-500" },
+  { key: "B", label: "Perencanaan Audit",               icon: "", color: "bg-blue-500" },
+  { key: "C", label: "Manajemen SDM Auditor",           icon: "", color: "bg-purple-500" },
+  { key: "D", label: "Perpustakaan Regulasi & SOP",     icon: "", color: "bg-amber-500" },
+  { key: "F", label: "Kalender Terintegrasi",           icon: "", color: "bg-indigo-500" },
+  { key: "G", label: "Perencanaan Anggaran",            icon: "", color: "bg-emerald-600" },
 ];
 
 // ── Shared link-input modal (with before/after reminders) ─────────────────────
@@ -3732,7 +4085,7 @@ function LinkModal({
       onClick={() => { if (step !== "saved") onClose(); }}>
       <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-bold text-gray-800">🔗 {title}</h4>
+          <h4 className="text-sm font-bold text-gray-800">{title}</h4>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
         {step === "form" && (
@@ -3759,7 +4112,7 @@ function LinkModal({
         {step === "confirm" && (
           <>
             <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4">
-              <span className="text-lg flex-shrink-0">⚠️</span>
+              <span className="text-lg flex-shrink-0"></span>
               <div>
                 <p className="text-xs font-bold text-amber-800 mb-1">Cek akses link sebelum menyimpan</p>
                 <p className="text-[11px] text-amber-700 leading-relaxed">Pastikan link sudah diatur ke <strong>publik (anyone with the link)</strong> agar bisa dibuka tanpa login. Kalau belum, klik <strong>Kembali</strong> dan perbaiki dulu.</p>
@@ -3778,7 +4131,7 @@ function LinkModal({
         {step === "saved" && (
           <>
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 mb-4">
-              <span className="text-base">✅</span>
+              <span className="text-base"></span>
               <p className="text-xs font-semibold text-green-700">Link berhasil disimpan!</p>
             </div>
             <div className="flex justify-end">
@@ -3810,7 +4163,7 @@ function TambahItemModal({
       onClick={() => { if (!saved) onClose(); }}>
       <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-bold text-gray-800">➕ {title}</h4>
+          <h4 className="text-sm font-bold text-gray-800">{title}</h4>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
         {!saved ? (
@@ -3831,7 +4184,7 @@ function TambahItemModal({
               </div>
             </div>
             <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
-              <span className="text-xs flex-shrink-0">⚠️</span>
+              <span className="text-xs flex-shrink-0"></span>
               <p className="text-[10px] text-amber-700 leading-relaxed">Pastikan akses link ke <strong>public</strong> (tidak privat) sebelum menyimpan.</p>
             </div>
             <div className="flex gap-2 justify-end">
@@ -3849,11 +4202,11 @@ function TambahItemModal({
         ) : (
           <>
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 mb-3">
-              <span className="text-base">✅</span>
+              <span className="text-base"></span>
               <p className="text-xs font-semibold text-green-700">Data berhasil disimpan!</p>
             </div>
             <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 mb-4">
-              <span className="text-xs flex-shrink-0 mt-0.5">⚠️</span>
+              <span className="text-xs flex-shrink-0 mt-0.5"></span>
               <p className="text-[10px] text-amber-700 leading-relaxed"><strong>Pastikan akses link public dan link sudah sesuai</strong> — cek kembali apakah dokumen bisa dibuka tanpa login.</p>
             </div>
             <div className="flex justify-end">
@@ -3894,7 +4247,7 @@ function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fi
       onClick={() => { if (step !== "saved") onClose(); }}>
       <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-md mx-4 my-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-sm font-bold text-gray-800">➕ {title}</h4>
+          <h4 className="text-sm font-bold text-gray-800">{title}</h4>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
         {step === "form" && (
@@ -3934,7 +4287,7 @@ function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fi
         {step === "confirm" && (
           <>
             <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4">
-              <span className="text-lg flex-shrink-0">⚠️</span>
+              <span className="text-lg flex-shrink-0"></span>
               <div>
                 <p className="text-xs font-bold text-amber-800 mb-1">Cek link sebelum menyimpan</p>
                 <p className="text-[11px] text-amber-700 leading-relaxed">Pastikan link Google Drive sudah diatur ke <strong>publik (anyone with the link)</strong> sehingga bisa dibuka tanpa login. Kalau belum, klik <strong>Kembali</strong> dan perbaiki dulu.</p>
@@ -3953,7 +4306,7 @@ function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fi
         {step === "saved" && (
           <>
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5 mb-4">
-              <span className="text-base">✅</span>
+              <span className="text-base"></span>
               <p className="text-xs font-semibold text-green-700">Data berhasil disimpan!</p>
             </div>
             <div className="flex justify-end">
@@ -4077,7 +4430,7 @@ function SectionRingkasan() {
 
   const kpiMenu = [
     {
-      key: "A", label: "Administrasi", icon: "📬", accent: "#0e8080", lightBg: "#f0fdfa",
+      key: "A", label: "Administrasi", icon: "", accent: "#0e8080", lightBg: "#f0fdfa",
       items: [
         { label: "Surat Terproses",  target: 56,  real: 50,  sat: "Surat" },
         { label: "Rapat Terlaksana", target: 20,  real: 18,  sat: "Rapat" },
@@ -4085,7 +4438,7 @@ function SectionRingkasan() {
       ],
     },
     {
-      key: "B", label: "Perencanaan Audit", icon: "📋", accent: "#3b82f6", lightBg: "#eff6ff",
+      key: "B", label: "Perencanaan Audit", icon: "", accent: "#3b82f6", lightBg: "#eff6ff",
       items: [
         { label: "Realisasi PKPT",               target: 6,   real: 3,  sat: "Program" },
         { label: "PKPT Tepat Waktu",             target: 100, real: 67, sat: "%"       },
@@ -4094,7 +4447,7 @@ function SectionRingkasan() {
       ],
     },
     {
-      key: "C", label: "Manajemen SDM", icon: "👥", accent: "#8b5cf6", lightBg: "#f5f3ff",
+      key: "C", label: "Manajemen SDM", icon: "", accent: "#8b5cf6", lightBg: "#f5f3ff",
       items: [
         { label: "Auditor Bersertifikat",  target: 10,  real: 8,  sat: "Orang" },
         { label: "Penugasan Tepat Waktu",  target: 100, real: 83, sat: "%"     },
@@ -4102,14 +4455,14 @@ function SectionRingkasan() {
       ],
     },
     {
-      key: "D", label: "Regulasi & SOP", icon: "📚", accent: "#f59e0b", lightBg: "#fffbeb",
+      key: "D", label: "Regulasi & SOP", icon: "", accent: "#f59e0b", lightBg: "#fffbeb",
       items: [
         { label: "Pedoman/SOP Aktif",    target: 15, real: 12, sat: "Dok" },
         { label: "Peraturan Terdaftar",  target: 20, real: 17, sat: "Dok" },
       ],
     },
     {
-      key: "G", label: "Anggaran", icon: "💰", accent: "#16a34a", lightBg: "#f0fdf4",
+      key: "G", label: "Anggaran", icon: "", accent: "#16a34a", lightBg: "#f0fdf4",
       items: [
         { label: "Realisasi Anggaran",  target: 191, real: 128, sat: "Jt"  },
         { label: "LPJ Tepat Waktu",     target: 10,  real: 9,   sat: "LPJ" },
@@ -4178,7 +4531,7 @@ function SectionRingkasan() {
                 if (isAlert) {
                   return (
                     <div key={i} className="px-5 py-3 flex items-center gap-3 bg-amber-50">
-                      <span className="text-base flex-shrink-0">⏳</span>
+                      <span className="text-base flex-shrink-0"></span>
                       <div className="flex-1">
                         <div className="text-[11px] font-semibold text-amber-700">{it.label}</div>
                         <div className="text-[9px] text-amber-600 mt-0.5">Perlu perhatian segera</div>
@@ -4224,7 +4577,7 @@ function SectionRingkasan() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h4 className="text-xs font-bold text-gray-700">📬 Administrasi</h4>
+            <h4 className="text-xs font-bold text-gray-700">Administrasi</h4>
             <p className="text-[10px] text-gray-400">Ringkasan surat & rapat bulan ini</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -4300,7 +4653,7 @@ function SectionRingkasan() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h4 className="text-xs font-bold text-gray-700">📋 PKPT — Detail Progres</h4>
+            <h4 className="text-xs font-bold text-gray-700">PKPT — Detail Progres</h4>
             <p className="text-[10px] text-gray-400">Program Kerja Pengawasan Tahunan 2025</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -4413,7 +4766,7 @@ function SectionRingkasan() {
       <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h4 className="text-xs font-bold text-gray-700">💰 Realisasi Anggaran per Komponen</h4>
+            <h4 className="text-xs font-bold text-gray-700">Realisasi Anggaran per Komponen</h4>
             <p className="text-[10px] text-gray-400">Rencana vs realisasi (Rp Juta)</p>
           </div>
           <button onClick={() => navigateTo("backoffice", "G", "Rencana Anggaran")}
@@ -4466,7 +4819,7 @@ function SectionRingkasan() {
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col gap-3">
           <div className="flex items-start justify-between">
             <div>
-              <h4 className="text-xs font-bold text-gray-700">👥 SDM — Riwayat Penugasan</h4>
+              <h4 className="text-xs font-bold text-gray-700">SDM — Riwayat Penugasan</h4>
               <p className="text-[10px] text-gray-400">Jumlah penugasan per auditor</p>
             </div>
             <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
@@ -4489,7 +4842,7 @@ function SectionRingkasan() {
             </div>
             <div className="flex-1 rounded-xl px-3 py-2 flex items-center gap-2"
               style={{ background: "#f0fdfa", border: "1px solid #99f6e4" }}>
-              <div className="text-lg flex-shrink-0">🏆</div>
+              <div className="text-lg flex-shrink-0"></div>
               <div>
                 <div className="text-[8px] font-bold uppercase tracking-wider" style={{ color: "var(--tsu-teal)" }}>Most Active</div>
                 <div className="text-[11px] font-black text-gray-800 leading-tight">{sdmMostActive.auditor}</div>
@@ -4535,7 +4888,7 @@ function SectionRingkasan() {
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col gap-3 h-full">
           <div className="flex items-center justify-between flex-shrink-0">
             <div>
-              <h4 className="text-xs font-bold text-gray-700">📅 Agenda Mendatang</h4>
+              <h4 className="text-xs font-bold text-gray-700">Agenda Mendatang</h4>
               <p className="text-[10px] text-gray-400">Jadwal rapat & kegiatan terdekat</p>
             </div>
             <button onClick={() => navigateTo("backoffice", "F", "Jadwal Rapat")}
@@ -4571,8 +4924,8 @@ function SectionRingkasan() {
                           <span className="text-gray-300">·</span>
                           <span className="text-[9px] text-gray-400">{a.jam} WIB</span>
                         </div>
-                        <div className="text-[9px] text-gray-400 mt-0.5 truncate">📍 {a.tempat}</div>
-                        {a.peserta.length > 0 && <div className="text-[8px] text-gray-400 mt-0.5 truncate">👤 {pesertaLabel(a.peserta)}</div>}
+                        <div className="text-[9px] text-gray-400 mt-0.5 truncate">{a.tempat}</div>
+                        {a.peserta.length > 0 && <div className="text-[8px] text-gray-400 mt-0.5 truncate">{pesertaLabel(a.peserta)}</div>}
                       </div>
                     </button>
                   );
@@ -4613,7 +4966,7 @@ function SectionRingkasan() {
                     <div className="text-[10px] text-gray-400">
                       Riwayat Penugasan · {stat?.penugasan ?? 0} penugasan ({sdmYear})
                       {sdmPopupAuditor === sdmMostActive.auditor && (
-                        <span className="ml-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light,#f0fdfa)", color: "var(--tsu-teal)" }}>🏆 Most Active</span>
+                        <span className="ml-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light,#f0fdfa)", color: "var(--tsu-teal)" }}>Most Active</span>
                       )}
                     </div>
                   </div>
@@ -4672,7 +5025,7 @@ function SectionRingkasan() {
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">📅</span>
+                  <span className="text-base"></span>
                   <div className="text-sm font-bold text-gray-800">Detail Agenda</div>
                 </div>
                 <button onClick={() => setAgendaDetailId(null)}
@@ -4697,7 +5050,7 @@ function SectionRingkasan() {
                   </div>
                   <div className="rounded-xl p-3 bg-gray-50 border border-gray-100 col-span-2">
                     <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Lokasi / Media</div>
-                    <div className="text-xs font-semibold text-gray-700">📍 {agenda.tempat}</div>
+                    <div className="text-xs font-semibold text-gray-700">{agenda.tempat}</div>
                   </div>
                 </div>
 
@@ -4812,7 +5165,7 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
         {/* Internal SPI */}
         <div className="bg-white rounded-lg border border-gray-200 p-3 mb-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-bold text-gray-700">🏢 Internal SPI</span>
+            <span className="text-[10px] font-bold text-gray-700">Internal SPI</span>
             <button onClick={() => toggleAll(PESERTA_INTERNAL)}
               className="text-[9px] font-semibold text-teal-600 hover:underline">
               {allInternalSelected ? "Hapus semua" : "Pilih semua"}
@@ -4832,7 +5185,7 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
         {/* Unit Kerja */}
         <div className="bg-white rounded-lg border border-gray-200 p-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-bold text-gray-700">🏫 Unit Kerja (26 unit)</span>
+            <span className="text-[10px] font-bold text-gray-700">Unit Kerja (26 unit)</span>
             <button onClick={() => toggleAll(UNIT_KERJA_LIST)}
               className="text-[9px] font-semibold text-teal-600 hover:underline">
               {allUnitsSelected ? "Hapus semua" : "Pilih semua"}
@@ -5005,7 +5358,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
             </table>
           </div>
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <button onClick={() => navigateTo("backoffice", "F", "Siklus Audit")}
+            <button onClick={() => navigateTo("pengawasan", "kalender", "Siklus Audit")}
               className="w-full text-[10px] font-semibold py-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex items-center justify-center gap-1.5">
               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 2v2M11 2v2M2 7h12"/></svg>
               Lihat Kalender
@@ -5022,7 +5375,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
           <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setRapatDetailId(null)}>
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                <div className="text-sm font-bold text-gray-800">📋 Detail Rapat</div>
+                <div className="text-sm font-bold text-gray-800">Detail Rapat</div>
                 <button onClick={() => setRapatDetailId(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
               </div>
               <div className="p-5 flex flex-col gap-3">
@@ -5038,7 +5391,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
                   </div>
                   <div className="rounded-xl p-3 bg-gray-50 border border-gray-100 col-span-2">
                     <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">Tempat / Media</div>
-                    <div className="text-xs font-semibold text-gray-700">📍 {r.tempat || "—"}</div>
+                    <div className="text-xs font-semibold text-gray-700">{r.tempat || "—"}</div>
                   </div>
                 </div>
                 <div>
@@ -5066,7 +5419,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h4 className="text-xs font-bold text-gray-700">📬 Tren Aktivitas Surat</h4>
+                <h4 className="text-xs font-bold text-gray-700">Tren Aktivitas Surat</h4>
                 <p className="text-[10px] text-gray-400">Surat masuk & keluar per periode</p>
               </div>
               <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
@@ -5233,7 +5586,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
             {arsipDoks.map((d, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${d.tipe === "LHA" ? "bg-teal-50 text-teal-600" : d.tipe === "KKA" ? "bg-purple-50 text-purple-600" : d.tipe === "RTL" ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600"}`}>
-                  🔗
+                  
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-gray-700 truncate">{d.nama}</div>
@@ -6021,7 +6374,7 @@ function SectionC({ subSection }: { subSection: string }) {
         <div className="flex flex-col gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">🎯 Matriks Kompetensi Auditor</h4>
+              <h4 className="text-xs font-bold text-gray-700">Matriks Kompetensi Auditor</h4>
               <div className="flex gap-2">
                 {[{bg:"#dcfce7",l:"Mahir (4-5)"},{bg:"#fef9c3",l:"Cukup (2-3)"},{bg:"#fee2e2",l:"Perlu Latih (≤1)"}].map(s=>(
                   <div key={s.l} className="flex items-center gap-1">
@@ -6201,12 +6554,12 @@ function SectionD({ subSection }: { subSection: string }) {
   const [selectedStandar, setSelectedStandar] = useState(0);
 
   const [pedomanBase, setPedomanBase] = useState([
-    { icon: "📋", judul: "Pedoman Audit Internal SPI",    deskripsi: "Panduan pelaksanaan audit internal sesuai standar AAIPI",         versi: "v3.1", berlaku: "Jan 2025", link: "https://drive.google.com/file/pedoman-audit-internal-spi" },
-    { icon: "⚖️", judul: "Kode Etik Auditor Internal",    deskripsi: "Prinsip dan aturan perilaku auditor internal universitas",        versi: "v2.0", berlaku: "Jan 2025", link: "https://drive.google.com/file/kode-etik-auditor" },
-    { icon: "📝", judul: "SOP Pelaksanaan Audit Kinerja", deskripsi: "Prosedur standar operasional audit kinerja unit kerja",           versi: "v1.5", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kinerja" },
-    { icon: "🔍", judul: "SOP Audit Kepatuhan",           deskripsi: "Prosedur audit kepatuhan terhadap regulasi dan kebijakan",        versi: "v1.2", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kepatuhan" },
-    { icon: "📊", judul: "Panduan Kertas Kerja Audit",    deskripsi: "Format dan panduan pengisian kertas kerja audit (KKA)",           versi: "v2.3", berlaku: "Mar 2025", link: "https://drive.google.com/file/panduan-kka" },
-    { icon: "🎯", judul: "Pedoman Audit Berbasis Risiko", deskripsi: "Kerangka audit berbasis risiko untuk perencanaan dan pelaksanaan", versi: "v1.0", berlaku: "Apr 2025", link: "https://drive.google.com/file/pedoman-audit-risiko" },
+    { icon: "", judul: "Pedoman Audit Internal SPI",    deskripsi: "Panduan pelaksanaan audit internal sesuai standar AAIPI",         versi: "v3.1", berlaku: "Jan 2025", link: "https://drive.google.com/file/pedoman-audit-internal-spi" },
+    { icon: "", judul: "Kode Etik Auditor Internal",    deskripsi: "Prinsip dan aturan perilaku auditor internal universitas",        versi: "v2.0", berlaku: "Jan 2025", link: "https://drive.google.com/file/kode-etik-auditor" },
+    { icon: "", judul: "SOP Pelaksanaan Audit Kinerja", deskripsi: "Prosedur standar operasional audit kinerja unit kerja",           versi: "v1.5", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kinerja" },
+    { icon: "", judul: "SOP Audit Kepatuhan",           deskripsi: "Prosedur audit kepatuhan terhadap regulasi dan kebijakan",        versi: "v1.2", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kepatuhan" },
+    { icon: "", judul: "Panduan Kertas Kerja Audit",    deskripsi: "Format dan panduan pengisian kertas kerja audit (KKA)",           versi: "v2.3", berlaku: "Mar 2025", link: "https://drive.google.com/file/panduan-kka" },
+    { icon: "", judul: "Pedoman Audit Berbasis Risiko", deskripsi: "Kerangka audit berbasis risiko untuk perencanaan dan pelaksanaan", versi: "v1.0", berlaku: "Apr 2025", link: "https://drive.google.com/file/pedoman-audit-risiko" },
   ]);
   const pedomanList = pedomanBase.filter(d => d.judul.toLowerCase().includes(search.toLowerCase()));
 
@@ -6331,7 +6684,7 @@ function SectionD({ subSection }: { subSection: string }) {
           { key:"berlaku",  label:"Berlaku Sejak",                 type:"text", placeholder:"Jan 2025" },
           { key:"link",     label:"Link Dokumen (Google Drive)",   type:"url" },
         ]}
-        onSave={(v) => setPedomanBase(prev => [{ icon: "📄", judul: v.judul || "-", deskripsi: v.deskripsi || "-", versi: v.versi || "v1.0", berlaku: v.berlaku || "-", link: v.link || "#" }, ...prev])}
+        onSave={(v) => setPedomanBase(prev => [{ icon: "", judul: v.judul || "-", deskripsi: v.deskripsi || "-", versi: v.versi || "v1.0", berlaku: v.berlaku || "-", link: v.link || "#" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Peraturan" && (
@@ -6369,16 +6722,6 @@ function SectionF({ subSection }: { subSection: string }) {
     15: [{ label: "Deadline RTL",   color: "bg-red-500" }],
     18: [{ label: "Deadline RTL",   color: "bg-amber-500" }],
   };
-
-  const siklusData = [
-    { unit: "BAAK",              start: 1, dur: 2 },
-    { unit: "LPPM",              start: 2, dur: 2 },
-    { unit: "Sarpras",           start: 4, dur: 3 },
-    { unit: "BAUK",              start: 5, dur: 3 },
-    { unit: "Fak. Teknik",       start: 7, dur: 2 },
-    { unit: "LPM",               start: 9, dur: 2 },
-  ];
-  const ganttData = siklusData.map(d => ({ name: d.unit, mulai: d.start, durasi: d.dur }));
 
   const reminders = [
     { id: 1, label: "RTL Terlambat — Fakultas Hukum",  deadline: "10 Mei 2025", tag: "Overdue",  prioritas: "Kritis"  },
@@ -6465,7 +6808,7 @@ function SectionF({ subSection }: { subSection: string }) {
           {/* Deadline & Reminder — merged into Jadwal Rapat */}
           {overdue.length > 0 && (
             <div className="bg-white rounded-xl border border-red-100 p-4 shadow-sm">
-              <h4 className="text-xs font-bold text-red-600 mb-3">🔴 Overdue ({overdue.length})</h4>
+              <h4 className="text-xs font-bold text-red-600 mb-3">Overdue ({overdue.length})</h4>
               <div className="flex flex-col gap-2">
                 {overdue.map(r => (
                   <div key={r.id} className="flex items-center gap-3 p-2.5 rounded-xl border-l-4 border-red-400 bg-red-50">
@@ -6485,7 +6828,7 @@ function SectionF({ subSection }: { subSection: string }) {
             </div>
           )}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📅 Deadline Mendatang ({mendatang.length})</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Deadline Mendatang ({mendatang.length})</h4>
             <div className="flex flex-col gap-2">
               {mendatang.map(r => (
                 <div key={r.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
@@ -6501,7 +6844,7 @@ function SectionF({ subSection }: { subSection: string }) {
                     className="text-[9px] font-semibold px-2 py-1 rounded border border-gray-200 text-gray-600 hover:bg-gray-100 flex-shrink-0">Tandai Selesai</button>}
                 </div>
               ))}
-              {mendatang.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Semua deadline selesai 🎉</p>}
+              {mendatang.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Semua deadline selesai </p>}
             </div>
             {doneIds.length > 0 && (
               <div className="text-center mt-2">
@@ -6512,34 +6855,7 @@ function SectionF({ subSection }: { subSection: string }) {
         </div>
       )}
 
-      {/* Siklus Audit */}
-      {active === "Siklus Audit" && (
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-1">Siklus Audit Tahunan 2025 — Timeline per Unit</h4>
-          <p className="text-[10px] text-gray-400 mb-3">Setiap bar menunjukkan periode pelaksanaan audit (dalam bulan)</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={ganttData} layout="vertical" margin={{ top: 4, right: 16, left: 72, bottom: 4 }} barSize={18}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-              <XAxis type="number" domain={[0, 12]} tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false}
-                tickFormatter={(v) => ["","Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][v] || ""} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#374151" }} axisLine={false} tickLine={false} width={68} />
-              <Tooltip contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-                formatter={(v: unknown, name: unknown) => [name === "mulai" ? `Mulai bulan ke-${v}` : `${v} bulan`, name === "mulai" ? "Mulai" : "Durasi"]} />
-              <Bar dataKey="mulai" stackId="a" fill="transparent" radius={0} />
-              <Bar dataKey="durasi" stackId="a" fill="var(--tsu-teal)" radius={[4,4,4,4]} />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {siklusData.map((d, i) => (
-              <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 text-xs">
-                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: "var(--tsu-teal)" }} />
-                <span className="font-medium text-gray-700">{d.unit}</span>
-                <span className="text-gray-400 ml-auto">{["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][d.start - 1]}–{["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"][d.start + d.dur - 2]}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {active === "Deadline & Reminder" && <DeadlineReminderPanel />}
       {pendingDelete && (
         <ConfirmModal
           message={pendingDelete.msg}
@@ -6573,9 +6889,9 @@ function SectionG({ subSection }: { subSection: string }) {
   const [catatan, setCatatan] = useState("Realisasi anggaran berjalan sesuai rencana. Komponen lain-lain perlu evaluasi karena penyerapan masih rendah.");
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [laporanLinks, setLaporanLinks] = useState([
-    { label: "Laporan Excel Semester I",   icon: "📊", link: "https://docs.google.com/spreadsheets/d/laporan-keuangan-s1-2025", color: "border-green-200 text-green-700 hover:bg-green-50" },
-    { label: "Laporan PDF Semester II",    icon: "📄", link: "https://drive.google.com/file/laporan-pdf-s2-2024",              color: "border-red-200 text-red-600 hover:bg-red-50"      },
-    { label: "Ringkasan Anggaran Tahunan", icon: "📋", link: "https://docs.google.com/spreadsheets/d/ringkasan-anggaran-2025",  color: "border-blue-200 text-blue-600 hover:bg-blue-50"   },
+    { label: "Laporan Excel Semester I",   icon: "", link: "https://docs.google.com/spreadsheets/d/laporan-keuangan-s1-2025", color: "border-green-200 text-green-700 hover:bg-green-50" },
+    { label: "Laporan PDF Semester II",    icon: "", link: "https://drive.google.com/file/laporan-pdf-s2-2024",              color: "border-red-200 text-red-600 hover:bg-red-50"      },
+    { label: "Ringkasan Anggaran Tahunan", icon: "", link: "https://docs.google.com/spreadsheets/d/ringkasan-anggaran-2025",  color: "border-blue-200 text-blue-600 hover:bg-blue-50"   },
   ]);
 
   const komponenAnggaran = [
@@ -6620,7 +6936,7 @@ function SectionG({ subSection }: { subSection: string }) {
         <div className="flex flex-col gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">📊 Rencana vs Realisasi per Komponen</h4>
+              <h4 className="text-xs font-bold text-gray-700">Rencana vs Realisasi per Komponen</h4>
               <div className="flex gap-3">
                 <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-300"/><span className="text-[8px] text-gray-400">Rencana</span></div>
                 <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{background:"var(--tsu-teal)"}}/><span className="text-[8px] text-gray-400">Realisasi</span></div>
@@ -6680,7 +6996,7 @@ function SectionG({ subSection }: { subSection: string }) {
       {active === "Realisasi Anggaran" && (
         <div className="flex flex-col gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">📈 Tren Realisasi vs Rencana (Rp Jt)</h4>
+            <h4 className="text-xs font-bold text-gray-700 mb-3">Tren Realisasi vs Rencana (Rp Jt)</h4>
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={anggaranTrend} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
                 <defs>
@@ -6818,18 +7134,18 @@ function SectionG({ subSection }: { subSection: string }) {
           { key:"sumber",   label:"Sumber Dana",       type:"select", options:["DIPA","BOPTN","PNBP","Dana Mandiri"] },
           { key:"link",     label:"Link Dokumen Pendukung (Google Drive)", type:"url", required:false },
         ]}
-        onSave={(v) => setLaporanLinks(prev => [{ label: `${v.komponen || "Komponen"} — ${v.sub || ""}`.trim().replace(/—\s*$/, ""), icon: "📊", link: v.link || "#", color: "border-teal-200 text-teal-700 hover:bg-teal-50" }, ...prev])}
+        onSave={(v) => setLaporanLinks(prev => [{ label: `${v.komponen || "Komponen"} — ${v.sub || ""}`.trim().replace(/—\s*$/, ""), icon: "", link: v.link || "#", color: "border-teal-200 text-teal-700 hover:bg-teal-50" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Link Laporan" && (
         <TambahFormModal title="Tambah Laporan Keuangan" fields={[
           { key:"label",   label:"Nama Laporan",                       type:"text",   placeholder:"Laporan Excel Semester I 2025" },
-          { key:"format",  label:"Format",                             type:"select", options:["📊 Excel / Sheets","📄 PDF","📋 Ringkasan"] },
+          { key:"format",  label:"Format",                             type:"select", options:["Excel / Sheets","PDF","Ringkasan"] },
           { key:"semester",label:"Periode / Semester",                 type:"text",   placeholder:"Sem I 2025" },
           { key:"link",    label:"Link Laporan (Google Sheets / Drive)",type:"url" },
         ]}
         onSave={(v) => {
-          const icon = v.format?.startsWith("📊") ? "📊" : v.format?.startsWith("📄") ? "📄" : "📋";
+          const icon = "";
           setLaporanLinks(prev => [{ label: `${v.label || "Laporan"} ${v.semester || ""}`.trim(), icon, link: v.link || "#", color: "border-teal-200 text-teal-700 hover:bg-teal-50" }, ...prev]);
         }}
         onClose={() => setTambahModal(null)} />
@@ -6847,25 +7163,35 @@ function SectionG({ subSection }: { subSection: string }) {
 }
 
 function IndeksKomposit() {
+  const metrics = [
+    { label: "Kepatuhan",             val: "85,2%" },
+    { label: "Pengendalian Internal", val: "82,7%" },
+    { label: "Manajemen Risiko",      val: "78,4%" },
+    { label: "Efektivitas RTL",       val: "83,1%" },
+  ];
+
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-wrap items-center gap-4" style={{ borderLeft: "4px solid var(--tsu-teal)" }}>
-      {[
-        { label: "Kepatuhan",             val: "85,2%" },
-        { label: "Pengendalian Internal", val: "82,7%" },
-        { label: "Manajemen Risiko",      val: "78,4%" },
-        { label: "Efektivitas RTL",       val: "83,1%" },
-      ].map((m) => (
-        <div key={m.label} className="flex items-center gap-2 flex-1 min-w-[100px]">
-          <div className="flex-1">
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {metrics.map((m) => (
+          <div key={m.label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm" style={{ borderTop: "3px solid var(--tsu-teal)" }}>
             <div className="text-[10px] text-gray-400">{m.label}</div>
-            <div className="text-lg font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-teal)" }}>{m.val}</div>
+            <div className="text-2xl font-black mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-teal)" }}>{m.val}</div>
           </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex items-center justify-between gap-3" style={{ borderTop: "3px solid var(--tsu-gold)" }}>
+          <div>
+            <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal-dark)" }}>Indeks Komposit</div>
+            <div className="text-2xl font-black mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-gold)" }}>82,4%</div>
+          </div>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>Efektif</span>
         </div>
-      ))}
-      <div className="border-l border-gray-100 pl-4 text-center flex-shrink-0">
-        <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal-dark)" }}>Indeks Komposit</div>
-        <div className="text-2xl font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-gold)" }}>82,4%</div>
-        <div className="text-xs font-semibold" style={{ color: "var(--tsu-teal)" }}>Baik</div>
+        <div className="md:col-span-2 bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-center" style={{ borderLeft: "4px solid var(--tsu-teal)" }}>
+          <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "var(--tsu-teal-dark)" }}>Tindakan Manajemen</div>
+          <div className="text-xs font-semibold text-gray-600 mt-1">Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai</div>
+        </div>
       </div>
     </div>
   );
@@ -6919,14 +7245,14 @@ const NOTIF_PREFS_DEFAULT: Record<string, Record<string,boolean>> = {
   },
 };
 
-function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }) {
+function PengaturanSistem({ user, onClose, onPasswordChanged }: { user: User; onClose: () => void; onPasswordChanged: () => void }) {
   const tabs = [
-    { id:"profil", label:"👤 Profil & Akun" },
+    { id:"profil", label:"Profil & Akun" },
     ...(user.role === "full" ? [
-      { id:"users",  label:"👥 Manajemen User" },
-      { id:"config", label:"⚙️ Konfigurasi Sistem" },
+      { id:"users",  label:"Manajemen User" },
+      { id:"config", label:"Konfigurasi Sistem" },
     ] : []),
-    { id:"notif", label:"🔔 Preferensi Notifikasi" },
+    { id:"notif", label:"Preferensi Notifikasi" },
   ];
 
   const [tab, setTab] = useState("profil");
@@ -6960,10 +7286,17 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
   const [unitEdit, setUnitEdit]       = useState(user.unit ?? "");
 
   // Manajemen User
-  const [userList, setUserList]           = useState(DEMO_USERS_EXT);
+  const [userList, setUserList]           = useState<(typeof DEMO_USERS_EXT[0] & { mustChange?: boolean })[]>(DEMO_USERS_EXT);
   const [showAddForm, setShowAddForm]     = useState(false);
   const [userFilter, setUserFilter]       = useState("semua");
-  const [newUser, setNewUser]             = useState({ nama:"", email:"", role:"auditee", unit:"", jabatan:"" });
+  const [newUser, setNewUser]             = useState({ nama:"", email:"", role:"auditee", unit:"", jabatan:"", password:"" });
+  const [showNewPw, setShowNewPw]         = useState(false);
+  const [resetTarget, setResetTarget]     = useState<number | null>(null);
+  const [resetPw, setResetPw]             = useState("");
+  const [showPw, setShowPw]                 = useState<Record<string,boolean>>({});
+  const [confirmAct, setConfirmAct]       = useState<{ kind:"edit"|"toggle"; id:number } | null>(null);
+  const [pwNotice, setPwNotice]           = useState("");
+  const [pwError, setPwError]             = useState("");
   const [editUserId, setEditUserId]       = useState<number | null>(null);
   const [editUserData, setEditUserData]   = useState({ nama:"", email:"", jabatan:"", unit:"", role:"" });
 
@@ -6974,9 +7307,26 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
   }
   function addUserHandler() {
     if (!newUser.nama || !newUser.email) return;
-    setUserList(prev => [...prev, { ...newUser, id: prev.length + 1, aktif: true }]);
-    setNewUser({ nama:"", email:"", role:"auditee", unit:"", jabatan:"" });
+    if (newUser.password.length < 8) return;
+    const { password, ...akun } = newUser;
+    setUserList(prev => [...prev, { ...akun, id: prev.length + 1, aktif: true, mustChange: true }]);
+    ACCOUNTS.push({
+      email: akun.email.trim(), password, name: akun.nama, jabatan: akun.jabatan || ROLE_LABEL_MAP[akun.role],
+      initials: akun.nama.split(" ").filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join(""),
+      role: akun.role as User["role"], avatarColor: "bg-teal-500", unit: akun.unit || undefined, mustChangePassword: true,
+    });
+    setPwNotice(`Akun ${akun.email} dibuat. Serahkan password sementara ke pengguna; pengguna akan diminta menggantinya saat login.`);
+    setNewUser({ nama:"", email:"", role:"auditee", unit:"", jabatan:"", password:"" });
     setShowAddForm(false);
+  }
+  function resetPasswordHandler() {
+    const target = userList.find(u => u.id === resetTarget);
+    if (!target || resetPw.length < 8) return;
+    const acc = ACCOUNTS.find(a => a.email === target.email);
+    if (acc) { acc.password = resetPw; acc.mustChangePassword = true; }
+    setUserList(prev => prev.map(u => u.id === resetTarget ? { ...u, mustChange: true } : u));
+    setPwNotice(`Password ${target.email} direset. Serahkan password sementara ke pengguna; pengguna akan diminta menggantinya saat login.`);
+    setResetTarget(null); setResetPw("");
   }
   function startEditUser(u: typeof DEMO_USERS_EXT[0]) {
     setEditUserId(u.id);
@@ -7036,7 +7386,7 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
         <div className="hidden md:flex w-56 flex-shrink-0 flex-col border-r border-white/10"
           style={{ background:"linear-gradient(180deg,var(--tsu-teal-dark) 0%,var(--tsu-teal) 100%)" }}>
           <div className="px-4 py-5 border-b border-white/10">
-            <div className="text-sm font-black text-white">⚙️ Pengaturan</div>
+            <div className="text-sm font-black text-white">Pengaturan</div>
             <div className="text-[10px] text-white/60 mt-0.5">SIMSPI TSU</div>
           </div>
           <div className="px-4 py-3 border-b border-white/10">
@@ -7158,15 +7508,27 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                   ].map(({ label, val, set, ph }) => (
                     <div key={label}>
                       <label className="block text-xs font-semibold text-gray-600 mb-1.5">{label}</label>
-                      <input type="password" value={val} onChange={e => set(e.target.value)} placeholder={ph}
+                      <input type={showPw[label] ? "text" : "password"} value={val} onChange={e => set(e.target.value)} placeholder={ph}
                         className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all" />
+                      <label className="mt-1.5 flex items-center gap-1.5 text-[10px] text-gray-500 cursor-pointer select-none w-fit">
+                        <input type="checkbox" checked={!!showPw[label]} onChange={e => setShowPw(p => ({ ...p, [label]: e.target.checked }))} />
+                        Tampilkan password
+                      </label>
                     </div>
                   ))}
                   {pwBaru && pwKonfirmasi && pwBaru !== pwKonfirmasi && (
                     <p className="text-[10px] text-red-500">Password baru tidak cocok.</p>
                   )}
+                  {pwError && <p className="text-[10px] text-red-500">{pwError}</p>}
                   <button onClick={() => {
-                    if (pwBaru && pwBaru === pwKonfirmasi) {
+                    setPwError("");
+                    const acc = ACCOUNTS.find(a => a.email === user.email);
+                    if (acc && acc.password !== pwLama) { setPwError("Password lama salah."); return; }
+                    if (pwBaru.length < 8) { setPwError("Password baru minimal 8 karakter."); return; }
+                    if (pwBaru === pwLama) { setPwError("Password baru harus berbeda dari password lama."); return; }
+                    if (pwBaru === pwKonfirmasi) {
+                      if (acc) { acc.password = pwBaru; acc.mustChangePassword = false; }
+                      onPasswordChanged();
                       setPwSaved(true); setPwLama(""); setPwBaru(""); setPwKonfirmasi("");
                       setTimeout(() => setPwSaved(false), 2500);
                     }
@@ -7231,6 +7593,23 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                       </div>
                     )}
                   </div>
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 flex flex-col gap-2">
+                    <label className="text-[10px] font-bold text-amber-800">Password Sementara *</label>
+                    <div className="flex gap-2 items-center">
+                      <input type={showNewPw ? "text" : "password"} autoComplete="new-password" value={newUser.password}
+                        onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))}
+                        placeholder="Min. 8 karakter"
+                        className="flex-1 border border-amber-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-teal-400" />
+                      <button type="button" onClick={() => setShowNewPw(v => !v)}
+                        className="text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border border-amber-200 bg-white hover:bg-amber-100">
+                        {showNewPw ? "Sembunyikan" : "Tampilkan"}
+                      </button>
+                    </div>
+                    {newUser.password && newUser.password.length < 8 && (
+                      <p className="text-[10px] text-red-500">Password minimal 8 karakter.</p>
+                    )}
+                    <p className="text-[10px] text-amber-700">Diisi manual oleh Ketua SPI lalu diserahkan ke pengguna. Saat pengguna login, muncul peringatan agar segera mengganti password ini.</p>
+                  </div>
                   <div className="flex gap-2">
                     <button onClick={addUserHandler}
                       className="text-xs font-bold px-3 py-1.5 rounded-lg text-white"
@@ -7241,6 +7620,52 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                       className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
                       Batal
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {confirmAct && (() => {
+                const t = userList.find(x => x.id === confirmAct.id);
+                const nonaktif = confirmAct.kind === "toggle" && !!t?.aktif;
+                const msg = confirmAct.kind === "edit"
+                  ? `Apakah Anda yakin ingin menyimpan perubahan data akun ${t?.nama}?`
+                  : nonaktif
+                    ? `Apakah Anda yakin ingin menonaktifkan akun ${t?.nama}? Pengguna tidak akan bisa login sampai diaktifkan kembali.`
+                    : `Apakah Anda yakin ingin mengaktifkan kembali akun ${t?.nama}?`;
+                return (
+                  <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background:"rgba(15,23,42,0.6)" }}>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col gap-4">
+                      <h3 className="text-sm font-black text-gray-800">{confirmAct.kind === "edit" ? "Simpan Perubahan" : nonaktif ? "Nonaktifkan Akun" : "Aktifkan Akun"}</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">{msg}</p>
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => setConfirmAct(null)}
+                          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">Batal</button>
+                        <button onClick={() => { if (confirmAct.kind === "edit") saveEditUser(); else toggleAktif(confirmAct.id); setConfirmAct(null); }}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-lg text-white ${nonaktif ? "bg-red-500" : ""}`}
+                          style={nonaktif ? undefined : { background:"var(--tsu-teal)" }}>
+                          Ya, Yakin
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+              {pwNotice && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-start justify-between gap-3">
+                  <p className="text-xs text-emerald-800">{pwNotice}</p>
+                  <button onClick={() => setPwNotice("")} className="text-[10px] font-semibold text-emerald-700 flex-shrink-0">Tutup</button>
+                </div>
+              )}
+              {resetTarget !== null && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 flex flex-col gap-2">
+                  <div className="text-xs font-bold text-amber-800">Reset password: {userList.find(u => u.id === resetTarget)?.email}</div>
+                  <input type="text" value={resetPw} onChange={e => setResetPw(e.target.value)} placeholder="Password sementara baru (min. 8 karakter)"
+                    className="w-full border border-amber-200 rounded-lg px-2.5 py-1.5 text-xs bg-white focus:outline-none focus:border-teal-400" />
+                  <div className="flex gap-2">
+                    <button onClick={resetPasswordHandler} disabled={resetPw.length < 8}
+                      className="text-xs font-bold px-3 py-1.5 rounded-lg text-white disabled:opacity-40" style={{ background:"var(--tsu-teal)" }}>Simpan</button>
+                    <button onClick={() => { setResetTarget(null); setResetPw(""); }}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">Batal</button>
                   </div>
                 </div>
               )}
@@ -7299,7 +7724,7 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <button onClick={saveEditUser}
+                              <button onClick={() => setConfirmAct({ kind:"edit", id: u.id })}
                                 className="text-[9px] font-bold px-3 py-1 rounded-lg text-white"
                                 style={{ background:"var(--tsu-teal)" }}>
                                 ✓ Simpan
@@ -7330,6 +7755,9 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                             u.aktif ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-400"
                           }`}>{u.aktif ? "Aktif" : "Nonaktif"}</span>
+                          {u.mustChange && (
+                            <div className="mt-1 text-[9px] font-semibold text-amber-600">Wajib ganti password</div>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex gap-1">
@@ -7337,7 +7765,11 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                               className="text-[9px] font-semibold px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
                               Edit
                             </button>
-                            <button onClick={() => toggleAktif(u.id)}
+                            <button onClick={() => { setResetTarget(u.id); setResetPw(""); }}
+                              className="text-[9px] font-semibold px-2 py-1 rounded-lg border border-amber-100 text-amber-600 hover:bg-amber-50">
+                              Reset Password
+                            </button>
+                            <button onClick={() => setConfirmAct({ kind:"toggle", id: u.id })}
                               className={`text-[9px] font-semibold px-2 py-1 rounded-lg border transition-colors ${
                                 u.aktif
                                   ? "border-red-100 text-red-500 hover:bg-red-50"
@@ -7397,7 +7829,7 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
                     className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center gap-2 hover:border-teal-300 transition-colors cursor-pointer">
                     <input id="logo-upload-input" type="file" accept="image/png,image/svg+xml" className="hidden"
                       onChange={e => { if (e.target.files?.[0]) { alert(`Logo "${e.target.files[0].name}" berhasil diunggah.`); e.target.value = ""; } }} />
-                    <div className="text-2xl">🖼️</div>
+                    <div className="text-2xl"></div>
                     <div className="text-xs text-gray-400">Klik untuk unggah logo</div>
                     <div className="text-[10px] text-gray-300">PNG, SVG — maks 1 MB</div>
                   </div>
@@ -7413,7 +7845,7 @@ function PengaturanSistem({ user, onClose }: { user: User; onClose: () => void }
               </div>
 
               <div className="border border-amber-200 bg-amber-50 rounded-xl p-4 max-w-lg">
-                <div className="text-xs font-bold text-amber-800 mb-1">ℹ️ Catatan Level 1</div>
+                <div className="text-xs font-bold text-amber-800 mb-1">ℹ Catatan Level 1</div>
                 <p className="text-[10px] text-amber-700 leading-relaxed">
                   Perubahan konfigurasi belum tersimpan ke database. Akan berlaku permanen setelah backend terhubung (Level 2).
                 </p>
@@ -7464,10 +7896,10 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
   const [showLogout, setShowLogout] = useState(false);
 
   const kpiCards = [
-    { label: "Indeks Komposit",     value: "82,4%",  sub: "↑ 3,5 poin dari Q1 (78,9%)",  icon: "🎯", color: { bg: "from-teal-500 to-teal-700",   badge: "bg-teal-100 text-teal-700"   }, trend: "up"      },
-    { label: "Program Audit Selesai",value: "3 / 6", sub: "50% program terlaksana",       icon: "✅", color: { bg: "from-blue-500 to-blue-700",   badge: "bg-blue-100 text-blue-700"   }, trend: "neutral" },
-    { label: "RTL Dituntaskan",     value: "12 / 18",sub: "67% rekomendasi selesai",      icon: "📋", color: { bg: "from-purple-500 to-purple-700",badge: "bg-purple-100 text-purple-700"}, trend: "up"     },
-    { label: "Penyerapan Anggaran", value: "67%",    sub: "Rp 127,8 Jt dari Rp 191 Jt",  icon: "💰", color: { bg: "from-amber-500 to-amber-600",  badge: "bg-amber-100 text-amber-700" }, trend: "down"    },
+    { label: "Indeks Komposit",     value: "82,4%",  sub: "↑ 3,5 poin dari Q1 (78,9%)",  icon: "", color: { bg: "from-teal-500 to-teal-700",   badge: "bg-teal-100 text-teal-700"   }, trend: "up"      },
+    { label: "Program Audit Selesai",value: "3 / 6", sub: "50% program terlaksana",       icon: "", color: { bg: "from-blue-500 to-blue-700",   badge: "bg-blue-100 text-blue-700"   }, trend: "neutral" },
+    { label: "RTL Dituntaskan",     value: "12 / 18",sub: "67% rekomendasi selesai",      icon: "", color: { bg: "from-purple-500 to-purple-700",badge: "bg-purple-100 text-purple-700"}, trend: "up"     },
+    { label: "Penyerapan Anggaran", value: "67%",    sub: "Rp 127,8 Jt dari Rp 191 Jt",  icon: "", color: { bg: "from-amber-500 to-amber-600",  badge: "bg-amber-100 text-amber-700" }, trend: "down"    },
   ];
 
   // ── Tren Q1 → Q2 ──────────────────────────────────────────────────────────
@@ -7588,7 +8020,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             <div key={k.label} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden">
               <div className={`absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-5 bg-gradient-to-br ${k.color.bg}`} />
               <div className="flex items-start justify-between mb-2">
-                <span className="text-xl">{k.icon}</span>
+                <span />
                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${k.color.badge}`}>
                   {k.trend === "up" ? "↑" : k.trend === "down" ? "↓" : "—"}
                 </span>
@@ -7603,7 +8035,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
         {/* ── Tren Q1 → Q2 ────────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-5 overflow-hidden">
           <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center gap-2">
-            <span className="text-base">📈</span>
+            <span className="text-base"></span>
             <div>
               <div className="text-sm font-bold text-gray-700">Tren Kinerja Pengawasan</div>
               <div className="text-[10px] text-gray-400">Perbandingan Q1 2025 vs Q2 2025</div>
@@ -7643,7 +8075,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
                 <div className="flex-1">
-                  <h2 className="text-sm font-bold text-gray-700">⚠️ Rekap Temuan Kritis Per Unit</h2>
+                  <h2 className="text-sm font-bold text-gray-700">Rekap Temuan Kritis Per Unit</h2>
                   <p className="text-[10px] text-gray-400 mt-0.5">Temuan dengan level risiko Tinggi & Sedang yang masih terbuka</p>
                 </div>
                 <svg width={64} height={36} style={{ flexShrink: 0 }}>
@@ -7687,7 +8119,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
                 <div className="flex-1">
-                  <h2 className="text-sm font-bold text-gray-700">🗂️ Riwayat Audit Keseluruhan</h2>
+                  <h2 className="text-sm font-bold text-gray-700">Riwayat Audit Keseluruhan</h2>
                   <p className="text-[10px] text-gray-400 mt-0.5">Seluruh program audit yang pernah dilaksanakan</p>
                 </div>
                 {/* Mini sparkline: audit selesai per tahun */}
@@ -7752,7 +8184,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-start gap-3">
                 <div className="flex-1">
-                  <h2 className="text-sm font-bold text-gray-700">📊 Status Audit Per Unit Kerja</h2>
+                  <h2 className="text-sm font-bold text-gray-700">Status Audit Per Unit Kerja</h2>
                   <p className="text-[10px] text-gray-400 mt-0.5">Program audit tahun 2025</p>
                 </div>
                 {/* Mini donut: Selesai/Berjalan/Rencana */}
@@ -7820,7 +8252,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
             {/* LHA Terbaru */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
               <div className="px-4 pt-4 pb-3 border-b border-gray-100 flex items-center gap-3">
-                <h2 className="text-sm font-bold text-gray-700 flex-1">📄 Laporan Hasil Audit (LHA) Terbaru</h2>
+                <h2 className="text-sm font-bold text-gray-700 flex-1">Laporan Hasil Audit (LHA) Terbaru</h2>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {[{label:"Final",count:2,color:"#0e8080",bg:"#f0fdfa"},{label:"Draft",count:1,color:"#f59e0b",bg:"#fffbeb"}].map(s => (
                     <div key={s.label} className="flex flex-col items-center px-2.5 py-1 rounded-lg" style={{ background: s.bg }}>
@@ -7835,7 +8267,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
                   <div key={i} className="flex items-center gap-3 px-4 py-3">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm flex-shrink-0"
                       style={{ background: "var(--tsu-teal-light)" }}>
-                      📋
+                      
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold text-gray-700 truncate">{l.judul}</div>
@@ -7860,7 +8292,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* Chart 1: Distribusi Level Temuan */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">🔴 Distribusi Level Temuan</h2>
+              <h2 className="text-sm font-bold text-gray-700 mb-3">Distribusi Level Temuan</h2>
               {(() => {
                 const items = [
                   { label: "Tinggi",  count: 3, color: "#ef4444" },
@@ -7907,7 +8339,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* Chart 2: Temuan Audit per Tahun */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <h2 className="text-sm font-bold text-gray-700 mb-1">📊 Temuan Audit per Tahun</h2>
+              <h2 className="text-sm font-bold text-gray-700 mb-1">Temuan Audit per Tahun</h2>
               <p className="text-[9px] text-gray-400 mb-3">Total temuan vs RTL selesai</p>
               {(() => {
                 const data = [
@@ -7951,7 +8383,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
 
             {/* Chart 3: Status Program Audit 2025 */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">🎯 Status Program Audit 2025</h2>
+              <h2 className="text-sm font-bold text-gray-700 mb-3">Status Program Audit 2025</h2>
               {(() => {
                 const statuses = [
                   { label: "Selesai",  count: 2, color: "#22c55e" },
@@ -8001,7 +8433,7 @@ function RektorDashboard({ user, onLogout }: { user: User; onLogout: () => void 
       {showLogout && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowLogout(false)}>
           <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
-            <div className="text-2xl mb-3">👋</div>
+            <div className="text-2xl mb-3"></div>
             <div className="font-bold text-gray-800 mb-1">Keluar dari sistem?</div>
             <div className="text-sm text-gray-500 mb-5">Sesi Anda akan berakhir dan Anda perlu masuk kembali.</div>
             <div className="flex gap-2">
@@ -8029,25 +8461,26 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showNotifModal, setShowNotifModal]       = useState(false);
   const [showSettings, setShowSettings]           = useState(false);
+  const [pwWarn, setPwWarn]                       = useState(!!user.mustChangePassword);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [rapatList, setRapatList]                 = useState<Rapat[]>(RAPAT_AWAL);
   const [readNotifIds, setReadNotifIds] = useState<Set<number>>(new Set());
 
   type Notif = { id: number; icon: string; title: string; body: string; time: string; tag: string; roles: string[] };
   const [allNotifs, setAllNotifs] = useState<Notif[]>([
-    { id:1,  icon:"⚠️", title:"RTL Sarpras jatuh tempo",              body:"Tindak lanjut rekomendasi R-003 batas akhir 3 hari lagi.",         time:"5 mnt lalu",  tag:"Deadline", roles:["full","pengawasan"] },
-    { id:2,  icon:"✅", title:"Audit BAAK selesai",                    body:"LHA sudah diterbitkan dan tersedia di modul Riwayat.",              time:"1 jam lalu",  tag:"Audit",    roles:["full","pengawasan","rektor"] },
-    { id:3,  icon:"📅", title:"Rapat Tinjauan Manajemen besok",        body:"Rapat dijadwalkan pukul 09.00 — Ruang Sidang Utama.",              time:"2 jam lalu",  tag:"Rapat",    roles:["full","pengawasan","backoffice","auditee","rektor"] },
-    { id:4,  icon:"📋", title:"PKPT baru diunggah",                    body:"Rencana Kerja Pengawasan Tahunan 2025 telah diperbarui.",           time:"3 jam lalu",  tag:"Info",     roles:["full","backoffice"] },
-    { id:5,  icon:"👤", title:"Auditor baru ditambahkan",              body:"Dwi Santoso, CISA — telah terdaftar di modul SDM.",                time:"Kemarin",     tag:"SDM",      roles:["full","backoffice"] },
-    { id:6,  icon:"🗑️", title:"Jadwal pemusnahan dokumen menunggu",    body:"3 arsip menunggu persetujuan pemusnahan di modul Retensi.",        time:"4 jam lalu",  tag:"Arsip",    roles:["full","backoffice"] },
-    { id:7,  icon:"💰", title:"Realisasi anggaran kurang dari 80%",    body:"Penyerapan anggaran Q2 masih 67% — perlu evaluasi segera.",        time:"Hari ini",    tag:"Anggaran", roles:["full","backoffice","rektor"] },
-    { id:8,  icon:"📝", title:"Rekomendasi baru dari auditor",         body:"2 rekomendasi baru pada audit BAAK perlu ditindaklanjuti.",        time:"6 mnt lalu",  tag:"RTL",      roles:["auditee"] },
-    { id:9,  icon:"⏰", title:"Deadline RTL #2 dalam 4 hari",          body:"Mohon segera unggah bukti tindak lanjut sebelum batas waktu.",    time:"30 mnt lalu", tag:"Deadline", roles:["auditee"] },
-    { id:10, icon:"📢", title:"Jadwal audit unit Anda ditetapkan",     body:"Audit unit dijadwalkan mulai 5 Juni 2025.",                        time:"1 hari lalu", tag:"Audit",    roles:["auditee"] },
-    { id:11, icon:"🔔", title:"Verifikasi RTL disetujui",              body:"Tindak lanjut R-001 telah diverifikasi dan diterima auditor.",     time:"2 jam lalu",  tag:"RTL",      roles:["auditee"] },
-    { id:12, icon:"📊", title:"Laporan Pengawasan Q2 tersedia",        body:"Ringkasan hasil audit dan status RTL semester I sudah dapat dilihat di dashboard.", time:"1 hari lalu", tag:"Audit", roles:["rektor"] },
-    { id:13, icon:"🎯", title:"Indeks Komposit naik ke 82,4%",         body:"Skor pengawasan meningkat dari Q1 (78,9%) berdasarkan 5 dimensi audit.",          time:"3 hari lalu", tag:"Info",  roles:["rektor"] },
+    { id:1,  icon:"", title:"RTL Sarpras jatuh tempo",              body:"Tindak lanjut rekomendasi R-003 batas akhir 3 hari lagi.",         time:"5 mnt lalu",  tag:"Deadline", roles:["full","pengawasan"] },
+    { id:2,  icon:"", title:"Audit BAAK selesai",                    body:"LHA sudah diterbitkan dan tersedia di modul Riwayat.",              time:"1 jam lalu",  tag:"Audit",    roles:["full","pengawasan","rektor"] },
+    { id:3,  icon:"", title:"Rapat Tinjauan Manajemen besok",        body:"Rapat dijadwalkan pukul 09.00 — Ruang Sidang Utama.",              time:"2 jam lalu",  tag:"Rapat",    roles:["full","pengawasan","backoffice","auditee","rektor"] },
+    { id:4,  icon:"", title:"PKPT baru diunggah",                    body:"Rencana Kerja Pengawasan Tahunan 2025 telah diperbarui.",           time:"3 jam lalu",  tag:"Info",     roles:["full","backoffice"] },
+    { id:5,  icon:"", title:"Auditor baru ditambahkan",              body:"Dwi Santoso, CISA — telah terdaftar di modul SDM.",                time:"Kemarin",     tag:"SDM",      roles:["full","backoffice"] },
+    { id:6,  icon:"", title:"Jadwal pemusnahan dokumen menunggu",    body:"3 arsip menunggu persetujuan pemusnahan di modul Retensi.",        time:"4 jam lalu",  tag:"Arsip",    roles:["full","backoffice"] },
+    { id:7,  icon:"", title:"Realisasi anggaran kurang dari 80%",    body:"Penyerapan anggaran Q2 masih 67% — perlu evaluasi segera.",        time:"Hari ini",    tag:"Anggaran", roles:["full","backoffice","rektor"] },
+    { id:8,  icon:"", title:"Rekomendasi baru dari auditor",         body:"2 rekomendasi baru pada audit BAAK perlu ditindaklanjuti.",        time:"6 mnt lalu",  tag:"RTL",      roles:["auditee"] },
+    { id:9,  icon:"", title:"Deadline RTL #2 dalam 4 hari",          body:"Mohon segera unggah bukti tindak lanjut sebelum batas waktu.",    time:"30 mnt lalu", tag:"Deadline", roles:["auditee"] },
+    { id:10, icon:"", title:"Jadwal audit unit Anda ditetapkan",     body:"Audit unit dijadwalkan mulai 5 Juni 2025.",                        time:"1 hari lalu", tag:"Audit",    roles:["auditee"] },
+    { id:11, icon:"", title:"Verifikasi RTL disetujui",              body:"Tindak lanjut R-001 telah diverifikasi dan diterima auditor.",     time:"2 jam lalu",  tag:"RTL",      roles:["auditee"] },
+    { id:12, icon:"", title:"Laporan Pengawasan Q2 tersedia",        body:"Ringkasan hasil audit dan status RTL semester I sudah dapat dilihat di dashboard.", time:"1 hari lalu", tag:"Audit", roles:["rektor"] },
+    { id:13, icon:"", title:"Indeks Komposit naik ke 82,4%",         body:"Skor pengawasan meningkat dari Q1 (78,9%) berdasarkan 5 dimensi audit.",          time:"3 hari lalu", tag:"Info",  roles:["rektor"] },
   ]);
 
   function addRapat(r: Omit<Rapat, "id" | "status">) {
@@ -8056,7 +8489,7 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
     const notifRoles = pesertaToRoles(r.peserta);
     setAllNotifs(prev => [{
       id: newId,
-      icon: "📅",
+      icon: "",
       title: `Rapat baru: ${r.judul}`,
       body: `${r.tgl} · ${r.jam} · ${r.tempat} · Peserta: ${pesertaLabel(r.peserta)}`,
       time: "Baru saja",
@@ -8289,6 +8722,18 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-3 md:p-5">
+          {pwWarn && (
+            <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <div className="text-xs font-bold text-amber-800">Segera ganti password sementara Anda</div>
+                <p className="text-[11px] text-amber-700 mt-0.5">Akun Anda masih memakai password sementara dari Ketua SPI. Demi keamanan, ganti dengan password pribadi di Pengaturan Sistem.</p>
+              </div>
+              <button onClick={() => setShowSettings(true)}
+                className="text-xs font-bold px-3 py-2 rounded-xl text-white flex-shrink-0" style={{ background:"var(--tsu-teal)" }}>
+                Ubah Password Sekarang
+              </button>
+            </div>
+          )}
           {/* Indeks komposit shown for full-access & rektor on pengawasan ringkasan */}
           {user.role === "full" && activeModule === "pengawasan" && activeSection === "ringkasan" && (
             <div className="mb-4"><IndeksKomposit /></div>
@@ -8346,10 +8791,6 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
                     className={`w-full text-left flex items-start gap-3 px-5 py-4 transition-colors hover:bg-gray-50 ${isRead ? "opacity-55" : ""}`}>
                     <span className={`mt-2 w-2 h-2 rounded-full flex-shrink-0 ${isRead ? "bg-transparent" : ""}`}
                       style={isRead ? {} : { background: "var(--tsu-teal)" }} />
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                      style={{ background: "var(--tsu-teal-light)" }}>
-                      {n.icon}
-                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <span className={`text-xs leading-tight ${isRead ? "font-medium text-gray-500" : "font-bold text-gray-800"}`}>{n.title}</span>
@@ -8380,7 +8821,7 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
 
     {/* Modal Pengaturan Sistem */}
     {showSettings && (
-      <PengaturanSistem user={user} onClose={() => setShowSettings(false)} />
+      <PengaturanSistem user={user} onClose={() => setShowSettings(false)} onPasswordChanged={() => setPwWarn(false)} />
     )}
 
     {/* Konfirmasi Keluar */}
@@ -8390,7 +8831,7 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
           <div className="px-6 pt-6 pb-2 flex flex-col items-center text-center gap-3">
             <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center text-2xl">
-              🚪
+              
             </div>
             <div>
               <h3 className="text-base font-black text-gray-800">Yakin ingin keluar?</h3>
@@ -8402,7 +8843,7 @@ export default function Dashboard({ user, onLogout }: { user: User; onLogout: ()
 
           <div className="px-6 py-4">
             <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2">
-              <span className="text-amber-500 flex-shrink-0 mt-0.5">⚠️</span>
+              <span className="text-amber-500 flex-shrink-0 mt-0.5"></span>
               <p className="text-[11px] text-amber-700 leading-relaxed">
                 Periksa kembali: form yang sedang diisi, data RTL yang belum disubmit, atau rapat yang belum disimpan.
               </p>
