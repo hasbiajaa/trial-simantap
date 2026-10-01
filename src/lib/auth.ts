@@ -9,6 +9,7 @@ export interface User {
   role: Role;
   avatarColor: string;
   unit?: string;
+  mustChangePassword?: boolean;
 }
 
 export const ACCOUNTS: User[] = [
