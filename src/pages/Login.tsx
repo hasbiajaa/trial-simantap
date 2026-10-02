@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { ACCOUNTS, User } from "@/types/auth";
-import logoTSU from "/LOGO_TSU.png";
+import logoTSU from "@/imports/LOGO_TSU_png.png";
 
 const IconEye = ({ className = "" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -21,11 +21,11 @@ const ROLE_HINTS: Record<string, { label: string; color: string; badgeStyle: CSS
   rektor:     { label: "Rektor — Lihat Saja", color: "border border-red-100 bg-red-50",    badgeStyle: { background: "#dc2626", color: "#fff" } },
 };
 
-export default function Login({ onLogin }: { onLogin: (user: User) => void }) {
+export default function Login({ onLogin, notice = "" }: { onLogin: (user: User) => void; notice?: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(notice);
   const [loading, setLoading] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
@@ -37,7 +37,10 @@ export default function Login({ onLogin }: { onLogin: (user: User) => void }) {
       const user = ACCOUNTS.find(
         (a) => a.email === email.trim() && a.password === password
       );
-      if (user) {
+      if (user && user.aktif === false) {
+        setError("Akun Anda dinonaktifkan. Hubungi Ketua SPI.");
+        setLoading(false);
+      } else if (user) {
         onLogin(user);
       } else {
         setError("Email atau password salah. Coba lagi.");
@@ -90,10 +93,10 @@ export default function Login({ onLogin }: { onLogin: (user: User) => void }) {
         {/* Feature list */}
         <div className="relative z-10 grid grid-cols-2 gap-3">
           {[
-            { icon: "🛡️", text: "Manajemen Risiko" },
-            { icon: "📋", text: "Program Audit" },
-            { icon: "✅", text: "Tindak Lanjut (RTL)" },
-            { icon: "📂", text: "Arsip & Dokumen" },
+            { icon: "", text: "Manajemen Risiko" },
+            { icon: "", text: "Program Audit" },
+            { icon: "", text: "Tindak Lanjut (RTL)" },
+            { icon: "", text: "Arsip & Dokumen" },
           ].map((f) => (
             <div key={f.text} className="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2">
               <span className="text-lg">{f.icon}</span>

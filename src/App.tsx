@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { User } from "@/types/auth";
+import { useState, useEffect } from "react";
+import { User, ACCOUNTS, AppConfig, DEFAULT_CONFIG } from "@/types/auth";
 import Login from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
+import Dashboard, { DEMO_USERS_EXT, type UserRow } from "@/pages/Dashboard";
 import Wireframe from "@/pages/Wireframe";
 
 // ── Tipe reminder ─────────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ function generateReminders(user: User): Reminder[] {
 
         reminders.push({
           id: 100 + i,
-          judul: `⏰ Deadline RTL: ${r.judul}`,
+          judul: `Deadline RTL: ${r.judul}`,
           isi: `Batas waktu tindak lanjut "${r.judul}" (${r.unit}) adalah ${sisaLabel}.`,
           tipe: "deadline",
           prioritas,
@@ -82,7 +82,7 @@ function generateReminders(user: User): Reminder[] {
         const label = r.tanggal === fmt(today) ? "HARI INI" : "besok";
         reminders.push({
           id: 200 + i,
-          judul: `📅 Rapat ${label}: ${r.judul}`,
+          judul: `Rapat ${label}: ${r.judul}`,
           isi: `Rapat "${r.judul}" dijadwalkan ${label}. Pastikan kehadiran dan persiapan materi.`,
           tipe: "rapat",
           prioritas: r.tanggal === fmt(today) ? "tinggi" : "sedang",
@@ -95,7 +95,7 @@ function generateReminders(user: User): Reminder[] {
   if (["full", "pengawasan"].includes(user.role) && rtlMenungguVerif > 0) {
     reminders.push({
       id: 300,
-      judul: `✅ ${rtlMenungguVerif} RTL menunggu verifikasi`,
+      judul: `${rtlMenungguVerif} RTL menunggu verifikasi`,
       isi: `Ada ${rtlMenungguVerif} tindak lanjut yang sudah diunggah auditee dan perlu diverifikasi segera.`,
       tipe: "rtl",
       prioritas: "tinggi",
@@ -107,7 +107,7 @@ function generateReminders(user: User): Reminder[] {
   if (["full", "pengawasan"].includes(user.role) && auditTertinggal > 0) {
     reminders.push({
       id: 400,
-      judul: `🔍 ${auditTertinggal} audit berjalan tertinggal`,
+      judul: `${auditTertinggal} audit berjalan tertinggal`,
       isi: `Ada ${auditTertinggal} audit yang progresnya di bawah 50% padahal sudah berjalan lebih dari 2 minggu.`,
       tipe: "audit",
       prioritas: "sedang",
@@ -123,7 +123,7 @@ function generateReminders(user: User): Reminder[] {
     if (rekBaru > 0) {
       reminders.push({
         id: 500,
-        judul: `📝 ${rekBaru} rekomendasi belum ditindaklanjuti`,
+        judul: `${rekBaru} rekomendasi belum ditindaklanjuti`,
         isi: `Unit ${user.unit} memiliki ${rekBaru} rekomendasi yang statusnya masih "Belum" dan perlu segera ditindaklanjuti.`,
         tipe: "rtl",
         prioritas: "tinggi",
@@ -139,7 +139,7 @@ function generateReminders(user: User): Reminder[] {
 
 // ── Warna per tipe dan prioritas ──────────────────────────────────────────────
 const TIPE_ICON: Record<string, string> = {
-  deadline: "⏰", rapat: "📅", rtl: "✅", audit: "🔍", info: "ℹ️",
+  deadline: "", rapat: "", rtl: "", audit: "", info: "ℹ",
 };
 const PRIORITAS_STYLE: Record<string, { bar: string; badge: string; border: string }> = {
   kritis: { bar: "bg-red-500",    badge: "bg-red-50 text-red-600 border-red-100",    border: "border-red-200" },
@@ -169,7 +169,7 @@ function ReminderPopup({ user, reminders, onClose }: {
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl flex-shrink-0">
-                🔔
+                
               </div>
               <div>
                 <div className="text-sm font-black text-white leading-tight">
@@ -193,7 +193,7 @@ function ReminderPopup({ user, reminders, onClose }: {
         <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-2">
           {reminders.length === 0 && (
             <div className="py-12 text-center">
-              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-3xl mb-2"></div>
               <div className="text-sm font-bold text-gray-700">Semua beres!</div>
               <div className="text-xs text-gray-400 mt-1">Tidak ada hal yang perlu ditindaklanjuti hari ini.</div>
             </div>
@@ -213,7 +213,7 @@ function ReminderPopup({ user, reminders, onClose }: {
                   <p className="text-[10px] text-gray-500 mt-1 leading-relaxed">{r.isi}</p>
                   {r.tanggal_acuan && (
                     <p className="text-[9px] text-gray-400 mt-1">
-                      📅 {new Date(r.tanggal_acuan).toLocaleDateString("id-ID", { weekday:"long", day:"numeric", month:"long", year:"numeric" })}
+                      {new Date(r.tanggal_acuan).toLocaleDateString("id-ID", { weekday:"long", day:"numeric", month:"long", year:"numeric" })}
                     </p>
                   )}
                 </div>
@@ -226,7 +226,7 @@ function ReminderPopup({ user, reminders, onClose }: {
         <div className="flex-shrink-0 px-4 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
           <span className="text-[10px] text-gray-400">
             {kritis > 0
-              ? `⚠ Ada ${kritis} item kritis yang perlu segera ditangani`
+              ? `Ada ${kritis} item kritis yang perlu segera ditangani`
               : "Semua item terlihat. Klik Lanjut untuk masuk."}
           </span>
           <button onClick={onClose}
@@ -243,13 +243,35 @@ function ReminderPopup({ user, reminders, onClose }: {
 // ── App root ──────────────────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<UserRow[]>(DEMO_USERS_EXT);
+  const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+  const [prefs, setPrefs] = useState<Record<string, Record<string, boolean>>>({});
+  const [loginNotice, setLoginNotice] = useState("");
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [showReminder, setShowReminder] = useState(false);
   const [showWireframe, setShowWireframe] = useState(
     () => window.location.hash === "#wireframe"
   );
 
+  function updateUser(patch: Partial<User>) {
+    setUser((u) => {
+      if (!u) return u;
+      const acc = ACCOUNTS.find((a) => a.email === u.email);
+      if (acc) Object.assign(acc, patch);
+      return { ...u, ...patch };
+    });
+  }
+
+  useEffect(() => {
+    if (user && users.find((x) => x.email === user.email)?.aktif === false) {
+      setLoginNotice("Akun Anda dinonaktifkan oleh Ketua SPI. Anda telah dikeluarkan dari sistem.");
+      setUser(null);
+      setShowReminder(false);
+    }
+  }, [users, user]);
+
   function handleLogin(loggedUser: User) {
+    setLoginNotice("");
     const generated = generateReminders(loggedUser);
     setUser(loggedUser);
     setReminders(generated);
@@ -269,12 +291,12 @@ export default function App() {
   if (showWireframe) return <Wireframe onClose={closeWireframe} />;
 
   if (!user) {
-    return <Login onLogin={handleLogin} />;
+    return <Login key={loginNotice} onLogin={handleLogin} notice={loginNotice} />;
   }
 
   return (
     <>
-      <Dashboard user={user} onLogout={() => { setUser(null); setShowReminder(false); }} />
+      <Dashboard user={user} users={users} setUsers={setUsers} onUpdateUser={updateUser} config={config} setConfig={setConfig} prefs={prefs} setPrefs={setPrefs} onLogout={() => { setUser(null); setShowReminder(false); }} />
       {showReminder && (
         <ReminderPopup
           user={user}

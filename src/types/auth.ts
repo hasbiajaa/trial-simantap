@@ -9,7 +9,28 @@ export interface User {
   role: Role;
   avatarColor: string;
   unit?: string;
-   mustChangePassword?: boolean;
+  mustChangePassword?: boolean;
+  aktif?: boolean;
+  foto?: string;
+}
+
+export interface AppConfig {
+  namaSystem: string;
+  namaInstitusi: string;
+  tahunAnggaran: string;
+  periodeAudit: string;
+  logo?: string;
+}
+
+export const DEFAULT_CONFIG: AppConfig = {
+  namaSystem: "SIMSPI TSU",
+  namaInstitusi: "Universitas Tiga Serangkai",
+  tahunAnggaran: "2026",
+  periodeAudit: "2026",
+};
+
+export function makeInitials(nama: string) {
+  return nama.replace(/,.*$/, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("");
 }
 
 export const ACCOUNTS: User[] = [
