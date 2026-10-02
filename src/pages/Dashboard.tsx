@@ -8078,7 +8078,7 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
             Pengaturan
           </button>
           <button onClick={() => setShowLogout(true)}
-            className="text-[10px] font-semibold text-red/80 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0">
+            className="text-[10px] font-semibold text-red-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0">
             Keluar
           </button>
         </div>
