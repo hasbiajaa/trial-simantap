@@ -26,7 +26,7 @@ export interface Rapat {
 }
 
 // Daftar peserta yang bisa dipilih di form
-const PESERTA_INTERNAL = ["Ketua SPI", "Tim Auditor", "Staf Back Office"];
+const PESERTA_INTERNAL = ["Kepala SPI", "Tim Auditor", "Staf Back Office"];
 const UNIT_KERJA_LIST = [
   "BAAK","BAKPU","BAUK","Sarpras","SDM","BPU",
   "D3-DKV","D3-DPT","D3-SI","D3-TI",
@@ -40,7 +40,7 @@ const UNIT_KERJA_LIST = [
 function pesertaToRoles(peserta: string[]): string[] {
   const roles = new Set<string>();
   peserta.forEach(p => {
-    if (p === "Ketua SPI")        roles.add("full");
+    if (p === "Kepala SPI")        roles.add("full");
     if (p === "Tim Auditor")      roles.add("pengawasan");
     if (p === "Staf Back Office") roles.add("backoffice");
     if (p === "Rektor")           roles.add("rektor");
@@ -56,9 +56,9 @@ function pesertaLabel(peserta: string[]): string {
 }
 
 const RAPAT_AWAL: Rapat[] = [
-  { id:1, judul:"Rapat Tinjauan Manajemen SPI",  tgl:"22 Mei 2025", jam:"09.00", tempat:"Ruang Rapat A",  peserta:["Ketua SPI","Tim Auditor"],        status:"Terjadwal" },
-  { id:2, judul:"Koordinasi Program Audit 2025", tgl:"28 Mei 2025", jam:"10.00", tempat:"Online / Zoom",  peserta:["Ketua SPI","Tim Auditor","Staf Back Office"], status:"Terjadwal" },
-  { id:3, judul:"Evaluasi RTL Semester I",       tgl:"3 Jun 2025",  jam:"13.00", tempat:"Ruang Rapat B",  peserta:["Ketua SPI","Tim Auditor","BAAK","LPPM","Sarpras"], status:"Terjadwal" },
+  { id:1, judul:"Rapat Tinjauan Manajemen SPI",  tgl:"22 Mei 2025", jam:"09.00", tempat:"Ruang Rapat A",  peserta:["Kepala SPI","Tim Auditor"],        status:"Terjadwal" },
+  { id:2, judul:"Koordinasi Program Audit 2025", tgl:"28 Mei 2025", jam:"10.00", tempat:"Online / Zoom",  peserta:["Kepala SPI","Tim Auditor","Staf Back Office"], status:"Terjadwal" },
+  { id:3, judul:"Evaluasi RTL Semester I",       tgl:"3 Jun 2025",  jam:"13.00", tempat:"Ruang Rapat B",  peserta:["Kepala SPI","Tim Auditor","BAAK","LPPM","Sarpras"], status:"Terjadwal" },
   { id:4, judul:"Rapat Penutupan Audit LPPM",    tgl:"10 Mei 2025", jam:"09.00", tempat:"Ruang LPPM",     peserta:["Tim Auditor","LPPM"],              status:"Selesai"   },
   { id:5, judul:"Kick-off Audit Keuangan",       tgl:"5 Mei 2025",  jam:"08.30", tempat:"Ruang Keuangan", peserta:["Tim Auditor","BAUK"],              status:"Selesai"   },
   { id:6, judul:"Rapat Koordinasi Lintas Unit",  tgl:"2 Apr 2025",  jam:"14.00", tempat:"Aula Utama",     peserta:[...PESERTA_INTERNAL,...UNIT_KERJA_LIST], status:"Batal" },
@@ -68,17 +68,141 @@ interface RapatCtxType {
   rapatList: Rapat[];
   addRapat: (r: Omit<Rapat, "id" | "status">) => void;
   batalkanRapat: (id: number) => void;
+  selesaiRapat: (id: number) => void;
+  updateRapat: (id: number, r: Omit<Rapat, "id" | "status">) => void;
 }
 
 const RapatCtx = createContext<RapatCtxType>({
   rapatList: RAPAT_AWAL,
   addRapat: () => {},
   batalkanRapat: () => {},
+  selesaiRapat: () => {},
+  updateRapat: () => {},
+});
+
+type SuratKeluarItem = { no: string; tgl: string; perihal: string; kepada: string; disposisi: string; link: string | null };
+const SURAT_KELUAR_AWAL: SuratKeluarItem[] = [
+  { no: "012/SPI/V/2025",  tgl: "19 Mei 2025", perihal: "Pemberitahuan Audit BAAK",          kepada: "Kepala BAAK",        disposisi: "Terkirim", link: "https://drive.google.com/file/pemberitahuan-audit-baak-2025" },
+  { no: "015/SPI/V/2025",  tgl: "18 Mei 2025", perihal: "Surat Tugas Audit Lapangan",        kepada: "Tim Auditor",        disposisi: "Terkirim", link: null },
+  { no: "016/SPI/V/2025",  tgl: "17 Mei 2025", perihal: "Pemberitahuan Audit Sarpras",       kepada: "Kepala Sarpras",     disposisi: "Terkirim", link: "https://drive.google.com/file/pemberitahuan-audit-sarpras-2025" },
+  { no: "018/SPI/V/2025",  tgl: "16 Mei 2025", perihal: "LHA Fakultas Teknik 2024",          kepada: "Dekan Fak. Teknik",  disposisi: "Diterima", link: null },
+  { no: "020/SPI/V/2025",  tgl: "14 Mei 2025", perihal: "Rekomendasi Tindak Lanjut Sarpras", kepada: "Kepala Sarpras",     disposisi: "Diterima", link: null },
+  { no: "021/SPI/V/2025",  tgl: "12 Mei 2025", perihal: "Pemberitahuan Audit BAUK",          kepada: "Kepala BAUK",        disposisi: "Terkirim", link: null },
+  { no: "022/SPI/IV/2025", tgl: "8 Apr 2025",  perihal: "Permohonan Data Anggaran 2025",     kepada: "Kepala Keuangan",    disposisi: "Terkirim", link: null },
+];
+const SuratKeluarCtx = createContext<{ suratKeluar: SuratKeluarItem[]; setSuratKeluar: React.Dispatch<React.SetStateAction<SuratKeluarItem[]>> }>({
+  suratKeluar: SURAT_KELUAR_AWAL, setSuratKeluar: () => {},
+});
+
+// ── Temuan Risiko → RTL → Verifikasi (store bersama) ─────────────────────────
+type TemuanRisiko = { id: string; auditNo: string; unit: string; deskripsi: string; kategori: string; tingkat: string; status: string };
+type HasilVerif = "Menunggu" | "Diterima" | "Ditolak";
+type RtlItem = {
+  id: number; temuanId: string; unit: string; rencana: string; pic: string; target: string;
+  link: string | null; progres: number; bukti: string | null; hasil: HasilVerif | null;
+  catatan: string; verifikator: string; tglSelesai: string;
+  tlStatus?: "Open" | "Close" | "Diterima" | "Progres";
+};
+type RtlStatus = "Selesai" | "Menunggu Verifikasi" | "Terlambat" | "Proses";
+
+const TEMUAN_AWAL: TemuanRisiko[] = [
+  { id: "R-001", auditNo: "PA-002", unit: "BAUK",         deskripsi: "Ketidaksesuaian pencatatan aset tetap",          kategori: "Keuangan",    tingkat: "Tinggi", status: "Belum Ditindak" },
+  { id: "R-002", auditNo: "PA-001", unit: "Sarpras",      deskripsi: "Pengelolaan aset tidak terdokumentasi",          kategori: "Operasional", tingkat: "Tinggi", status: "Proses" },
+  { id: "R-003", auditNo: "PA-005", unit: "BAAK",         deskripsi: "SOP penerimaan mahasiswa tidak diperbarui",      kategori: "Kepatuhan",   tingkat: "Sedang", status: "Proses" },
+  { id: "R-004", auditNo: "PA-006", unit: "LPPM",         deskripsi: "Dokumentasi kegiatan penelitian tidak lengkap",  kategori: "Operasional", tingkat: "Sedang", status: "Selesai" },
+  { id: "R-005", auditNo: "PA-007", unit: "Marcomm",      deskripsi: "Pengelolaan data alumni tanpa prosedur baku",    kategori: "Teknologi",   tingkat: "Rendah", status: "Selesai" },
+  { id: "R-006", auditNo: "PA-008", unit: "S1-Manajemen", deskripsi: "Laporan akreditasi tidak diarsipkan dengan baik",kategori: "Kepatuhan",   tingkat: "Sedang", status: "Belum Ditindak" },
+  { id: "R-007", auditNo: "PA-004", unit: "Perpustakaan", deskripsi: "Sistem katalog tidak terintegrasi dengan SIAKAD",kategori: "Teknologi",   tingkat: "Rendah", status: "Proses" },
+  { id: "R-008", auditNo: "PA-003", unit: "LPM",          deskripsi: "Pertanggungjawaban dana kegiatan UKM tidak tepat waktu", kategori: "Keuangan", tingkat: "Tinggi", status: "Belum Ditindak" },
+  { id: "R-009", auditNo: "PA-005", unit: "BAAK",         deskripsi: "Arsip mahasiswa keluar tidak terdigitalisasi",   kategori: "Operasional", tingkat: "Rendah", status: "Proses" },
+  { id: "R-010", auditNo: "PA-001", unit: "Sarpras",      deskripsi: "Belanja modal tidak disertai BA serah terima",   kategori: "Keuangan",    tingkat: "Sedang", status: "Belum Ditindak" },
+];
+
+const RTL_AWAL: RtlItem[] = [
+  { id: 1, temuanId: "R-002", unit: "Sarpras",      rencana: "Lengkapi dokumen BA serah terima aset 2019–2024",        pic: "Kabag Sarpras",  target: "18 Mei 2025", link: null, progres: 40,  bukti: null, hasil: null, catatan: "", verifikator: "—", tglSelesai: "—", tlStatus: "Progres" },
+  { id: 2, temuanId: "R-003", unit: "BAAK",         rencana: "Perbarui SOP penerimaan mahasiswa sesuai Permendikbud 2023", pic: "Kabag BAAK", target: "30 Jun 2025", link: null, progres: 60,  bukti: null, hasil: null, catatan: "", verifikator: "—", tglSelesai: "—", tlStatus: "Progres" },
+  { id: 3, temuanId: "R-004", unit: "LPPM",         rencana: "Lengkapi dokumentasi kegiatan penelitian",               pic: "Kepala LPPM",    target: "15 Mei 2025", link: null, progres: 100, bukti: "https://drive.google.com/file/rtl-lppm-dokumentasi", hasil: "Diterima", catatan: "Bukti lengkap.", verifikator: "Budi S.",  tglSelesai: "10 Mei 2025", tlStatus: "Close" },
+  { id: 4, temuanId: "R-005", unit: "Marcomm",      rencana: "Susun prosedur baku pengelolaan data alumni",            pic: "Kabag Marcomm",  target: "10 Mei 2025", link: null, progres: 100, bukti: "https://drive.google.com/file/rtl-marcomm-sop-alumni", hasil: "Diterima", catatan: "SOP sudah disahkan.", verifikator: "Ratna D.", tglSelesai: "8 Mei 2025", tlStatus: "Close" },
+  { id: 5, temuanId: "R-007", unit: "Perpustakaan", rencana: "Integrasikan sistem katalog dengan SIAKAD",              pic: "Kepala Perpustakaan", target: "15 Jun 2025", link: null, progres: 30, bukti: null, hasil: null, catatan: "", verifikator: "—", tglSelesai: "—", tlStatus: "Diterima" },
+  { id: 6, temuanId: "R-009", unit: "BAAK",         rencana: "Digitalisasi arsip mahasiswa keluar 2020–2024",          pic: "Kabag BAAK",     target: "20 Jun 2025", link: null, progres: 100, bukti: "https://drive.google.com/file/rtl-baak-arsip", hasil: null, catatan: "", verifikator: "—", tglSelesai: "—", tlStatus: "Progres" },
+];
+const RTL_TODAY = new Date(2025, 4, 22);
+const RTL_TODAY_LABEL = "22 Mei 2025";
+const BULAN_IDX: Record<string, number> = { Jan:0, Feb:1, Mar:2, Apr:3, Mei:4, Jun:5, Jul:6, Agu:7, Sep:8, Okt:9, Nov:10, Des:11 };
+
+function sisaHariRtl(tgl: string): number {
+  const [d, m, y] = tgl.split(" ");
+  const target = new Date(parseInt(y), BULAN_IDX[m] ?? 0, parseInt(d));
+  return Math.round((target.getTime() - RTL_TODAY.getTime()) / 86400000);
+}
+
+// Auditor dianggap ditugaskan bila namanya cocok dengan salah satu anggota tim Rencana Audit.
+// Tim disimpan sebagai teks singkat, mis. "Budi S., Ratna D." → cocokkan nama depan + inisial nama kedua.
+function isAuditorDitugaskan(userName: string, tim: string): boolean {
+  const [first, second] = userName.replace(/,.*$/, "").trim().toLowerCase().split(/\s+/);
+  if (!first) return false;
+  return tim.split(",").some(t => {
+    const [f, s] = t.trim().toLowerCase().split(/\s+/);
+    return f === first && (!s || !second || s[0] === second[0]);
+  });
+}
+
+// Status Tindak Lanjut (sub menu Tindak Lanjut):
+// Diterima = RTL sudah dibahas di exit meeting, belum ada aktivitas tindak lanjut
+// Progres  = tindak lanjut berjalan sesuai RTL, belum selesai
+// Close    = tindak lanjut selesai dilaksanakan (diverifikasi SPI)
+// Open     = temuan berulang setelah tindak lanjut dilakukan (verifikasi ditolak)
+type TlStatus = "Open" | "Close" | "Diterima" | "Progres";
+const TL_STATUS_LIST: TlStatus[] = ["Diterima", "Progres", "Open", "Close"];
+const TL_STATUS_STYLE: Record<TlStatus, { cls: string; color: string; desc: string }> = {
+  Diterima: { cls: "bg-sky-50 text-sky-600",     color: "#0ea5e9", desc: "Terbahas di exit meeting, belum ada aktivitas" },
+  Progres:  { cls: "bg-amber-50 text-amber-600", color: "#f59e0b", desc: "Dijalankan sesuai RTL, belum selesai" },
+  Open:     { cls: "bg-red-50 text-red-600",     color: "#ef4444", desc: "Temuan berulang setelah tindak lanjut" },
+  Close:    { cls: "bg-green-50 text-green-600", color: "#22c55e", desc: "Tindak lanjut selesai dilaksanakan" },
+};
+function rtlTlStatus(r: RtlItem): TlStatus {
+  if (r.tlStatus) return r.tlStatus;
+  if (r.hasil === "Diterima") return "Close";
+  if (r.hasil === "Ditolak") return "Open";
+  if (r.bukti) return "Progres";
+  return "Diterima";
+}
+
+function rtlEffStatus(r: RtlItem): RtlStatus {
+  if (r.hasil === "Diterima") return "Selesai";
+  if (r.bukti && r.hasil === "Menunggu") return "Menunggu Verifikasi";
+  return sisaHariRtl(r.target) < 0 ? "Terlambat" : "Proses";
+}
+
+interface TemuanCtxType {
+  temuanList: TemuanRisiko[];
+  rtlList: RtlItem[];
+  addTemuan: (t: Omit<TemuanRisiko, "status">) => void;
+  ajukanRtl: (temuanId: string, v: { rencana: string; pic: string; target: string; link: string | null }) => void;
+  setProgresRtl: (id: number, progres: number) => void;
+  kirimBukti: (id: number, link: string) => void;
+  verifikasiRtl: (id: number, hasil: "Diterima" | "Ditolak", catatan: string, verifikator: string) => void;
+  setTlStatusRtl: (id: number, status: TlStatus) => void;
+  updateRtl: (id: number, patch: { rencana: string; pic: string; target: string; link: string | null; bukti: string | null }) => void;
+  tambahRtl: (temuanId: string, v: { rencana: string; pic: string; target: string; link: string | null; bukti: string | null }) => void;
+}
+
+const TemuanCtx = createContext<TemuanCtxType>({
+  temuanList: TEMUAN_AWAL,
+  rtlList: RTL_AWAL,
+  addTemuan: () => {},
+  ajukanRtl: () => {},
+  setProgresRtl: () => {},
+  kirimBukti: () => {},
+  verifikasiRtl: () => {},
+  setTlStatusRtl: () => {},
+  updateRtl: () => {},
+  tambahRtl: () => {},
 });
 
 // ── Audit context (shared laporanList + rencanaList) ──────────────────────────
-type LaporanItem = { no: string; unit: string; tgl: string; temuan: number; rekomendasi: number; status: string; link: string | null };
-type RencanaItem = { no: string; unit: string; jenis: string; tim: string; anggaran: string; tglMulai: string; status: string };
+type LaporanItem = { no: string; unit: string; tgl: string; temuan: number; rekomendasi: number; status: string; link: string | null; auditNo?: string; revisiKe?: number; riwayatRevisi?: { tgl: string; catatan: string }[] };
+type RencanaItem = { no: string; unit: string; jenis: string; tim: string; anggaran: string; tglMulai: string; status: string; pkptNo?: number };
 interface AuditCtxType {
   laporanList: LaporanItem[];
   setLaporanList: React.Dispatch<React.SetStateAction<LaporanItem[]>>;
@@ -87,14 +211,18 @@ interface AuditCtxType {
 }
 const LAPORAN_AWAL: LaporanItem[] = [
   { no: "LHA-001/SPI/IV/2025", unit: "Fak. Teknik", tgl: "10 Apr 2025", temuan: 3, rekomendasi: 5, status: "Diterima", link: "https://drive.google.com/file/lha-001-spi-2025" },
-  { no: "LHA-002/SPI/IV/2025", unit: "LPPM",            tgl: "25 Apr 2025", temuan: 2, rekomendasi: 3, status: "Diterima", link: "https://drive.google.com/file/lha-002-spi-2025" },
-  { no: "LHA-003/SPI/V/2025",  unit: "BAAK",            tgl: "Draft",       temuan: 2, rekomendasi: 4, status: "Draft",    link: null },
+  { no: "LHA-002/SPI/IV/2025", auditNo: "PA-006", unit: "LPPM",            tgl: "25 Apr 2025", temuan: 2, rekomendasi: 3, status: "Diterima", link: "https://drive.google.com/file/lha-002-spi-2025" },
+  { no: "LHA-003/SPI/V/2025",  auditNo: "PA-005", unit: "BAAK",            tgl: "Draft",       temuan: 2, rekomendasi: 4, status: "Draft",    link: null },
 ];
 const RENCANA_AWAL: RencanaItem[] = [
   { no: "PA-001", unit: "Sarpras",       jenis: "Kinerja",   tim: "Budi S., Ratna D.", anggaran: "Rp 4.500.000", tglMulai: "5 Mei 2025",  status: "Disetujui" },
   { no: "PA-002", unit: "BAUK",      jenis: "Keuangan",  tim: "Ratna D., Andi P.", anggaran: "Rp 3.200.000", tglMulai: "20 Mei 2025", status: "Disetujui" },
   { no: "PA-003", unit: "LPM", jenis: "Kinerja",   tim: "Andi P., Siti A.",  anggaran: "Rp 2.800.000", tglMulai: "1 Jun 2025",  status: "Draft" },
   { no: "PA-004", unit: "Perpustakaan",  jenis: "Kepatuhan", tim: "Siti A.",            anggaran: "Rp 1.500.000", tglMulai: "15 Jun 2025", status: "Draft" },
+  { no: "PA-005", unit: "BAAK",          jenis: "Kepatuhan", tim: "Budi S., Siti A.",   anggaran: "Rp 2.500.000", tglMulai: "3 Mar 2025",  status: "Disetujui" },
+  { no: "PA-006", unit: "LPPM",          jenis: "Kinerja",   tim: "Andi P., Ratna D.",  anggaran: "Rp 2.800.000", tglMulai: "10 Feb 2025", status: "Disetujui" },
+  { no: "PA-007", unit: "Marcomm",       jenis: "Kepatuhan", tim: "Siti A.",            anggaran: "Rp 1.200.000", tglMulai: "17 Feb 2025", status: "Disetujui" },
+  { no: "PA-008", unit: "S1-Manajemen",  jenis: "Kepatuhan", tim: "Ratna D.",           anggaran: "Rp 1.500.000", tglMulai: "24 Mar 2025", status: "Disetujui" },
 ];
 const RIWAYAT_HISTORIS: Record<string, { tahun: string; jenis: string; ketua: string; temuan: number; rtl: number; status: string }[]> = {
   "Fak. Teknik": [
@@ -122,6 +250,8 @@ const AuditCtx = createContext<AuditCtxType>({
 
 type NavFn = (module: string, section: string, subSection: string, suratTab?: "Masuk" | "Keluar") => void;
 const NavCtx = createContext<NavFn>(() => {});
+type NotifPayload = { title: string; body: string; tag: string; roles: string[]; unit?: string };
+const NotifyCtx = createContext<(n: NotifPayload) => void>(() => {});
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const Ic = (path: string) =>
@@ -151,21 +281,21 @@ const rtlData    = [{ name: "Selesai", value: 18, color: "#22c55e" }, { name: "P
 const auditBar   = [{ name: "Perencanaan", value: 12 }, { name: "Pelaksanaan", value: 18 }, { name: "Pelaporan", value: 14 }, { name: "Tindak Lanjut", value: 9 }];
 const suratData  = [{ name: "Surat Masuk", value: 22, color: "#3b82f6" }, { name: "Surat Keluar", value: 28, color: "#14b8a6" }, { name: "Disposisi", value: 6, color: "#f59e0b" }];
 
-const risikoDonut = [
-  { name: "Tinggi", value: 3, color: "#ef4444" },
-  { name: "Sedang", value: 4, color: "#f59e0b" },
-  { name: "Rendah", value: 1, color: "#22c55e" },
-];
-const risikoPerUnit = [
-  { unit: "BAUK",          tinggi: 1, sedang: 0, rendah: 0 },
-  { unit: "Sarpras",       tinggi: 1, sedang: 0, rendah: 0 },
-  { unit: "LPM",           tinggi: 1, sedang: 0, rendah: 0 },
-  { unit: "BAAK",          tinggi: 0, sedang: 1, rendah: 0 },
-  { unit: "LPPM",          tinggi: 0, sedang: 1, rendah: 0 },
-  { unit: "S1-Manajemen",  tinggi: 0, sedang: 1, rendah: 0 },
-  { unit: "Marcomm",       tinggi: 0, sedang: 0, rendah: 1 },
-  { unit: "Perpustakaan",  tinggi: 0, sedang: 0, rendah: 1 },
-];
+function buildRisikoStats(list: TemuanRisiko[]) {
+  const risikoDonut = [
+    { name: "Tinggi", value: list.filter(t => t.tingkat === "Tinggi").length, color: "#ef4444" },
+    { name: "Sedang", value: list.filter(t => t.tingkat === "Sedang").length, color: "#f59e0b" },
+    { name: "Rendah", value: list.filter(t => t.tingkat === "Rendah").length, color: "#22c55e" },
+  ];
+  const units = Array.from(new Set(list.map(t => t.unit)));
+  const risikoPerUnit = units.map(unit => ({
+    unit,
+    tinggi: list.filter(t => t.unit === unit && t.tingkat === "Tinggi").length,
+    sedang: list.filter(t => t.unit === unit && t.tingkat === "Sedang").length,
+    rendah: list.filter(t => t.unit === unit && t.tingkat === "Rendah").length,
+  })).sort((a, b) => (b.tinggi * 100 + b.sedang * 10 + b.rendah) - (a.tinggi * 100 + a.sedang * 10 + a.rendah));
+  return { risikoDonut, risikoPerUnit, totalTemuan: list.length };
+}
 
 const auditTahapDonut = [
   { name: "Rencana",      value: 1, color: "#cbd5e1" },
@@ -323,13 +453,6 @@ const anggaranWaterfall = [
   { name: "Q2 Realisasi", base: 95,  value: 45,  color: "#22c55e", isTotal: false },
   { name: "Sisa",         base: 0,   value: 95,  color: "#f59e0b", isTotal: true  },
 ];
-const anggaranTrend = [
-  { bulan: "Jan", rencana: 30, realisasi: 28 },
-  { bulan: "Feb", rencana: 30, realisasi: 32 },
-  { bulan: "Mar", rencana: 35, realisasi: 30 },
-  { bulan: "Apr", rencana: 40, realisasi: 38 },
-  { bulan: "Mei", rencana: 50, realisasi: 42 },
-];
 
 const auditRows = [
   { no: 1, unit: "Fak. Teknik",        jenis: "Kinerja",    status: "Pelaksanaan",   progress: 65 },
@@ -419,6 +542,34 @@ const kpiData = [
     ],
   },
 ];
+
+type KpiItem = { arah: string; target: number; real: number; bobot: number };
+type KpiKategori = { items: KpiItem[] };
+
+const skorItemKpi = (it: KpiItem) =>
+  it.arah === "bawah"
+    ? (it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10))
+    : Math.min(100, Math.round((it.real / it.target) * 100));
+
+const skorKategoriKpi = (kat: KpiKategori) =>
+  Math.round(kat.items.reduce((s, it) => s + skorItemKpi(it), 0) / kat.items.length);
+
+// Indeks komposit = rata-rata skor 7 kategori KPI Pengawasan
+function hitungIndeksKomposit(data: KpiKategori[]): number | null {
+  const kats = data.filter(k => k.items.length);
+  if (!kats.length) return null;
+  return Math.round((kats.reduce((s, k) => s + skorKategoriKpi(k), 0) / kats.length) * 10) / 10;
+}
+
+// Skala BR-18; tindakan_manajemen nanti dari tabel indeks_kategori
+const INDEKS_KATEGORI = [
+  { min: 85, max: 100, label: "Sangat Efektif",        tindakan: "Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai" },
+  { min: 75, max: 84,  label: "Efektif",               tindakan: "Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai" },
+  { min: 60, max: 74,  label: "Perlu Peningkatan",     tindakan: "Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai" },
+  { min: 0,  max: 59,  label: "Perlu Perhatian Serius", tindakan: "Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai" },
+];
+const getKategoriIndeks = (nilai: number) =>
+  INDEKS_KATEGORI.find(k => Math.floor(nilai) >= k.min && Math.floor(nilai) <= k.max) ?? INDEKS_KATEGORI[INDEKS_KATEGORI.length - 1];
 const kpiBackoffice = [
   { label: "Surat Terproses",     icon: <IconMail      className="w-5 h-5" />, bg: "bg-teal-100 text-teal-600",    target: 56,  real: 50,  sat: "Surat",    trend: +12 },
   { label: "Rapat Terlaksana",    icon: <IconGroup     className="w-5 h-5" />, bg: "bg-purple-100 text-purple-600",target: 20,  real: 18,  sat: "Rapat",    trend: +5  },
@@ -434,7 +585,7 @@ const navGroups = [
       { label: "Ringkasan",              sectionKey: "ringkasan", icon: <IconDashboard  className="w-4 h-4" />, children: [] },
       { label: "Risiko",                 sectionKey: "risiko",    icon: <IconShield     className="w-4 h-4" />, children: ["Temuan Risiko", "Pemetaan Risiko"] },
       { label: "Audit",                  sectionKey: "audit",     icon: <IconClipboard  className="w-4 h-4" />, children: ["Rencana & Laporan Audit", "Entry Meeting – Draft – Exit", "Kertas Kerja Audit (KKA)"] },
-      { label: "RTL",                    sectionKey: "rtl",       icon: <IconCheck      className="w-4 h-4" />, children: ["Tindak Lanjut (RTL)", "Verifikasi RTL"] },
+      { label: "RTL",                    sectionKey: "rtl",       icon: <IconCheck      className="w-4 h-4" />, children: ["Tindak Lanjut (RTL)"] },
       { label: "Riwayat Audit per Unit", sectionKey: "riwayat",   icon: <IconFolder     className="w-4 h-4" />, children: ["Riwayat per Unit", "Temuan Berulang"] },
       { label: "Kalender Pengawasan",    sectionKey: "kalender",  icon: <IconCalendar   className="w-4 h-4" />, children: ["Kalender Pengawasan", "Siklus Audit"] },
     ],
@@ -449,7 +600,7 @@ const navGroups = [
       { label: "Manajemen SDM",     sectionKey: "C", icon: <IconGroup     className="w-4 h-4" />, children: ["Kompetensi Auditor", "Riwayat Penugasan", "Jadwal Pelatihan"] },
       { label: "Regulasi & SOP",    sectionKey: "D", icon: <IconFolder    className="w-4 h-4" />, children: ["Pedoman Audit", "Peraturan Internal"] },
       { label: "Perencanaan Anggaran",   sectionKey: "G", icon: <IconWallet    className="w-4 h-4" />, children: ["Rencana Anggaran", "Realisasi Anggaran", "Laporan Keuangan"] },
-      { label: "Kalender",               sectionKey: "F", icon: <IconCalendar  className="w-4 h-4" />, children: ["Jadwal Rapat", "Deadline & Reminder"] },
+      { label: "Kalender",               sectionKey: "F", icon: <IconCalendar  className="w-4 h-4" />, children: ["Jadwal Rapat", "Agenda SPI"] },
     ],
   },
 ];
@@ -582,22 +733,7 @@ function KpiPengawasanPanel() {
     return "Kurang";
   };
 
-  const katScore = (kat: typeof kpiData[0]) => {
-    const scores = kat.items.map(it =>
-      it.arah === "bawah"
-        ? it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10)
-        : Math.min(100, Math.round((it.real / it.target) * 100))
-    );
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  };
-
-  const totalBobot = kpiData.flatMap(k => k.items).reduce((s, i) => s + i.bobot, 0);
-  const indeks = Math.round(kpiData.flatMap(k => k.items).reduce((s, it) => {
-    const score = it.arah === "bawah"
-      ? (it.real <= it.target ? 100 : Math.max(0, 100 - (it.real - it.target) * 10))
-      : Math.min(100, (it.real / it.target) * 100);
-    return s + score * it.bobot;
-  }, 0) / totalBobot);
+  const katScore = skorKategoriKpi;
 
   const popupData = kpiData.find(k => k.kategori === popupKat) ?? null;
 
@@ -606,10 +742,6 @@ function KpiPengawasanPanel() {
       {/* Header + indeks */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-700">KPI Pengawasan — 7 Kategori · 25 Indikator</h3>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border" style={{ borderColor: "var(--tsu-teal)", background: "var(--tsu-teal-light)" }}>
-          <span className="text-[10px] font-bold" style={{ color: "var(--tsu-teal)" }}>Indeks Komposit</span>
-          <span className="text-sm font-black" style={{ color: "var(--tsu-teal-dark)" }}>{indeks}%</span>
-        </div>
       </div>
 
       {/* Horizontal slider */}
@@ -699,6 +831,9 @@ function PwRingkasan() {
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
   const [chartDetail, setChartDetail] = useState<string|null>(null);
+  const navigateTo = useContext(NavCtx);
+  const { temuanList, rtlList } = useContext(TemuanCtx);
+  const { risikoDonut, risikoPerUnit, totalTemuan } = buildRisikoStats(temuanList);
   return (
     <div className="flex flex-col gap-4">
       {myUnit && (
@@ -722,7 +857,7 @@ function PwRingkasan() {
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => setChartDetail("risiko")}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xs font-bold text-gray-700">Risiko — Sebaran Tingkat</h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>8 Temuan</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>{totalTemuan} Temuan</span>
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <ResponsiveContainer width="38%" height={110}>
@@ -730,7 +865,7 @@ function PwRingkasan() {
                     <Pie data={risikoDonut} cx="50%" cy="50%" innerRadius={32} outerRadius={48} dataKey="value" startAngle={90} endAngle={-270} strokeWidth={0}>
                       {risikoDonut.map((e, i) => <Cell key={i} fill={e.color} />)}
                     </Pie>
-                    <text x="50%" y="45%" textAnchor="middle" fontSize="15" fontWeight="700" fill="#1e293b">8</text>
+                    <text x="50%" y="45%" textAnchor="middle" fontSize="15" fontWeight="700" fill="#1e293b">{totalTemuan}</text>
                     <text x="50%" y="58%" textAnchor="middle" fontSize="7.5" fill="#64748b">Risiko</text>
                   </PieChart>
                 </ResponsiveContainer>
@@ -740,7 +875,7 @@ function PwRingkasan() {
                       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: d.color }} />
                       <span className="text-[10px] text-gray-600 flex-1">{d.name}</span>
                       <span className="text-[10px] font-bold text-gray-700">{d.value}</span>
-                      <span className="text-[9px] text-gray-400">({Math.round(d.value / 8 * 100)}%)</span>
+                      <span className="text-[9px] text-gray-400">({Math.round(d.value / Math.max(totalTemuan, 1) * 100)}%)</span>
                     </div>
                   ))}
                 </div>
@@ -990,23 +1125,11 @@ function PwRingkasan() {
 
       {/* ── Auditee unit view ── */}
       {myUnit && (() => {
-        const auditeeRisiko = [
-          { id: "R-003", deskripsi: "SOP penerimaan mahasiswa tidak diperbarui",  kategori: "Kepatuhan",   tingkat: "Sedang",  status: "Proses"         },
-          { id: "R-009", deskripsi: "Arsip mahasiswa keluar tidak terdigitalisasi",kategori: "Operasional", tingkat: "Rendah",  status: "Belum Ditindak" },
-        ].filter(r => myUnit === "BAAK").concat(
-          myUnit === "Sarpras" ? [
-            { id: "R-002", deskripsi: "Pengelolaan aset tidak terdokumentasi",     kategori: "Operasional", tingkat: "Tinggi",  status: "Proses"         },
-            { id: "R-010", deskripsi: "Belanja modal tidak disertai BA serah terima",kategori: "Keuangan",  tingkat: "Sedang",  status: "Belum Ditindak" },
-          ] : myUnit === "BAUK" ? [
-            { id: "R-001", deskripsi: "Ketidaksesuaian pencatatan aset tetap",     kategori: "Keuangan",    tingkat: "Tinggi",  status: "Belum Ditindak" },
-          ] : []
-        );
-
-        const rtlAuditee = [
-          { no: 1, rekomendasi: "Perbarui SOP penerimaan mahasiswa sesuai Permendikbud 2023", batas: "30 Jun 2025", progres: 60,  status: "Proses"  },
-          { no: 2, rekomendasi: "Digitalisasi arsip mahasiswa keluar 2020–2024",               batas: "31 Agt 2025", progres: 0,   status: "Belum"   },
-          { no: 3, rekomendasi: "Penyusunan laporan pertanggungjawaban kegiatan UKM",          batas: "15 Jul 2025", progres: 100, status: "Selesai" },
-        ];
+        const auditeeRisiko = temuanList.filter(t => t.unit === myUnit);
+        const rtlAuditee = rtlList.filter(r => r.unit === myUnit).map(r => ({
+          no: r.id, rekomendasi: r.rencana, batas: r.target,
+          tlStatus: rtlTlStatus(r),
+        }));
 
         const auditBerjalan = { nama: "Audit Kepatuhan 2025", ketua: "Budi Santoso, S.E.", mulai: "1 Apr 2025", perkiraan: "30 Jun 2025", tahap: "Lapangan", progres: 65 };
         const auditSelesai  = [
@@ -1015,23 +1138,94 @@ function PwRingkasan() {
         ];
 
         const tingkatColor = (t: string) => t === "Tinggi" ? "bg-red-50 text-red-600" : t === "Sedang" ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600";
-        const statusRtlColor = (s: string) => s === "Selesai" ? "bg-green-50 text-green-600" : s === "Proses" ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500";
+        const statusRtlColor = (s: string) => s === "Selesai" ? "bg-green-50 text-green-600" : s === "Proses" ? "bg-blue-50 text-blue-600" : s === "Terlambat" ? "bg-red-50 text-red-600" : s === "Menunggu Verifikasi" ? "bg-purple-50 text-purple-600" : "bg-gray-100 text-gray-500";
 
         return (
           <div className="flex flex-col gap-4">
+            {/* Stepper 8 tahap */}
+            {(() => {
+              const tahapAktif = 2; // Lapangan → KKA
+              const steps: { label: string; nav: [string, string, string] }[] = [
+                { label: "Pemberitahuan",      nav: ["pengawasan", "kalender", "Pemberitahuan & Jadwal"] },
+                { label: "Entry Meeting",      nav: ["pengawasan", "audit", "Entry Meeting"] },
+                { label: "KKA",                nav: ["pengawasan", "audit", "Draft Temuan & Konfirmasi"] },
+                { label: "Draft Temuan",       nav: ["pengawasan", "audit", "Draft Temuan & Konfirmasi"] },
+                { label: "Exit Meeting & LHA", nav: ["pengawasan", "audit", "Exit Meeting"] },
+                { label: "RTL",                nav: ["pengawasan", "rtl", "Tindak Lanjut (RTL)"] },
+                { label: "Pemantauan",         nav: ["pengawasan", "kalender", "Kalender Pengawasan"] },
+                { label: "Riwayat",            nav: ["pengawasan", "riwayat", ""] },
+              ];
+              return (
+                <div className="bg-white rounded-xl border border-purple-100 p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-bold text-gray-700">Alur Tahapan Pengawasan</h4>
+                    <span className="text-[9px] text-gray-400">Klik tahap untuk membuka menu terkait</span>
+                  </div>
+                  <ol className="flex items-start overflow-x-auto pb-1">
+                    {steps.map((s, i) => {
+                      const done = i < tahapAktif;
+                      const active = i === tahapAktif;
+                      return (
+                        <li key={s.label} className="flex items-start flex-1 min-w-[84px]">
+                          <button onClick={() => navigateTo(...s.nav)}
+                            aria-current={active ? "step" : undefined}
+                            className="flex flex-col items-center gap-1.5 w-full group">
+                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all group-hover:scale-110 ${active ? "text-white ring-4 ring-purple-100" : done ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400 group-hover:bg-gray-200"}`}
+                              style={active ? { background: "#7c3aed" } : {}}>
+                              {done ? "✓" : i + 1}
+                            </span>
+                            <span className={`text-[10px] leading-tight text-center px-1 ${active ? "font-bold text-purple-700" : done ? "font-semibold text-gray-600" : "text-gray-400"}`}>{s.label}</span>
+                            {active && <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-600">Sedang berjalan</span>}
+                          </button>
+                          {i < steps.length - 1 && (
+                            <span className={`h-0.5 w-4 mt-4 flex-shrink-0 rounded-full ${i < tahapAktif ? "bg-purple-300" : "bg-gray-200"}`} />
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              );
+            })()}
+
             {/* KPI strip auditee */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: "Audit Aktif",       val: 1,   color: "text-purple-600" },
                 { label: "Total Temuan",       val: auditeeRisiko.length, color: "text-amber-600" },
-                { label: "RTL Selesai",        val: 1,   color: "text-green-600"  },
-                { label: "RTL Belum Selesai",  val: 2,   color: "text-red-600"    },
+                { label: "RTL Selesai",        val: rtlAuditee.filter(r => r.tlStatus === "Close").length,  color: "text-green-600"  },
+                { label: "RTL Belum Selesai",  val: rtlAuditee.filter(r => r.tlStatus !== "Close").length,  color: "text-amber-600"    },
               ].map(s => (
                 <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm text-center">
                   <div className={`text-2xl font-black ${s.color}`}>{s.val}</div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{s.label}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Risiko per kategori — klik untuk ke menu Risiko */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { k: "Keuangan",    c: "#8b5cf6" },
+                { k: "Operasional", c: "#f97316" },
+                { k: "Kepatuhan",   c: "#0e8080" },
+                { k: "Teknologi",   c: "#0ea5e9" },
+              ].map(({ k, c }) => {
+                const items = auditeeRisiko.filter(t => t.kategori === k);
+                const tinggi = items.filter(t => t.tingkat === "Tinggi").length;
+                return (
+                  <button key={k} onClick={() => navigateTo("pengawasan", "risiko", "Temuan Risiko")}
+                    className="group text-left bg-white rounded-xl border border-gray-100 p-3 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                    style={{ borderTop: `3px solid ${c}` }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: c }}>{k}</span>
+                      <span className="text-[10px] text-gray-300 group-hover:text-gray-500 transition-colors">→</span>
+                    </div>
+                    <div className="text-2xl font-black text-gray-800 mt-1">{items.length}</div>
+                    <div className="text-[10px] text-gray-400">Temuan{tinggi > 0 && <span className="text-red-500 font-semibold"> · {tinggi} Tinggi</span>}</div>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Audit berjalan */}
@@ -1082,19 +1276,16 @@ function PwRingkasan() {
             <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
               <h4 className="text-xs font-bold text-gray-700 mb-3">Tindak Lanjut Rekomendasi (RTL) — {myUnit}</h4>
               <div className="flex flex-col gap-3">
+                {rtlAuditee.length === 0 && <div className="text-center py-4 text-xs text-gray-400">Belum ada RTL untuk unit ini.</div>}
                 {rtlAuditee.map(r => (
                   <div key={r.no} className="flex flex-col gap-1.5 p-3 rounded-xl border border-gray-100">
                     <div className="flex items-start gap-2">
                       <span className="text-[9px] font-mono text-gray-400 flex-shrink-0 mt-0.5">#{r.no}</span>
                       <div className="flex-1 text-xs text-gray-700 font-medium leading-snug">{r.rekomendasi}</div>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${statusRtlColor(r.status)}`}>{r.status}</span>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${TL_STATUS_STYLE[r.tlStatus].cls}`}>{r.tlStatus}</span>
                     </div>
-                    <div className="flex items-center gap-2 pl-4">
-                      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                        <div className="h-1.5 rounded-full transition-all" style={{ width: `${r.progres}%`, background: r.progres === 100 ? "#22c55e" : r.progres > 0 ? "#3b82f6" : "#e2e8f0" }} />
-                      </div>
-                      <span className="text-[9px] text-gray-500 flex-shrink-0">{r.progres}%</span>
-                      <span className="text-[9px] text-gray-400 flex-shrink-0">Batas: {r.batas}</span>
+                    <div className="text-[10px] text-gray-400 pl-4">
+                      Batas: {r.batas}
                     </div>
                   </div>
                 ))}
@@ -1244,19 +1435,15 @@ function PwRisiko({ subSection }: { subSection: string }) {
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
   const activeRisiko = subSection === "Pemetaan Risiko" ? "peta" : "temuan";
+  const [detailTemuan, setDetailTemuan] = useState<string | null>(null);
   const [filterRisiko, setFilterRisiko] = useState("Semua");
   const [tambahModal, setTambahModal] = useState<string | null>(null);
 
-  const [temuan, setTemuan] = useState([
-    { id: "R-001", unit: "BAUK",                  deskripsi: "Ketidaksesuaian pencatatan aset tetap",          kategori: "Keuangan",      tingkat: "Tinggi",  status: "Belum Ditindak" },
-    { id: "R-002", unit: "Sarpras",               deskripsi: "Pengelolaan aset tidak terdokumentasi",           kategori: "Operasional",   tingkat: "Tinggi",  status: "Proses" },
-    { id: "R-003", unit: "BAAK",                  deskripsi: "SOP penerimaan mahasiswa tidak diperbarui",       kategori: "Kepatuhan",     tingkat: "Sedang",  status: "Proses" },
-    { id: "R-004", unit: "LPPM",                  deskripsi: "Dokumentasi kegiatan penelitian tidak lengkap",   kategori: "Operasional",   tingkat: "Sedang",  status: "Selesai" },
-    { id: "R-005", unit: "Marcomm",               deskripsi: "Pengelolaan data alumni tanpa prosedur baku",     kategori: "Teknologi",     tingkat: "Rendah",  status: "Selesai" },
-    { id: "R-006", unit: "S1-Manajemen",          deskripsi: "Laporan akreditasi tidak diarsipkan dengan baik", kategori: "Kepatuhan",     tingkat: "Sedang",  status: "Belum Ditindak" },
-    { id: "R-007", unit: "Perpustakaan",          deskripsi: "Sistem katalog tidak terintegrasi dengan SIAKAD", kategori: "Teknologi",     tingkat: "Rendah",  status: "Proses" },
-    { id: "R-008", unit: "LPM",                   deskripsi: "Pertanggungjawaban dana kegiatan UKM tidak tepat waktu", kategori: "Keuangan", tingkat: "Tinggi", status: "Belum Ditindak" },
-  ]);
+  const { temuanList: temuan, rtlList, addTemuan, ajukanRtl } = useContext(TemuanCtx);
+  const { rencanaList } = useContext(AuditCtx);
+  const [filterAudit, setFilterAudit] = useState("Semua");
+  const rtlOf = (id: string) => rtlList.find(x => x.temuanId === id);
+  const { risikoDonut, risikoPerUnit, totalTemuan } = buildRisikoStats(temuan);
 
   const tingkatColor: Record<string, string> = {
     Tinggi: "bg-red-50 text-red-600 border border-red-200",
@@ -1275,7 +1462,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
     Teknologi:   "bg-sky-50 text-sky-600",
   };
 
-  const baseTemuan = myUnit ? temuan.filter(r => r.unit === myUnit) : temuan;
+  const baseTemuan = (myUnit ? temuan.filter(r => r.unit === myUnit) : temuan).filter(r => filterAudit === "Semua" || r.auditNo === filterAudit);
   const visibleTemuan = filterRisiko === "Semua"         ? baseTemuan
     : filterRisiko === "Tinggi"         ? baseTemuan.filter(r => r.tingkat === "Tinggi")
     : filterRisiko === "Sedang"         ? baseTemuan.filter(r => r.tingkat === "Sedang")
@@ -1300,7 +1487,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-bold text-gray-700">Diagram Risiko — Sebaran per Unit Kerja</h4>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>8 Temuan</span>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>{totalTemuan} Temuan</span>
           </div>
           <div className="flex items-center gap-4 mb-4">
             <ResponsiveContainer width="30%" height={120}>
@@ -1308,7 +1495,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
                 <Pie data={risikoDonut} cx="50%" cy="50%" innerRadius={34} outerRadius={52} dataKey="value" startAngle={90} endAngle={-270} strokeWidth={0}>
                   {risikoDonut.map((e, i) => <Cell key={i} fill={e.color} />)}
                 </Pie>
-                <text x="50%" y="45%" textAnchor="middle" fontSize="16" fontWeight="700" fill="#1e293b">8</text>
+                <text x="50%" y="45%" textAnchor="middle" fontSize="16" fontWeight="700" fill="#1e293b">{totalTemuan}</text>
                 <text x="50%" y="58%" textAnchor="middle" fontSize="7.5" fill="#64748b">Temuan</text>
               </PieChart>
             </ResponsiveContainer>
@@ -1374,8 +1561,8 @@ function PwRisiko({ subSection }: { subSection: string }) {
         </div>
       )}
 
-      {/* Summary strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      {/* Summary strip (auditee: dipindah ke Ringkasan) */}
+      {!myUnit && <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {byTingkat.map(t => (
           <div key={t.label} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm flex items-center gap-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black" style={{ background: t.color }}>{t.count}</div>
@@ -1395,78 +1582,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* ── Auditee: detail RTL per temuan ── */}
-      {myUnit && (() => {
-        const rtlPerTemuan: Record<string, { rekomendasi: string; batas: string; progres: number; status: string }[]> = {
-          "R-003": [
-            { rekomendasi: "Perbarui SOP penerimaan mahasiswa sesuai Permendikbud 2023", batas: "30 Jun 2025", progres: 60,  status: "Proses"   },
-            { rekomendasi: "Sosialisasi SOP yang diperbarui kepada staf BAAK",            batas: "31 Jul 2025", progres: 0,   status: "Belum"    },
-          ],
-          "R-009": [
-            { rekomendasi: "Digitalisasi arsip mahasiswa keluar 2020–2024",               batas: "31 Agt 2025", progres: 0,   status: "Belum"    },
-          ],
-          "R-002": [
-            { rekomendasi: "Lengkapi dokumen BA serah terima aset 2019–2024",             batas: "30 Jun 2025", progres: 40,  status: "Proses"   },
-            { rekomendasi: "Implementasi sistem manajemen aset berbasis digital",          batas: "31 Des 2025", progres: 10,  status: "Proses"   },
-          ],
-          "R-010": [
-            { rekomendasi: "Buat prosedur wajib BA untuk setiap pengadaan barang",        batas: "30 Jul 2025", progres: 0,   status: "Belum"    },
-          ],
-          "R-001": [
-            { rekomendasi: "Rekonsiliasi seluruh pencatatan aset tetap periode 2022–2024",batas: "30 Jun 2025", progres: 25,  status: "Proses"   },
-            { rekomendasi: "Pelaporan hasil rekonsiliasi ke Wakil Rektor II",              batas: "15 Jul 2025", progres: 0,   status: "Belum"    },
-          ],
-        };
-        return (
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">Detail RTL per Temuan Risiko</h4>
-            <div className="flex flex-col gap-3">
-              {visibleTemuan.map(r => {
-                const rtls = rtlPerTemuan[r.id] ?? [];
-                return (
-                  <div key={r.id} className="rounded-xl border border-gray-100 overflow-hidden">
-                    {/* Header temuan */}
-                    <div className={`flex items-center gap-2 px-3 py-2 ${r.tingkat === "Tinggi" ? "bg-red-50" : r.tingkat === "Sedang" ? "bg-amber-50" : "bg-green-50"}`}>
-                      <span className="text-[9px] font-mono text-gray-400">{r.id}</span>
-                      <span className="text-xs font-semibold text-gray-700 flex-1">{r.deskripsi}</span>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${tingkatColor[r.tingkat]}`}>{r.tingkat}</span>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${statusColor[r.status]}`}>{r.status}</span>
-                    </div>
-                    {/* RTL list */}
-                    {rtls.length > 0 ? (
-                      <div className="divide-y divide-gray-50">
-                        {rtls.map((rtl, j) => (
-                          <div key={j} className="px-3 py-2 flex flex-col gap-1">
-                            <div className="flex items-start gap-2">
-                              <span className="text-[9px] font-bold text-gray-400 mt-0.5 flex-shrink-0">→</span>
-                              <span className="text-xs text-gray-600 flex-1 leading-snug">{rtl.rekomendasi}</span>
-                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${rtl.status === "Selesai" ? "bg-green-50 text-green-600" : rtl.status === "Proses" ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"}`}>{rtl.status}</span>
-                            </div>
-                            <div className="flex items-center gap-2 pl-3.5">
-                              <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                                <div className="h-1.5 rounded-full transition-all" style={{ width: `${rtl.progres}%`, background: rtl.progres === 100 ? "#22c55e" : rtl.progres > 0 ? "#3b82f6" : "#e2e8f0" }} />
-                              </div>
-                              <span className="text-[9px] text-gray-400 flex-shrink-0">{rtl.progres}%</span>
-                              <span className="text-[9px] text-gray-400 flex-shrink-0 whitespace-nowrap">Batas: {rtl.batas}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="px-3 py-2 text-[10px] text-gray-400 italic">Belum ada RTL yang ditetapkan.</div>
-                    )}
-                  </div>
-                );
-              })}
-              {visibleTemuan.length === 0 && (
-                <div className="text-center py-6 text-xs text-gray-400">Tidak ada temuan untuk filter yang dipilih.</div>
-              )}
-            </div>
-          </div>
-        );
-      })()}
+      </div>}
 
       {activeRisiko === "temuan" && (
         <div className="flex flex-col gap-4">
@@ -1516,6 +1632,14 @@ function PwRisiko({ subSection }: { subSection: string }) {
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <h4 className="text-xs font-bold text-gray-700">Daftar Temuan Risiko — Tahun 2025</h4>
               <div className="flex items-center gap-2">
+                <select value={filterAudit} onChange={e => setFilterAudit(e.target.value)}
+                  className="text-[10px] border border-gray-200 rounded-lg px-2 py-1 text-gray-600 bg-white focus:outline-none focus:border-teal-400">
+                  <option value="Semua">Semua Audit</option>
+                  {Array.from(new Set((myUnit ? temuan.filter(t => t.unit === myUnit) : temuan).map(t => t.auditNo))).map(no => {
+                    const a = rencanaList.find(x => x.no === no);
+                    return <option key={no} value={no}>{no}{a ? ` — ${a.unit}` : ""} ({temuan.filter(t => t.auditNo === no).length} temuan)</option>;
+                  })}
+                </select>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>{visibleTemuan.length} Temuan</span>
                 {!myUnit && canEdit && (
                   <button onClick={() => setTambahModal("Tambah Temuan")} className="text-[10px] font-semibold px-3 py-1 rounded-lg text-white flex items-center gap-1"
@@ -1529,27 +1653,65 @@ function PwRisiko({ subSection }: { subSection: string }) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-gray-50 text-left">
-                  {["ID","Unit Kerja","Deskripsi Temuan","Kategori","Tingkat Risiko","Status","Aksi"].map(h => (
+                  {(myUnit ? ["ID","Temuan","Tingkat Risiko","Status","Aksi"] : ["ID","Audit","Unit Kerja","Deskripsi Temuan","Kategori","Tingkat Risiko","Status","Aksi"]).map(h => (
                     <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {visibleTemuan.map((r) => (
+                {myUnit && visibleTemuan.map(r => (
                   <tr key={r.id} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-2.5 font-mono text-[10px] text-gray-500">{r.id}</td>
+                    <td className="px-4 py-2.5 text-gray-700 font-medium max-w-[320px]"><div className="truncate" title={r.deskripsi}>{r.deskripsi}</div></td>
+                    <td className="px-4 py-2.5"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${tingkatColor[r.tingkat]}`}>{r.tingkat}</span></td>
+                    <td className="px-4 py-2.5"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColor[r.status]}`}>{r.status}</span></td>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => setDetailTemuan(r.id)} className="text-[9px] font-bold px-2 py-1 rounded-lg border whitespace-nowrap hover:bg-gray-50"
+                          style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>Detail</button>
+                        {!rtlOf(r.id) && canEdit && r.status !== "Selesai" && (
+                          <button onClick={() => setTambahModal(`tl-${r.id}`)} className="text-[9px] font-bold px-2 py-1 rounded-lg text-white whitespace-nowrap"
+                            style={{ background: "var(--tsu-teal)" }}>Tindak Lanjut →</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {visibleTemuan.length === 0 && (
+                  <tr><td colSpan={8} className="py-6 text-center text-xs text-gray-400">Tidak ada temuan untuk filter yang dipilih.</td></tr>
+                )}
+                {!myUnit && visibleTemuan.map((r) => (
+                  <tr key={r.id} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-2.5 font-mono text-[10px] text-gray-500">{r.id}</td>
+                    <td className="px-4 py-2.5 font-mono text-[10px] text-gray-500 whitespace-nowrap">{r.auditNo}</td>
                     <td className="px-4 py-2.5 font-medium text-gray-700 whitespace-nowrap">{r.unit}</td>
-                    <td className="px-4 py-2.5 text-gray-600 max-w-[240px]">{r.deskripsi}</td>
+                    <td className="px-4 py-2.5 text-gray-600 max-w-[240px]">
+                      {r.deskripsi}
+                      {(() => { const x = rtlOf(r.id); return x ? (
+                        <div className="mt-1 flex items-start gap-1 text-[9px] text-blue-600 leading-snug">
+                          <span className="flex-shrink-0">→</span>
+                          <span className="flex-1">{x.rencana} <span className="text-gray-400">· PIC {x.pic} · target {x.target}</span></span>
+                          {x.link && <a href={x.link} target="_blank" rel="noopener noreferrer" title="Buka dokumen pendukung" className="flex-shrink-0 text-teal-600 hover:text-teal-800">🔗</a>}
+                        </div>
+                      ) : null; })()}
+                    </td>
                     <td className="px-4 py-2.5"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${kategoriColor[r.kategori]}`}>{r.kategori}</span></td>
                     <td className="px-4 py-2.5"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${tingkatColor[r.tingkat]}`}>{r.tingkat}</span></td>
                     <td className="px-4 py-2.5"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColor[r.status]}`}>{r.status}</span></td>
                     <td className="px-4 py-2.5">
-                      {r.status !== "Selesai" && (
-                        <button onClick={() => setTambahModal(`tl-${r.id}`)} className="text-[9px] font-bold px-2 py-1 rounded-lg text-white whitespace-nowrap"
-                          style={{ background: "var(--tsu-teal)" }}>
-                          Tindak Lanjut →
-                        </button>
-                      )}
+                      {(() => {
+                        const x = rtlOf(r.id);
+                        if (x) {
+                          const tl = rtlTlStatus(x);
+                          return <span className={`text-[9px] font-bold px-2 py-1 rounded-lg whitespace-nowrap ${TL_STATUS_STYLE[tl].cls}`}>RTL: {tl}</span>;
+                        }
+                        return canEdit && r.status !== "Selesai" ? (
+                          <button onClick={() => setTambahModal(`tl-${r.id}`)} className="text-[9px] font-bold px-2 py-1 rounded-lg text-white whitespace-nowrap"
+                            style={{ background: "var(--tsu-teal)" }}>
+                            Tindak Lanjut →
+                          </button>
+                        ) : null;
+                      })()}
                     </td>
                   </tr>
                 ))}
@@ -1560,7 +1722,7 @@ function PwRisiko({ subSection }: { subSection: string }) {
         </div>
       )}
 
-      {activeRisiko === "peta" && (
+      {(activeRisiko === "peta" || myUnit) && (
         <div className="flex flex-col gap-4">
           {/* Score grid — risiko unit × dimensi */}
           {!myUnit && (
@@ -1631,22 +1793,34 @@ function PwRisiko({ subSection }: { subSection: string }) {
                   {["Rendah","Sedang","Tinggi"].map(l => <div key={l} className="text-[9px] text-gray-400 font-medium">{l}</div>)}
                 </div>
               </div>
-              {[
-                { prob: "Tinggi",  cells: [{ color:"bg-amber-200", items:["R-003"] }, { color:"bg-red-200", items:["R-001","R-008"] }, { color:"bg-red-300", items:["R-002"] }] },
-                { prob: "Sedang",  cells: [{ color:"bg-green-200", items:["R-005"] }, { color:"bg-amber-200",items:["R-004","R-006"]}, { color:"bg-red-200", items:[] }] },
-                { prob: "Rendah",  cells: [{ color:"bg-green-100", items:["R-007"] }, { color:"bg-green-200",items:[]             }, { color:"bg-amber-200",items:[]}] },
-              ].map(row => (
-                <div key={row.prob} className="flex items-stretch gap-1 mb-1">
-                  <div className="w-20 text-right text-[9px] text-gray-400 pr-2 flex items-center justify-end">{row.prob}</div>
-                  <div className="flex-1 grid grid-cols-3 gap-1">
-                    {row.cells.map((cell, ci) => (
-                      <div key={ci} className={`${cell.color} rounded-lg p-2 min-h-[52px] flex flex-wrap gap-1 content-start`}>
-                        {cell.items.map(id => <span key={id} className="text-[9px] bg-white/70 rounded px-1 font-mono font-bold text-gray-600">{id}</span>)}
-                      </div>
-                    ))}
+              {(() => {
+                // Posisi [baris kemungkinan, kolom dampak]; temuan tanpa posisi ditempatkan berdasarkan tingkat risiko
+                const POS: Record<string, [number, number]> = { "R-003":[0,0], "R-001":[0,1], "R-008":[0,1], "R-002":[0,2], "R-005":[1,0], "R-004":[1,1], "R-006":[1,1], "R-007":[2,0] };
+                const posOf = (t: TemuanRisiko): [number, number] => POS[t.id] ?? (t.tingkat === "Tinggi" ? [0,1] : t.tingkat === "Sedang" ? [1,1] : [2,0]);
+                const list = myUnit ? temuan.filter(t => t.unit === myUnit) : temuan;
+                const colors = [["bg-amber-200","bg-red-200","bg-red-300"],["bg-green-200","bg-amber-200","bg-red-200"],["bg-green-100","bg-green-200","bg-amber-200"]];
+                return ["Tinggi","Sedang","Rendah"].map((prob, ri) => (
+                  <div key={prob} className="flex items-stretch gap-1 mb-1">
+                    <div className="w-20 text-right text-[9px] text-gray-400 pr-2 flex items-center justify-end">{prob}</div>
+                    <div className="flex-1 grid grid-cols-3 gap-1">
+                      {colors[ri].map((color, ci) => (
+                        <div key={ci} className={`${color} rounded-lg p-1.5 min-h-[64px] flex flex-col gap-1`}>
+                          {list.filter(t => { const [r, c] = posOf(t); return r === ri && c === ci; }).map(t => (
+                            <button key={t.id} onClick={() => setDetailTemuan(t.id)} title={t.deskripsi}
+                              className="text-left bg-white/80 hover:bg-white rounded-md px-1.5 py-1 shadow-sm transition-colors">
+                              <div className="flex items-center gap-1">
+                                <span className="text-[9px] font-mono font-bold text-gray-700">{t.id}</span>
+                                <span className={`text-[8px] font-bold px-1 rounded ${kategoriColor[t.kategori] ?? "bg-gray-100 text-gray-500"}`}>{t.kategori}</span>
+                              </div>
+                              <div className="text-[9px] text-gray-600 leading-tight line-clamp-2 mt-0.5">{t.deskripsi}</div>
+                            </button>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
               <div className="flex gap-1 ml-20 mt-1 text-center">
                 {["Rendah","Sedang","Tinggi"].map(l => <div key={l} className="flex-1 text-[9px] text-gray-400">{l}</div>)}
               </div>
@@ -1663,25 +1837,87 @@ function PwRisiko({ subSection }: { subSection: string }) {
         </div>
       )}
 
+      {detailTemuan && (() => {
+        const t = temuan.find(x => x.id === detailTemuan);
+        if (!t) return null;
+        const x = rtlOf(t.id);
+        const audit = rencanaList.find(a => a.no === t.auditNo);
+        const row = (k: string, v: React.ReactNode) => (
+          <div className="flex justify-between gap-4 py-2 border-b border-gray-50 last:border-0">
+            <span className="text-[10px] text-gray-400 flex-shrink-0">{k}</span>
+            <span className="text-[11px] text-gray-700 font-medium text-right">{v}</span>
+          </div>
+        );
+        return (
+          <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setDetailTemuan(null)}>
+            <div className="absolute inset-0 bg-black/30" />
+            <aside className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+              <div className="p-5 border-b border-gray-100 flex items-start gap-3">
+                <div className="flex-1">
+                  <div className="text-[10px] font-mono text-gray-400">{t.id} · {t.auditNo}</div>
+                  <h3 className="text-sm font-bold text-gray-800 mt-1 leading-snug">{t.deskripsi}</h3>
+                  <div className="flex gap-1.5 mt-2">
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${tingkatColor[t.tingkat]}`}>{t.tingkat}</span>
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColor[t.status]}`}>{t.status}</span>
+                  </div>
+                </div>
+                <button onClick={() => setDetailTemuan(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Tutup">×</button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
+                <section>
+                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Informasi Temuan</h4>
+                  {row("Unit Kerja", t.unit)}
+                  {row("Audit", audit ? `${t.auditNo} — ${audit.jenis}` : t.auditNo)}
+                  {row("Tim Auditor", audit?.tim ?? "—")}
+                  {row("Kategori", <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${kategoriColor[t.kategori] ?? ""}`}>{t.kategori}</span>)}
+                  {row("Tingkat Risiko", t.tingkat)}
+                  {row("Status Temuan", t.status)}
+                </section>
+                <section>
+                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Rencana Tindak Lanjut</h4>
+                  {x ? (<>
+                    {row("Rencana", x.rencana)}
+                    {row("PIC", x.pic)}
+                    {row("Target Selesai", x.target)}
+                    {row("Status RTL", <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${TL_STATUS_STYLE[rtlTlStatus(x)].cls}`}>{rtlTlStatus(x)}</span>)}
+                    <div className="flex gap-2 mt-3">
+                      {x.link && <a href={x.link} target="_blank" rel="noreferrer" className="text-[10px] font-bold px-3 py-1.5 rounded-lg border" style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>Dokumen RTL ↗</a>}
+                      {x.bukti && <a href={x.bukti} target="_blank" rel="noreferrer" className="text-[10px] font-bold px-3 py-1.5 rounded-lg border" style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>Bukti ↗</a>}
+                    </div>
+                  </>) : (
+                    <div className="text-[11px] text-gray-400 italic py-2">Belum ada RTL yang ditetapkan.</div>
+                  )}
+                </section>
+              </div>
+              {!x && canEdit && t.status !== "Selesai" && (
+                <div className="p-4 border-t border-gray-100">
+                  <button onClick={() => { setDetailTemuan(null); setTambahModal(`tl-${t.id}`); }} className="w-full text-xs font-bold py-2 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>Susun Tindak Lanjut →</button>
+                </div>
+              )}
+            </aside>
+          </div>
+        );
+      })()}
+
       {tambahModal?.startsWith("tl-") && (
         <TambahFormModal title={`Tindak Lanjut — ${tambahModal.replace("tl-","")}`} fields={[
           { key:"pic",     label:"Penanggung Jawab",    type:"text" },
           { key:"rencana", label:"Rencana Tindak Lanjut", type:"textarea" },
           { key:"target",  label:"Target Selesai",      type:"date" },
-          { key:"link",    label:"Link Bukti / Dokumen (Google Drive)", type:"url", required:false },
+          { key:"link",    label:"Link Dokumen Pendukung (Google Drive, opsional)", type:"url", required:false },
         ]}
-        onSave={(v) => setTemuan(prev => prev.map(t => tambahModal === `tl-${t.id}` ? { ...t, status: "Proses" } : t))}
+        onSave={(v) => ajukanRtl(tambahModal.replace("tl-",""), { rencana: v.rencana || "-", pic: v.pic || "-", target: v.target || "", link: v.link?.trim() || null })}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Temuan" && (
         <TambahFormModal title="Tambah Temuan Risiko" fields={[
-          { key:"kode",    label:"Kode Temuan",     type:"text",   placeholder:"R-009" },
-          { key:"unit",    label:"Unit Kerja",      type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"] },
+          { key:"audit",   label:"Audit (satu audit dapat memiliki banyak temuan)", type:"select", options: rencanaList.map(a => `${a.no} — ${a.unit} (${a.jenis})`) },
+          { key:"kode",    label:"Kode Temuan",     type:"text",   placeholder:"R-011" },
           { key:"deskripsi",label:"Deskripsi Temuan", type:"textarea" },
           { key:"kategori",label:"Kategori",        type:"select", options:["Keuangan","Operasional","Kepatuhan","Teknologi"] },
           { key:"tingkat", label:"Tingkat Risiko",  type:"select", options:["Tinggi","Sedang","Rendah"] },
         ]}
-        onSave={(v) => setTemuan(prev => [{ id: v.kode || `R-${String(prev.length + 1).padStart(3,"0")}`, unit: v.unit || "-", deskripsi: v.deskripsi || "-", kategori: v.kategori || "-", tingkat: v.tingkat || "Sedang", status: "Belum Ditindak" }, ...prev])}
+        onSave={(v) => { const a = rencanaList.find(x => x.no === (v.audit || "").split(" — ")[0]); addTemuan({ id: v.kode || `R-${String(temuan.length + 1).padStart(3,"0")}`, auditNo: a?.no ?? "-", unit: a?.unit ?? "-", deskripsi: v.deskripsi || "-", kategori: v.kategori || "-", tingkat: v.tingkat || "Sedang" }); }}
         onClose={() => setTambahModal(null)} />
       )}
     </div>
@@ -1693,15 +1929,19 @@ function AuditPageRencana() {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
+  const isKepala = user?.role === "full";
   const [filterRencana, setFilterRencana] = useState("Semua");
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
   const [showLHAModal, setShowLHAModal] = useState(false);
   const [lhaSaved, setLhaSaved] = useState(false);
   const [lhaStep, setLhaStep] = useState<"form" | "confirm" | "saved">("form");
-  const [lhaForm, setLhaForm] = useState({ noLHA: "", unit: "", tanggal: "", linkDokumen: "", catatan: "" });
+  const [lhaForm, setLhaForm] = useState({ noLHA: "", auditNo: "", tanggal: "", linkDokumen: "", catatan: "" });
   const [revisiLHANo, setRevisiLHANo] = useState<string|null>(null);
   const [revisiCatatan, setRevisiCatatan] = useState("");
+  const [ajukanUlangNo, setAjukanUlangNo] = useState<string|null>(null);
+  const [ajukanUlangLink, setAjukanUlangLink] = useState("");
+  const notify = useContext(NotifyCtx);
   const proses = [
     { key: "rencana", label: "Rencana Audit", icon: "" },
     { key: "entry",   label: "Entry Meeting",  icon: "" },
@@ -1884,7 +2124,7 @@ function AuditPageRencana() {
             <tbody>
               {visibleRencanaFiltered.map((r,i)=>(
                 <tr key={i} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-mono text-[10px] text-gray-500 font-bold">{r.no}</td>
+                  <td className="px-4 py-3 font-mono text-[10px] text-gray-500 font-bold">{r.no}{r.pkptNo !== undefined && <div className="font-sans font-semibold text-[9px] text-teal-600">dari PKPT #{r.pkptNo}</div>}</td>
                   <td className="px-4 py-3 font-semibold text-gray-700">{r.unit}</td>
                   <td className="px-4 py-3 text-gray-500">{r.jenis}</td>
                   <td className="px-4 py-3 text-gray-500">{r.tim}</td>
@@ -1950,6 +2190,12 @@ function AuditPageRencana() {
                   <td className="px-4 py-3 text-center font-black text-amber-600">{l.rekomendasi}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${l.status==="Diterima"?"bg-green-50 text-green-600":l.status==="Revisi"?"bg-amber-50 text-amber-600":"bg-gray-100 text-gray-500"}`}>{l.status}</span>
+                    {!!l.revisiKe && <span className="ml-1 text-[9px] text-gray-400">· Revisi ke-{l.revisiKe}</span>}
+                    {l.status==="Revisi" && l.riwayatRevisi && l.riwayatRevisi.length>0 && (
+                      <div className="mt-1 max-w-[220px] text-[10px] text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1">
+                        <span className="font-bold">Catatan: </span>{l.riwayatRevisi[l.riwayatRevisi.length-1].catatan}
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -1961,20 +2207,31 @@ function AuditPageRencana() {
                           ↗ Buka
                         </a>
                       )}
-                      {/* Tombol aksi — hanya SPI/Ketua, bukan auditee */}
-                      {!myUnit && canEdit && l.status === "Draft" && (
+                      {/* Setujui/Revisi LHA hanya oleh Kepala SPI; Auditor membuat & mengajukan ulang */}
+                      {isKepala && l.status === "Draft" && (
                         <button
-                          onClick={() => setLaporanList(prev => prev.map(x => x.no === l.no ? { ...x, status: "Diterima", tgl: new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}) } : x))}
+                          onClick={() => { notify({ title: `LHA ${l.no} disetujui`, body: `LHA ${l.unit} telah diterima dan tersedia di Riwayat.`, tag: "Audit", roles: ["full", "pengawasan", "rektor"] }); setLaporanList(prev => prev.map(x => x.no === l.no ? { ...x, status: "Diterima", tgl: new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"}) } : x)); }}
                           className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors whitespace-nowrap">
                           ✓ Setujui
                         </button>
                       )}
-                      {!myUnit && canEdit && (
+                      {!myUnit && canEdit && l.status === "Revisi" && (
+                        <button
+                          onClick={() => { setAjukanUlangNo(l.no); setAjukanUlangLink(l.link ?? ""); }}
+                          className="text-[9px] font-bold px-2.5 py-1 rounded-lg text-white whitespace-nowrap"
+                          style={{ background: "var(--tsu-teal)" }}>
+                          ↻ Ajukan Ulang
+                        </button>
+                      )}
+                      {isKepala && l.status === "Draft" && (
                         <button
                           onClick={() => { setRevisiLHANo(l.no); setRevisiCatatan(""); }}
                           className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors whitespace-nowrap">
                           ↩ Revisi
                         </button>
+                      )}
+                      {!myUnit && canEdit && !isKepala && l.status === "Draft" && (
+                        <span className="text-[9px] text-gray-400 italic whitespace-nowrap">Menunggu persetujuan Kepala SPI</span>
                       )}
                       {(!canEdit || myUnit) && l.status !== "Diterima" && (
                         <span className="text-[9px] text-gray-300 italic">—</span>
@@ -2007,14 +2264,15 @@ function AuditPageRencana() {
                       className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400" />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Unit Kerja</label>
-                    <select value={lhaForm.unit} onChange={e => setLhaForm(p => ({ ...p, unit: e.target.value }))}
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Audit yang Dilaporkan</label>
+                    <select value={lhaForm.auditNo} onChange={e => setLhaForm(p => ({ ...p, auditNo: e.target.value }))}
                       className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400">
-                      <option value="">-- Pilih Unit --</option>
-                      {["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD"].map(u => (
-                        <option key={u} value={u}>{u}</option>
+                      <option value="">-- Pilih Audit --</option>
+                      {rencanaList.map(a => (
+                        <option key={a.no} value={a.no}>{a.no} — {a.unit} ({a.jenis})</option>
                       ))}
                     </select>
+                    <p className="text-[9px] text-gray-400 mt-1">Jumlah temuan dan rekomendasi dihitung otomatis dari Temuan Risiko audit ini.</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Tanggal Terbit</label>
@@ -2039,7 +2297,7 @@ function AuditPageRencana() {
                     className="text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
                     Batal
                   </button>
-                  <button onClick={() => setLhaStep("confirm")} disabled={!lhaForm.noLHA.trim() || !lhaForm.unit}
+                  <button onClick={() => setLhaStep("confirm")} disabled={!lhaForm.noLHA.trim() || !lhaForm.auditNo}
                     className="text-xs font-semibold px-4 py-2 rounded-lg text-white disabled:opacity-40"
                     style={{ background: "var(--tsu-teal)" }}>
                     Simpan LHA
@@ -2060,7 +2318,8 @@ function AuditPageRencana() {
                   <button onClick={() => setLhaStep("form")}
                     className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">← Kembali</button>
                   <button onClick={() => {
-                    setLaporanList(prev => [{ no: lhaForm.noLHA || "LHA-NEW", unit: lhaForm.unit || "-", tgl: lhaForm.tanggal || "-", temuan: 0, rekomendasi: 0, status: "Draft", link: lhaForm.linkDokumen || null }, ...prev]);
+                    setLaporanList(prev => [{ no: lhaForm.noLHA || "LHA-NEW", auditNo: lhaForm.auditNo, unit: rencanaList.find(a => a.no === lhaForm.auditNo)?.unit ?? "-", tgl: lhaForm.tanggal || "-", temuan: 0, rekomendasi: 0, status: "Draft", link: lhaForm.linkDokumen || null }, ...prev]);
+                    notify({ title: `LHA ${lhaForm.noLHA || "baru"} diajukan`, body: "LHA menunggu persetujuan Kepala SPI.", tag: "Audit", roles: ["full"] });
                     setLhaSaved(true); setLhaStep("saved");
                   }} className="text-xs font-bold px-4 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>
                     Sudah Sesuai, Simpan
@@ -2104,6 +2363,48 @@ function AuditPageRencana() {
           onCancel={() => setPendingDelete(null)}
         />
       )}
+      {ajukanUlangNo && (() => {
+        const lha = laporanList.find(x => x.no === ajukanUlangNo);
+        if (!lha) return null;
+        const last = lha.riwayatRevisi?.[lha.riwayatRevisi.length-1];
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
+            onClick={() => setAjukanUlangNo(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4" style={{ background: "linear-gradient(135deg, var(--tsu-teal-dark) 0%, var(--tsu-teal) 100%)" }}>
+                <div className="text-sm font-black text-white">↻ Ajukan Ulang LHA</div>
+                <button onClick={() => setAjukanUlangNo(null)} className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 flex items-center justify-center text-white text-sm font-bold">✕</button>
+              </div>
+              <div className="p-5 flex flex-col gap-4">
+                {last && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[10px] text-amber-700">
+                    <div className="font-bold mb-0.5">Catatan revisi ({last.tgl})</div>{last.catatan}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Link Dokumen LHA Terbaru (Google Drive)</label>
+                  <input value={ajukanUlangLink} onChange={e => setAjukanUlangLink(e.target.value)} placeholder="https://drive.google.com/..."
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100" />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      notify({ title: `LHA ${lha.no} diajukan ulang`, body: `${lha.unit}: revisi ke-${lha.revisiKe ?? 1} menunggu persetujuan Kepala SPI.`, tag: "Audit", roles: ["full", "pengawasan"] });
+                      setLaporanList(prev => prev.map(x => x.no === ajukanUlangNo ? { ...x, status: "Draft", link: ajukanUlangLink.trim() || x.link } : x));
+                      setAjukanUlangNo(null);
+                    }}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "var(--tsu-teal)" }}>
+                    Ajukan Ulang
+                  </button>
+                  <button onClick={() => setAjukanUlangNo(null)}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {revisiLHANo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
@@ -2128,12 +2429,17 @@ function AuditPageRencana() {
               </div>
               <div className="flex gap-2">
                 <button
+                  disabled={!revisiCatatan.trim()}
                   onClick={() => {
-                    setLaporanList(prev => prev.map(x => x.no === revisiLHANo ? { ...x, status: "Revisi" } : x));
+                    const tgl = new Date().toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+                    const catatan = revisiCatatan.trim();
+                    const target = laporanList.find(x => x.no === revisiLHANo);
+                    if (target) notify({ title: `LHA ${target.no} perlu direvisi`, body: `${target.unit}: ${catatan}`, tag: "Audit", roles: ["full", "pengawasan"] });
+                    setLaporanList(prev => prev.map(x => x.no === revisiLHANo ? { ...x, status: "Revisi", revisiKe: (x.revisiKe ?? 0) + 1, riwayatRevisi: [...(x.riwayatRevisi ?? []), { tgl, catatan }] } : x));
                     setRevisiLHANo(null);
                     setRevisiCatatan("");
                   }}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors">
+                  className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   ↩ Konfirmasi Revisi
                 </button>
                 <button onClick={() => setRevisiLHANo(null)}
@@ -2150,11 +2456,13 @@ function AuditPageRencana() {
 }
 
 // ── Audit page 2: Entry – Draft – Exit ───────────────────────────────────────
-function AuditPageLapangan() {
+function AuditPageLapangan({ fixedStep }: { fixedStep?: "entry"|"draft"|"exit" } = {}) {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
-  const [activeStep, setActiveStep] = useState<"entry"|"draft"|"exit">("entry");
+  const [activeStep, setActiveStep] = useState<"entry"|"draft"|"exit">(fixedStep ?? "entry");
+  const [linkDraft, setLinkDraft] = useState<Record<string, string>>({});
+  const [uploadDocs, setUploadDocs] = useState<Record<string, { name: string; url: string }>>({});
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [editEntryState, setEditEntryState] = useState<{ idx: number; field: "notulen"|"ba"|"presensi" } | null>(null);
   const [editEntryLink, setEditEntryLink] = useState("");
@@ -2174,6 +2482,7 @@ function AuditPageLapangan() {
     { unit: "BAAK",     tgl: "2 Apr 2025",  notulen: "Ada",    ba: "Ada",   statusEntry: "Terlaksana",  linkNotulen: "https://drive.google.com/file/notulen-entry-baak",    linkBA: "https://drive.google.com/file/ba-entry-baak",     linkPresensi: "https://drive.google.com/file/presensi-entry-baak"   },
   ]);
   const [exitEdit, setExitEdit] = useState<{ idx: number; linkPresensi: string; linkBA: string; temuanSepakat: string; tindakLanjut: string } | null>(null);
+  const [detailDraft, setDetailDraft] = useState<string | null>(null);
   const [dispoModal, setDispoModal] = useState<{ no: string; status: "Setuju"|"Keberatan"; catatan: string } | null>(null);
   const [draftList, setDraftList] = useState([
     { unit: "BAAK", no: "DT-001", temuan: "SOP Penerimaan Mahasiswa Tidak Diperbarui", tglKirim: "15 Mei 2025", disposisi: "Setuju",     catatanAuditor: "Mohon SOP direvisi sesuai regulasi terbaru", catatanAuditee: "Akan diperbarui pada Q3 2025" },
@@ -2221,7 +2530,7 @@ function AuditPageLapangan() {
       )}
 
       {/* Step switcher */}
-      <div className="flex gap-0 bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
+      {!fixedStep && <div className="flex gap-0 bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
         {steps.map((s, i) => (
           <button key={s.key} onClick={() => setActiveStep(s.key)}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all relative"
@@ -2236,8 +2545,8 @@ function AuditPageLapangan() {
             )}
           </button>
         ))}
-      </div>
-      <p className="text-xs text-gray-400 -mt-2 px-1">{steps.find(s=>s.key===activeStep)?.desc}</p>
+      </div>}
+      {!fixedStep && <p className="text-xs text-gray-400 -mt-2 px-1">{steps.find(s=>s.key===activeStep)?.desc}</p>}
 
       {/* Entry Meeting */}
       {activeStep === "entry" && (
@@ -2315,6 +2624,37 @@ function AuditPageLapangan() {
                   )
                 )}
               </div>
+              {myUnit && canEdit && (
+                <div className="mt-3 border-t border-gray-100 pt-3">
+                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Link Dokumen yang Diperlukan (Google Drive)</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {["Struktur Organisasi Unit", "SOP / Pedoman Unit", "Daftar Dokumen Pendukung"].map(label => {
+                      const key = `${e.unit}|${label}`;
+                      const f = uploadDocs[key];
+                      return (
+                        <div key={label} className="rounded-lg border border-dashed border-purple-200 bg-purple-50/40 px-3 py-2">
+                          <div className="text-[10px] font-semibold text-gray-600 mb-1">{label}</div>
+                          {f ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <a href={f.url} target="_blank" rel="noreferrer" className="text-[10px] font-semibold text-purple-700 truncate">{f.name} ↗</a>
+                              <button onClick={() => setUploadDocs(prev => { const n = { ...prev }; delete n[key]; return n; })} className="text-[10px] text-gray-400 hover:text-red-500" aria-label="Hapus">✕</button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-1">
+                              <input type="url" value={linkDraft[key] ?? ""} onChange={ev => setLinkDraft(prev => ({ ...prev, [key]: ev.target.value }))}
+                                placeholder="https://drive.google.com/..."
+                                className="flex-1 min-w-0 border border-gray-200 rounded-md px-2 py-1 text-[10px] focus:outline-none focus:border-purple-400" />
+                              <button disabled={!/^https?:\/\/\S+$/.test((linkDraft[key] ?? "").trim())}
+                                onClick={() => { const u = (linkDraft[key] ?? "").trim(); setUploadDocs(prev => ({ ...prev, [key]: { name: "Buka dokumen", url: u } })); setLinkDraft(prev => { const n = { ...prev }; delete n[key]; return n; }); }}
+                                className="text-[10px] font-bold px-2 py-1 rounded-md text-white disabled:opacity-40" style={{ background: "#7c3aed" }}>Simpan</button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -2354,14 +2694,14 @@ function AuditPageLapangan() {
                     <td className="px-4 py-3 text-gray-500 text-[10px] italic max-w-[180px]">{d.catatanAuditee}</td>
                     {myUnit && canEdit && (
                       <td className="px-4 py-3 whitespace-nowrap">
-                        {d.disposisi === "Menunggu" ? (
-                          <div className="flex gap-1.5">
-                            <button onClick={() => setDispoModal({ no: d.no, status: "Setuju", catatan: "" })}
-                              className="text-[9px] font-bold px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100">Setuju</button>
-                            <button onClick={() => setDispoModal({ no: d.no, status: "Keberatan", catatan: "" })}
-                              className="text-[9px] font-bold px-2 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100">Keberatan</button>
-                          </div>
-                        ) : <span className="text-[9px] text-gray-300 italic">Sudah direspons</span>}
+                        <div className="flex gap-1.5">
+                          <button title="Detail" aria-label="Detail" onClick={() => setDetailDraft(d.no)}
+                            className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 text-xs font-bold">ⓘ</button>
+                          <button title="Terima" aria-label="Terima" disabled={d.disposisi !== "Menunggu"} onClick={() => setDispoModal({ no: d.no, status: "Setuju", catatan: "" })}
+                            className="w-7 h-7 rounded-lg bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed">✓</button>
+                          <button title="Keberatan" aria-label="Keberatan" disabled={d.disposisi !== "Menunggu"} onClick={() => setDispoModal({ no: d.no, status: "Keberatan", catatan: "" })}
+                            className="w-7 h-7 rounded-lg bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs font-bold disabled:opacity-30 disabled:cursor-not-allowed">✕</button>
+                        </div>
                       </td>
                     )}
                   </tr>
@@ -2369,6 +2709,24 @@ function AuditPageLapangan() {
               </tbody>
             </table>
           </div>
+          {myUnit && <AuditPageKKA />}
+          {detailDraft && (() => {
+            const d = draftList.find(x => x.no === detailDraft);
+            if (!d) return null;
+            return (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,23,42,0.55)" }} onClick={() => setDetailDraft(null)}>
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-5 flex flex-col gap-3" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-gray-800">Detail Draft Temuan {d.no}</h4>
+                    <button onClick={() => setDetailDraft(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+                  </div>
+                  {[["Unit", d.unit], ["Temuan", d.temuan], ["Tgl Kirim", d.tglKirim], ["Catatan Auditor", d.catatanAuditor], ["Respons Auditee", d.disposisi], ["Catatan Auditee", d.catatanAuditee]].map(([k, v]) => (
+                    <div key={k}><div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{k}</div><div className="text-xs text-gray-700">{v}</div></div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -2795,12 +3153,60 @@ function AuditPageKKA() {
   );
 }
 
+function AuditPageLHA() {
+  const user = useContext(UserCtx);
+  const myUnit = user?.role === "auditee" ? user.unit : null;
+  const { laporanList } = useContext(AuditCtx);
+  const rows = myUnit ? laporanList.filter(l => l.unit === myUnit) : laporanList;
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-100">
+        <h4 className="text-xs font-bold text-gray-700">Laporan Hasil Audit (LHA){myUnit ? ` — ${myUnit}` : ""}</h4>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead><tr className="bg-gray-50 text-left">
+            {["No LHA","Unit Kerja","Tgl Terbit","Temuan","Rekomendasi","Status","Dokumen"].map(h => <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>)}
+          </tr></thead>
+          <tbody>
+            {rows.map(l => (
+              <tr key={l.no} className="border-t border-gray-50 hover:bg-gray-50">
+                <td className="px-4 py-3 font-mono text-[10px] text-gray-500 whitespace-nowrap">{l.no}</td>
+                <td className="px-4 py-3 font-semibold text-gray-700">{l.unit}</td>
+                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{l.tgl}</td>
+                <td className="px-4 py-3 text-center font-black text-red-500">{l.temuan}</td>
+                <td className="px-4 py-3 text-center font-black text-amber-600">{l.rekomendasi}</td>
+                <td className="px-4 py-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${l.status==="Diterima"?"bg-green-50 text-green-600":l.status==="Revisi"?"bg-amber-50 text-amber-600":"bg-gray-100 text-gray-500"}`}>{l.status}</span></td>
+                <td className="px-4 py-3">{l.link
+                  ? <a href={l.link} target="_blank" rel="noreferrer" className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-lg text-white whitespace-nowrap" style={{ background: "var(--tsu-teal)" }}>↗ Buka Dokumen</a>
+                  : <span className="text-[10px] text-gray-300">Belum ada link</span>}</td>
+              </tr>
+            ))}
+            {rows.length === 0 && <tr><td colSpan={7} className="text-center py-6 text-xs text-gray-400">Belum ada LHA.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ── PwAudit shell driven by top-strip subSection ─────────────────────────────
 function PwAudit({ subSection }: { subSection: string }) {
+  const user = useContext(UserCtx);
+  if (user?.role === "auditee") {
+    return (
+      <div className="flex flex-col gap-4">
+        {subSection === "Draft Temuan & Konfirmasi" ? <AuditPageLapangan key="draft" fixedStep="draft" />
+          : subSection === "Exit Meeting" ? <><AuditPageLapangan key="exit" fixedStep="exit" /><AuditPageLHA /></>
+          : <AuditPageLapangan key="entry" fixedStep="entry" />}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-4">
       {subSection === "Entry Meeting – Draft – Exit" && <AuditPageLapangan />}
       {subSection === "Kertas Kerja Audit (KKA)"    && <AuditPageKKA />}
+      {subSection === "Laporan Hasil Audit (LHA)"   && <AuditPageLHA />}
       {(subSection === "Rencana & Laporan Audit" || !subSection) && <AuditPageRencana />}
     </div>
   );
@@ -2811,59 +3217,22 @@ function PwRTL({ subSection }: { subSection: string }) {
   const user = useContext(UserCtx);
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
-  const showVerif = subSection === "Verifikasi RTL";
+  void subSection;
+  const showVerif = false;
   const [filterRTL, setFilterRTL] = useState("Semua");
-  const [buktiLinks, setBuktiLinks] = useState<Record<number, string>>({});
-  const [editingBukti, setEditingBukti] = useState<{ no: number; value: string } | null>(null);
-  const [verifCatatan, setVerifCatatan] = useState<Record<number, string>>({});
-  const [verifResult, setVerifResult]   = useState<Record<number, "Diterima"|"Ditolak"|undefined>>({});
+  const { rtlList, temuanList, kirimBukti, setTlStatusRtl, updateRtl, tambahRtl } = useContext(TemuanCtx);
+  const [editingBukti, setEditingBukti] = useState<{ id: number; value: string } | null>(null);
+  const [editRtl, setEditRtl] = useState<{ id: number | null; temuanId: string; rencana: string; pic: string; target: string; link: string; bukti: string } | null>(null);
+  const rtlCode = (id: number) => `RTL-${String(id).padStart(3, "0")}`;
 
-  // "today" fixed at 22 May 2025 for days-remaining calculation
-  const today2025 = new Date(2025, 4, 22); // month 0-indexed
-  function sisaHari(tglStr: string): number {
-    const parts = tglStr.split(" ");
-    const monthMap: Record<string, number> = {
-      Jan:0, Feb:1, Mar:2, Apr:3, Mei:4, Jun:5, Jul:6, Agu:7, Sep:8, Okt:9, Nov:10, Des:11,
-    };
-    const d = parseInt(parts[0]);
-    const m = monthMap[parts[1]] ?? 0;
-    const y = parseInt(parts[2]);
-    const target = new Date(y, m, d);
-    return Math.round((target.getTime() - today2025.getTime()) / (1000 * 60 * 60 * 24));
-  }
+  const sisaHari = sisaHariRtl;
+  const temuanDesc = (id: string) => temuanList.find(t => t.id === id)?.deskripsi ?? id;
+  const auditOf = (id: string) => temuanList.find(t => t.id === id)?.auditNo ?? "";
 
-  const allRTL = [
-    ...rtlRows.map(r=>({...r, statusRTL: "Terlambat"})),
-    { no:4, unit:"Fak. Teknik",     temuan:"Rekonsiliasi Aset Q1",   tgl:"31 Mei 2025", statusRTL:"Proses"  },
-    { no:5, unit:"LPPM",            temuan:"Revisi SOP Penelitian",   tgl:"15 Jun 2025", statusRTL:"Proses"  },
-    { no:6, unit:"LPM",             temuan:"Laporan Kegiatan UKM Q1", tgl:"30 Jun 2025", statusRTL:"Selesai" },
-    { no:7, unit:"BAAK",            temuan:"Arsip Mahasiswa Keluar",  tgl:"20 Jun 2025", statusRTL:"Proses"  },
-  ];
-  const allVerifikasi = [
-    { unit:"LPM",           temuan:"Laporan Kegiatan UKM Q1", tglSelesai:"25 Mei 2025", bukti:"Laporan PDF",     verifikator:"Ratna D.", hasil:"Diterima"  },
-    { unit:"LPPM",          temuan:"Update Profil Riset",     tglSelesai:"10 Mei 2025", bukti:"Screenshot SINTA", verifikator:"Budi S.", hasil:"Diterima"  },
-    { unit:"BAAK",          temuan:"Arsip Mahasiswa Keluar",  tglSelesai:"—",           bukti:"Menunggu",         verifikator:"—",       hasil:"Menunggu" },
-  ];
-
-  // Hitung status efektif per RTL berdasarkan hasil verifikasi dan bukti yang diupload
-  function getEffStatus(r: typeof allRTL[0]): string {
-    const verifIdx = allVerifikasi.findIndex(v => v.unit === r.unit && v.temuan === r.temuan);
-    if (verifIdx >= 0) {
-      const hasil = verifResult[verifIdx] ?? allVerifikasi[verifIdx].hasil;
-      if (hasil === "Diterima") return "Selesai";
-      if (hasil === "Ditolak")  return "Proses";
-    }
-    if (buktiLinks[r.no]) return "Menunggu Verifikasi";
-    return r.statusRTL;
-  }
-
-  const baseRTL2 = myUnit ? allRTL.filter(r => r.unit === myUnit) : allRTL;
-  const rtlRows2 = filterRTL === "Semua"               ? baseRTL2
-    : filterRTL === "Terlambat"          ? baseRTL2.filter(r => getEffStatus(r) === "Terlambat")
-    : filterRTL === "Proses"             ? baseRTL2.filter(r => getEffStatus(r) === "Proses")
-    : filterRTL === "Menunggu Verifikasi"? baseRTL2.filter(r => getEffStatus(r) === "Menunggu Verifikasi")
-    : baseRTL2.filter(r => getEffStatus(r) === "Selesai");
-  const verRows  = myUnit ? allVerifikasi.filter(v => v.unit === myUnit) : allVerifikasi;
+  const baseRTL2 = myUnit ? rtlList.filter(r => r.unit === myUnit) : rtlList;
+  const rtlRows2 = filterRTL === "Semua" ? baseRTL2 : baseRTL2.filter(r => rtlTlStatus(r) === filterRTL);
+  const countStatus = (st: TlStatus) => baseRTL2.filter(r => rtlTlStatus(r) === st).length;
+  const rtlSummary = TL_STATUS_LIST.map(st => ({ name: st, value: baseRTL2.filter(r => rtlTlStatus(r) === st).length, color: TL_STATUS_STYLE[st].color }));
 
   return (
     <div className="flex flex-col gap-4">
@@ -2878,22 +3247,18 @@ function PwRTL({ subSection }: { subSection: string }) {
         </div>
       )}
       {myUnit && !showVerif && (
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Total RTL",    val: baseRTL2.length,                                    color: "text-gray-700"   },
-            { label: "Proses",       val: baseRTL2.filter(r=>r.statusRTL==="Proses").length,   color: "text-blue-600"   },
-            { label: "Terlambat",    val: baseRTL2.filter(r=>r.statusRTL==="Terlambat").length,color: "text-red-600"    },
-          ].map(s => (
-            <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm text-center">
-              <div className={`text-2xl font-black ${s.color}`}>{s.val}</div>
-              <div className="text-[10px] text-gray-400 mt-0.5">{s.label}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {TL_STATUS_LIST.map(st => (
+            <div key={st} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm text-center">
+              <div className="text-2xl font-black" style={{ color: TL_STATUS_STYLE[st].color }}>{countStatus(st)}</div>
+              <div className="text-[10px] text-gray-400 mt-0.5">{st}</div>
             </div>
           ))}
         </div>
       )}
       {myUnit && !showVerif && (
         <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] text-blue-700">
-          <strong>Cara menyelesaikan RTL:</strong> Klik <em>Isi Link Bukti</em> pada baris RTL yang sedang berjalan, tempel link Google Drive atau tautan dokumen bukti tindak lanjut, lalu tunggu verifikasi dari SPI.
+          <strong>Cara menyelesaikan RTL:</strong> Klik ikon edit pada kolom Aksi untuk memperbarui isian RTL serta menambah link dokumen RTL dan bukti pelaksanaan. Auditor SPI akan memantau pelaksanaan RTL melalui tautan tersebut dan memperbarui status secara langsung.
         </div>
       )}
 
@@ -2957,10 +3322,16 @@ function PwRTL({ subSection }: { subSection: string }) {
       {!showVerif && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-xs font-bold text-gray-700">Daftar Tindak Lanjut (RTL){myUnit ? ` — ${myUnit}` : ""}</h4>
+          {myUnit && canEdit && (
+            <button onClick={() => setEditRtl({ id: null, temuanId: temuanList.find(t => t.unit === myUnit)?.id ?? "", rencana: "", pic: "", target: "", link: "", bukti: "" })}
+              className="text-[11px] font-bold px-3 py-1.5 rounded-lg text-white flex items-center gap-1 hover:opacity-90" style={{ background: "var(--tsu-teal)" }}>
+              <span className="text-sm leading-none">+</span> Tambah RTL
+            </button>
+          )}
         </div>
         {!myUnit && (
         <div className="flex gap-3 mb-3">
-          {rtlData.map(d=>(
+          {rtlSummary.map(d=>(
             <div key={d.name} className="flex-1 text-center">
               <div className="text-xl font-black" style={{ color: d.color, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{d.value}</div>
               <div className="text-[9px] text-gray-400">{d.name}</div>
@@ -2970,63 +3341,118 @@ function PwRTL({ subSection }: { subSection: string }) {
         )}
         {/* Filter pills */}
         <div className="flex gap-2 flex-wrap mb-3">
-          {["Semua","Terlambat","Proses","Menunggu Verifikasi","Selesai"].map(f => (
-            <button key={f} onClick={() => setFilterRTL(f)}
+          {["Semua", ...TL_STATUS_LIST].map(f => (
+            <button key={f} onClick={() => setFilterRTL(f)} title={f === "Semua" ? undefined : TL_STATUS_STYLE[f as TlStatus].desc}
               className="text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-all"
               style={filterRTL === f
-                ? { background: f === "Terlambat" ? "#ef4444" : f === "Menunggu Verifikasi" ? "#7c3aed" : "var(--tsu-teal)", color: "#fff", borderColor: f === "Terlambat" ? "#ef4444" : f === "Menunggu Verifikasi" ? "#7c3aed" : "var(--tsu-teal)" }
+                ? { background: f === "Semua" ? "var(--tsu-teal)" : TL_STATUS_STYLE[f as TlStatus].color, color: "#fff", borderColor: f === "Semua" ? "var(--tsu-teal)" : TL_STATUS_STYLE[f as TlStatus].color }
                 : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}>
               {f}
             </button>
           ))}
         </div>
+        {myUnit ? (
+        <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead><tr className="text-left border-b border-gray-100">
+            {["ID RTL","Temuan","Judul RTL","Jatuh Tempo","Status","Aksi"].map(h=><th key={h} className="pb-2 text-[10px] text-gray-400 font-semibold whitespace-nowrap pr-3">{h}</th>)}
+          </tr></thead>
+          <tbody>
+            {rtlRows2.length === 0 && (
+              <tr><td colSpan={6} className="py-6 text-center text-xs text-gray-400">Belum ada RTL untuk filter ini.</td></tr>
+            )}
+            {rtlRows2.map(r => {
+              const tl = rtlTlStatus(r);
+              const sisa = sisaHari(r.target);
+              const isLate = tl !== "Close" && sisa < 0;
+              return (
+                <tr key={r.id} className={`border-b border-gray-50 last:border-0 ${isLate ? "bg-red-50/60" : ""}`}>
+                  <td className="py-2 pr-3 font-mono text-[10px] text-gray-500 whitespace-nowrap">{rtlCode(r.id)}</td>
+                  <td className="py-2 pr-3 max-w-[220px]">
+                    <div className="font-mono text-[9px] text-gray-400">{r.temuanId}</div>
+                    <div className="text-[10px] text-gray-600 truncate" title={temuanDesc(r.temuanId)}>{temuanDesc(r.temuanId)}</div>
+                  </td>
+                  <td className="py-2 pr-3 max-w-[260px]">
+                    <div className="text-[11px] font-semibold text-gray-700 leading-snug">{r.rencana}</div>
+                    <div className="flex gap-2 mt-0.5">
+                      {r.link && <a href={r.link} target="_blank" rel="noreferrer" className="text-[9px] font-bold text-teal-600 hover:underline">Dokumen ↗</a>}
+                      {r.bukti && <a href={r.bukti} target="_blank" rel="noreferrer" className="text-[9px] font-bold text-teal-600 hover:underline">Bukti ↗</a>}
+                    </div>
+                  </td>
+                  <td className="py-2 pr-3 whitespace-nowrap">
+                    <div className="text-[10px] text-gray-600">{r.target}</div>
+                    {tl !== "Close" && <div className={`text-[9px] font-bold ${sisa < 0 ? "text-red-600" : sisa <= 7 ? "text-amber-600" : "text-gray-400"}`}>{sisa < 0 ? `${Math.abs(sisa)} hari lewat` : `${sisa} hari lagi`}</div>}
+                  </td>
+                  <td className="py-2 pr-3">
+                    <span title={`${TL_STATUS_STYLE[tl].desc} (diperbarui oleh Auditor SPI)`} className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap ${TL_STATUS_STYLE[tl].cls}`}>{tl}</span>
+                  </td>
+                  <td className="py-2">
+                    {canEdit && (
+                      <button title="Edit RTL" aria-label={`Edit ${rtlCode(r.id)}`}
+                        onClick={() => setEditRtl({ id: r.id, temuanId: r.temuanId, rencana: r.rencana, pic: r.pic, target: tglIdToIso(r.target), link: r.link ?? "", bukti: r.bukti ?? "" })}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center border border-gray-200 text-gray-500 hover:text-teal-700 hover:border-teal-300 hover:bg-teal-50 transition-colors">
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        </div>
+        ) : (
         <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead><tr className="text-left border-b border-gray-100">
             {["No","Unit Kerja","Temuan","Jatuh Tempo","Sisa Hari","Status","Aksi"].map(h=><th key={h} className="pb-2 text-[10px] text-gray-400 font-semibold whitespace-nowrap pr-3">{h}</th>)}
           </tr></thead>
           <tbody>
-            {rtlRows2.map((r,i)=>{
-              const sisa = sisaHari(r.tgl);
-              const effStatus = getEffStatus(r);
-              const isLate = effStatus === "Terlambat";
+            {rtlRows2.length === 0 && (
+              <tr><td colSpan={7} className="py-6 text-center text-xs text-gray-400">Belum ada RTL untuk filter ini.</td></tr>
+            )}
+            {rtlRows2.map((r)=>{
+              const sisa = sisaHari(r.target);
+              const tl = rtlTlStatus(r);
+              const isLate = tl !== "Close" && sisa < 0;
               return (
-                <tr key={i} className={`border-b border-gray-50 last:border-0 ${isLate ? "bg-red-50" : ""}`}>
-                  <td className="py-1.5 text-gray-500 pr-3">{r.no}</td>
+                <tr key={r.id} className={`border-b border-gray-50 last:border-0 ${isLate ? "bg-red-50" : ""}`}>
+                  <td className="py-1.5 text-gray-500 pr-3">{r.id}</td>
                   <td className="py-1.5 font-medium text-gray-700 pr-3">{r.unit}</td>
-                  <td className="py-1.5 text-gray-500 text-[10px] pr-3">{r.temuan}</td>
-                  <td className="py-1.5 text-gray-500 text-[10px] whitespace-nowrap pr-3">{r.tgl}</td>
+                  <td className="py-1.5 text-gray-500 text-[10px] pr-3 max-w-[260px]">
+                    <div className="font-semibold text-gray-600"><span className="font-mono text-gray-400">{auditOf(r.temuanId)} · {r.temuanId}</span> · {temuanDesc(r.temuanId)}</div>
+                    <div className="text-gray-400">→ {r.rencana} · PIC {r.pic}</div>
+                
+                  </td>
+                  <td className="py-1.5 text-gray-500 text-[10px] whitespace-nowrap pr-3">{r.target}</td>
                   <td className="py-1.5 pr-3 whitespace-nowrap">
-                    <span className={`text-[9px] font-bold ${sisa < 0 ? "text-red-600" : sisa <= 7 ? "text-amber-600" : "text-gray-500"}`}>
-                      {sisa < 0 ? `${Math.abs(sisa)}h lewat` : `${sisa} hari`}
+                    <span className={`text-[9px] font-bold ${tl === "Close" ? "text-gray-400" : sisa < 0 ? "text-red-600" : sisa <= 7 ? "text-amber-600" : "text-gray-500"}`}>
+                      {tl === "Close" ? "—" : sisa < 0 ? `${Math.abs(sisa)}h lewat` : `${sisa} hari`}
                     </span>
                   </td>
                   <td className="py-1.5 pr-3">
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                      effStatus === "Selesai"              ? "bg-green-50 text-green-600"   :
-                      effStatus === "Terlambat"            ? "bg-red-50 text-red-600"       :
-                      effStatus === "Menunggu Verifikasi"  ? "bg-purple-50 text-purple-600" :
-                      "bg-blue-50 text-blue-600"}`}>
-                      {effStatus}
+                    <span title={TL_STATUS_STYLE[tl].desc} className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${TL_STATUS_STYLE[tl].cls}`}>
+                      {tl}
                     </span>
+
                   </td>
                   <td className="py-1.5">
                     <div className="flex flex-col gap-1">
                       {/* Auditee: input/ganti bukti hanya saat Proses atau Terlambat */}
-                      {myUnit && (effStatus === "Proses" || effStatus === "Terlambat") && (
+                      {myUnit && tl !== "Close" && (
                         <>
-                          {buktiLinks[r.no] ? (
+                          {r.bukti ? (
                             <div className="flex items-center gap-1">
-                              <a href={buktiLinks[r.no]} target="_blank" rel="noreferrer"
+                              <a href={r.bukti} target="_blank" rel="noreferrer"
                                 className="text-[9px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 hover:opacity-80"
                                 style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>
                                 ↗ Buka Bukti
                               </a>
-                              {canEdit && <button onClick={() => setEditingBukti({ no: r.no, value: buktiLinks[r.no] })}
+                              {canEdit && <button onClick={() => setEditingBukti({ id: r.id, value: r.bukti ?? "" })}
                                 className="text-[9px] text-gray-400 hover:text-gray-600 underline">ganti</button>}
                             </div>
                           ) : canEdit ? (
-                            <button onClick={() => setEditingBukti({ no: r.no, value: "" })}
+                            <button onClick={() => setEditingBukti({ id: r.id, value: "" })}
                               className="text-[9px] font-bold px-2 py-1 rounded-lg border border-dashed whitespace-nowrap"
                               style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
                               Isi Link Bukti
@@ -3034,16 +3460,25 @@ function PwRTL({ subSection }: { subSection: string }) {
                           ) : null}
                         </>
                       )}
-                      {/* Auditee: teks info saat menunggu verifikasi */}
-                      {myUnit && effStatus === "Menunggu Verifikasi" && (
-                        <span className="text-[9px] text-purple-500 italic">Menunggu verifikasi SPI</span>
-                      )}
                       {/* Non-auditee: lihat bukti jika ada */}
-                      {!myUnit && buktiLinks[r.no] && (
-                        <a href={buktiLinks[r.no]} target="_blank" rel="noreferrer"
+                      {!myUnit && r.bukti && (
+                        <a href={r.bukti} target="_blank" rel="noreferrer"
                           className="text-[9px] text-teal-600 hover:underline flex items-center gap-0.5">
                           Lihat Bukti
                         </a>
+                      )}
+                      {!myUnit && r.link && (
+                        <a href={r.link} target="_blank" rel="noreferrer"
+                          className="text-[9px] text-teal-600 hover:underline flex items-center gap-0.5">
+                          Dokumen RTL
+                        </a>
+                      )}
+                      {/* Auditor memantau pelaksanaan RTL dengan mengubah status */}
+                      {!myUnit && canEdit && (
+                        <select value={tl} onChange={e => setTlStatusRtl(r.id, e.target.value as TlStatus)}
+                          className="text-[9px] border border-gray-200 rounded-lg px-1.5 py-1 text-gray-700 focus:outline-none focus:border-teal-400">
+                          {TL_STATUS_LIST.map(st => <option key={st} value={st}>{st}</option>)}
+                        </select>
                       )}
                     </div>
                   </td>
@@ -3053,6 +3488,7 @@ function PwRTL({ subSection }: { subSection: string }) {
           </tbody>
         </table>
         </div>
+        )}
       </div>}
 
       {/* Modal input link bukti RTL */}
@@ -3064,84 +3500,68 @@ function PwRTL({ subSection }: { subSection: string }) {
           onChange={v => setEditingBukti(p => p ? { ...p, value: v } : null)}
           onSave={() => {
             if (editingBukti.value.trim()) {
-              setBuktiLinks(prev => ({ ...prev, [editingBukti.no]: editingBukti.value.trim() }));
+              kirimBukti(editingBukti.id, editingBukti.value.trim());
             }
           }}
           onClose={() => setEditingBukti(null)}
         />
       )}
 
-      {/* Verifikasi RTL */}
-      {showVerif && <div className="flex flex-col gap-4">
-        {/* Summary strip */}
-        <div className="flex gap-3 flex-wrap">
-          {[
-            { label: "Diterima", count: verRows.filter(v => (verifResult[verRows.indexOf(v)] ?? v.hasil) === "Diterima").length, cls: "bg-green-50 text-green-700 border-green-200" },
-            { label: "Ditolak",  count: verRows.filter(v => verifResult[verRows.indexOf(v)] === "Ditolak").length,               cls: "bg-red-50 text-red-700 border-red-200"     },
-            { label: "Menunggu", count: verRows.filter(v => !verifResult[verRows.indexOf(v)] && v.hasil === "Menunggu").length,  cls: "bg-gray-100 text-gray-600 border-gray-200" },
-          ].map(s => (
-            <div key={s.label} className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-semibold ${s.cls}`}>
-              <span className="text-sm font-black">{s.count}</span><span>{s.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-          <h4 className="text-xs font-bold text-gray-700 mb-3">Verifikasi RTL{myUnit ? ` — ${myUnit}` : ""}</h4>
-          <div className="flex flex-col gap-3">
-            {verRows.map((v,i)=>{
-              const currentHasil = verifResult[i] ?? v.hasil;
-              const isMenunggu = currentHasil === "Menunggu" && !verifResult[i];
-              return (
-                <div key={i} className="border border-gray-100 rounded-xl p-4 flex flex-col md:flex-row gap-4">
-                  {/* left — temuan detail */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-gray-700">{v.unit}</span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                        currentHasil === "Diterima" ? "bg-green-50 text-green-600" :
-                        currentHasil === "Ditolak"  ? "bg-red-50 text-red-600"    :
-                        "bg-gray-100 text-gray-500"}`}>{currentHasil}</span>
-                    </div>
-                    <div className="text-[10px] font-semibold text-gray-700 mb-2">{v.temuan}</div>
-                    <div className="flex flex-wrap gap-3 text-[10px] text-gray-400">
-                      <span>Bukti: <strong className="text-gray-600">{v.bukti}</strong></span>
-                      <span>Verifikator: <strong className="text-gray-600">{v.verifikator}</strong></span>
-                      {v.tglSelesai !== "—" && <span>{v.tglSelesai}</span>}
-                    </div>
-                  </div>
-
-                  {/* right — verification actions (non-auditee, Menunggu only) */}
-                  {!myUnit && isMenunggu && (
-                    <div className="flex flex-col gap-2 flex-shrink-0 min-w-[180px]">
-                      <textarea rows={2} value={verifCatatan[i] ?? ""}
-                        onChange={e => setVerifCatatan(p => ({ ...p, [i]: e.target.value }))}
-                        placeholder="Catatan verifikasi..."
-                        className="w-full border border-gray-200 rounded-lg px-2 py-1 text-[9px] text-gray-700 focus:outline-none focus:border-teal-400 resize-none" />
-                      <div className="flex gap-2">
-                        <button onClick={() => setVerifResult(p => ({ ...p, [i]: "Diterima" }))}
-                          className="flex-1 text-[9px] font-bold py-1.5 rounded-lg text-white bg-green-500 hover:bg-green-600 transition-colors">
-                          ✓ Terima
-                        </button>
-                        <button onClick={() => setVerifResult(p => ({ ...p, [i]: "Ditolak" }))}
-                          className="flex-1 text-[9px] font-bold py-1.5 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-colors">
-                          ✗ Tolak
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {/* Hasil sudah diputuskan — tampilkan info efek ke Daftar Tindak Lanjut */}
-                  {!myUnit && !isMenunggu && (
-                    <div className="flex-shrink-0 text-[9px] text-gray-400 italic self-center">
-                      {currentHasil === "Diterima" ? "RTL otomatis Selesai" : currentHasil === "Ditolak" ? "RTL kembali ke Proses" : ""}
-                    </div>
-                  )}
+      {/* Modal edit RTL (Auditee) */}
+      {editRtl && (() => {
+        const isNew = editRtl.id === null;
+        const temuanUnit = temuanList.filter(t => t.unit === myUnit);
+        const valid = editRtl.temuanId && editRtl.rencana.trim() && editRtl.pic.trim() && editRtl.target;
+        const inp = "w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-teal-400";
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,23,42,0.45)" }} onClick={() => setEditRtl(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-bold text-gray-800">{isNew ? "Tambah RTL" : `Edit ${rtlCode(editRtl.id!)}`}</div>
+                  <div className="text-[10px] text-gray-400">{isNew ? "Status awal: Diterima (Progres bila bukti diisi). Selanjutnya diperbarui Auditor SPI." : "Status RTL diperbarui oleh Auditor SPI"}</div>
                 </div>
-              );
-            })}
+                <button onClick={() => setEditRtl(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none" aria-label="Tutup">×</button>
+              </div>
+              <div className="px-5 py-4 flex flex-col gap-3">
+                <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">Temuan</span>
+                  {isNew ? (
+                    <select value={editRtl.temuanId} onChange={e => setEditRtl({ ...editRtl, temuanId: e.target.value })} className={inp}>
+                      {temuanUnit.length === 0 && <option value="">Belum ada temuan untuk unit ini</option>}
+                      {temuanUnit.map(t => <option key={t.id} value={t.id}>{t.id} · {t.deskripsi}</option>)}
+                    </select>
+                  ) : (
+                    <div className="text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-2"><span className="font-mono text-gray-400">{editRtl.temuanId}</span> · {temuanDesc(editRtl.temuanId)}</div>
+                  )}
+                </label>
+                <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">Judul RTL</span>
+                  <textarea rows={2} value={editRtl.rencana} onChange={e => setEditRtl({ ...editRtl, rencana: e.target.value })} className={inp} /></label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">PIC</span>
+                    <input value={editRtl.pic} onChange={e => setEditRtl({ ...editRtl, pic: e.target.value })} className={inp} /></label>
+                  <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">Jatuh Tempo</span>
+                    <input type="date" value={editRtl.target} onChange={e => setEditRtl({ ...editRtl, target: e.target.value })} className={inp} /></label>
+                </div>
+                <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">Link Dokumen RTL</span>
+                  <input type="url" placeholder="https://drive.google.com/..." value={editRtl.link} onChange={e => setEditRtl({ ...editRtl, link: e.target.value })} className={inp} /></label>
+                <label className="flex flex-col gap-1"><span className="text-[10px] font-semibold text-gray-500">Link Bukti Pelaksanaan</span>
+                  <input type="url" placeholder="https://drive.google.com/..." value={editRtl.bukti} onChange={e => setEditRtl({ ...editRtl, bukti: e.target.value })} className={inp} /></label>
+              </div>
+              <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
+                <button onClick={() => setEditRtl(null)} className="text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
+                <button disabled={!valid}
+                  onClick={() => {
+                    const v = { rencana: editRtl.rencana.trim(), pic: editRtl.pic.trim(), target: tglIsoToId(editRtl.target), link: editRtl.link.trim() || null, bukti: editRtl.bukti.trim() || null };
+                    if (editRtl.id === null) tambahRtl(editRtl.temuanId, v); else updateRtl(editRtl.id, v);
+                    setEditRtl(null);
+                  }}
+                  className="text-xs font-bold px-4 py-2 rounded-lg text-white disabled:opacity-40" style={{ background: "var(--tsu-teal)" }}>{isNew ? "Tambah" : "Simpan"}</button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>}
+        );
+      })()}
+
     </div>
   );
 }
@@ -3209,62 +3629,59 @@ function PwRiwayat({ subSection }: { subSection: string }) {
           </div>
         </div>
       )}
-      {myUnit && !showBerulang && (() => {
+      {myUnit && (() => {
         const unitRiwayat = riwayat[myUnit] ?? [];
-        const totalTemuan = unitRiwayat.reduce((s,r)=>s+r.temuan,0);
-        const totalRTL    = unitRiwayat.reduce((s,r)=>s+r.rtl,0);
+        const statusCls = (st: string) => st === "Selesai" ? "bg-green-50 text-green-600" : st === "Berjalan" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-500";
         return (
           <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: "Total Audit",    val: unitRiwayat.length, color: "text-purple-600" },
-                { label: "Total Temuan",   val: totalTemuan,         color: "text-amber-600"  },
-                { label: "RTL Selesai",    val: totalRTL,            color: "text-green-600"  },
-              ].map(s => (
-                <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm text-center">
-                  <div className={`text-2xl font-black ${s.color}`}>{s.val}</div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{s.label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-              <h4 className="text-xs font-bold text-gray-700 mb-3">Daftar Audit — {myUnit}</h4>
-              <div className="flex flex-col gap-2">
-                {unitRiwayat.map((r, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${r.status==="Selesai"?"bg-green-100":r.status==="Berjalan"?"bg-amber-100":"bg-gray-100"}`}>
-                      {r.status==="Selesai"?"":r.status==="Berjalan"?"":""}
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-xs font-semibold text-gray-700">Audit {r.jenis} {r.tahun}</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">Ketua: {r.ketua}</div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className="text-xs font-bold" style={{ color: r.temuan>0?"var(--tsu-gold)":"#94a3b8" }}>{r.temuan} temuan</div>
-                      <div className="text-[9px] text-gray-400">{r.rtl} RTL</div>
-                    </div>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${r.status==="Selesai"?"bg-green-50 text-green-600":r.status==="Berjalan"?"bg-amber-50 text-amber-600":"bg-gray-100 text-gray-500"}`}>{r.status}</span>
-                  </div>
-                ))}
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <h4 className="text-xs font-bold text-gray-700">Riwayat Audit — {myUnit}</h4>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead><tr className="bg-gray-50 text-left">
+                    {["No","Tahun","Jenis Audit","Ketua Tim","Temuan","RTL","Status"].map(h => <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>)}
+                  </tr></thead>
+                  <tbody>
+                    {unitRiwayat.map((r, i) => (
+                      <tr key={i} className="border-t border-gray-50 hover:bg-gray-50">
+                        <td className="px-4 py-3 text-[10px] text-gray-400">{i + 1}</td>
+                        <td className="px-4 py-3 font-bold text-gray-700">{r.tahun}</td>
+                        <td className="px-4 py-3 text-gray-600">Audit {r.jenis}</td>
+                        <td className="px-4 py-3 text-gray-500">{r.ketua}</td>
+                        <td className="px-4 py-3 text-center font-black text-red-500">{r.temuan}</td>
+                        <td className="px-4 py-3 text-center font-black" style={{ color: "var(--tsu-teal)" }}>{r.rtl}</td>
+                        <td className="px-4 py-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusCls(r.status)}`}>{r.status}</span></td>
+                      </tr>
+                    ))}
+                    {unitRiwayat.length === 0 && <tr><td colSpan={7} className="text-center py-6 text-xs text-gray-400">Belum ada riwayat audit.</td></tr>}
+                  </tbody>
+                </table>
               </div>
             </div>
-            {unitBerulang.length > 0 && (
-              <div className="bg-white rounded-xl border border-amber-100 p-4 shadow-sm">
-                <h4 className="text-xs font-bold text-amber-700 mb-3">Temuan Berulang di Unit {myUnit}</h4>
-                <div className="flex flex-col gap-3">
-                  {unitBerulang.map((b, i) => (
-                    <div key={i} className="p-3 rounded-xl border border-amber-100 bg-amber-50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-semibold text-gray-700">{b.temuan}</span>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-auto ${b.tren==="Meningkat"?"bg-red-100 text-red-600":"bg-gray-100 text-gray-500"}`}>{b.tren}</span>
-                        <span className="text-[9px] text-gray-400">{b.frekuensi}× muncul</span>
-                      </div>
-                      <div className="text-[10px] text-gray-600 mt-1 leading-relaxed">{b.rekomendasi}</div>
-                    </div>
-                  ))}
-                </div>
+            <div className="bg-white rounded-xl border border-amber-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-3 border-b border-amber-100">
+                <h4 className="text-xs font-bold text-amber-700">Temuan Berulang — {myUnit}</h4>
               </div>
-            )}
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead><tr className="bg-amber-50/50 text-left">
+                    {["No","Temuan","Frekuensi"].map(h => <th key={h} className="px-4 py-2.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">{h}</th>)}
+                  </tr></thead>
+                  <tbody>
+                    {unitBerulang.map((b, i) => (
+                      <tr key={i} className="border-t border-gray-50 hover:bg-gray-50">
+                        <td className="px-4 py-3 text-[10px] text-gray-400">{i + 1}</td>
+                        <td className="px-4 py-3 font-semibold text-gray-700">{b.temuan}</td>
+                        <td className="px-4 py-3"><span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full whitespace-nowrap">{b.frekuensi}x muncul</span></td>
+                      </tr>
+                    ))}
+                    {unitBerulang.length === 0 && <tr><td colSpan={3} className="text-center py-6 text-xs text-gray-400">Tidak ada temuan berulang di unit {myUnit}.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         );
       })()}
@@ -3420,7 +3837,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
       )}
 
       {/* Unit selector + timeline */}
-      {!showBerulang && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+      {!showBerulang && !myUnit && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-xs font-bold text-gray-700">Riwayat Audit {myUnit ? `— ${myUnit}` : "per Unit"}</h4>
           <div className="flex gap-2">
@@ -3496,7 +3913,7 @@ function PwRiwayat({ subSection }: { subSection: string }) {
       </div>}
 
       {/* Temuan berulang */}
-      {showBerulang && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+      {showBerulang && !myUnit && <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center justify-between mb-1">
           <h4 className="text-xs font-bold text-gray-700">Temuan Berulang</h4>
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-600">Lintas Unit</span>
@@ -3589,126 +4006,286 @@ function SiklusAuditPanel({ onlyUnit }: { onlyUnit: string | null }) {
   );
 }
 
-function DeadlineReminderPanel() {
-  const events = pwEvents;
+// Agenda SPI — data periodik 1 tahun. Backend: tabel `agenda_spi` (tanggal, judul, jenis, pihak[]),
+// rapat dari Jadwal Rapat (RapatCtx) ikut digabung otomatis.
+type AgendaItem = { tgl: number; bln: number; judul: string; jenis: "rapat" | "audit" | "rtl" | "deadline"; pihak: string[]; jam?: string; tempat?: string; sumber?: "rapat" };
+const AGENDA_BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const AGENDA_AUDITOR = ["Budi Santoso", "Ratna Dewi", "Andi Prasetyo", "Siti Aisyah"];
+const AGENDA_UNIT = ["BAAK", "LPPM", "Sarpras", "BAUK", "LPM", "Fak. Teknik", "Perpustakaan", "PMB", "Marcomm", "S1-Manajemen"];
+const AGENDA_TARGET = [6, 12, 19, 23, 31, 15, 5, 11, 28, 21, 9, 7];
+const AGENDA_SEED: AgendaItem[] = (() => {
+  let seed = 7;
+  const rnd = (n: number) => { seed = (seed * 9301 + 49297) % 233280; return Math.floor((seed / 233280) * n); };
+  const daysIn = [31,28,31,30,31,30,31,31,30,31,30,31];
+  const out: AgendaItem[] = [];
+  AGENDA_TARGET.forEach((t, mi) => {
+    for (let i = 0; i < t; i++) {
+      let tgl = 1 + rnd(daysIn[mi]);
+      const dow = new Date(2025, mi, tgl).getDay();
+      if (dow === 0) tgl = Math.min(daysIn[mi], tgl + 1); else if (dow === 6) tgl = Math.max(1, tgl - 1);
+      const unit = AGENDA_UNIT[rnd(AGENDA_UNIT.length)];
+      const a1 = AGENDA_AUDITOR[rnd(4)];
+      const a2 = AGENDA_AUDITOR.filter(x => x !== a1)[rnd(3)];
+      const k = rnd(10);
+      if (k < 3) out.push({ tgl, bln: mi, jenis: "rapat", judul: ["Rapat Internal SPI", "Rapat Koordinasi Tim Audit", "Rapat Evaluasi Mingguan"][rnd(3)], pihak: ["Kepala SPI", "Anggota SPI"] });
+      else if (k < 6) out.push({ tgl, bln: mi, jenis: "audit", judul: `${["Audit", "Entry Meeting", "Exit Meeting", "Audit Lapangan"][rnd(4)]} ${unit}`, pihak: [`${a1} (Ketua Tim)`, `${a2} (Anggota)`, `Unit Kerja ${unit}`] });
+      else if (k < 8) out.push({ tgl, bln: mi, jenis: "rtl", judul: `RTL ${unit}`, pihak: [a1, `Unit Kerja ${unit}`] });
+      else out.push({ tgl, bln: mi, jenis: "deadline", judul: `Deadline ${["Laporan Audit", "Tindak Lanjut", "Dokumen Bukti"][rnd(3)]} ${unit}`, pihak: [a1, `Unit Kerja ${unit}`] });
+    }
+  });
+  return out;
+})();
+const agendaJenis: Record<AgendaItem["jenis"], { label: string; dot: string; chip: string }> = {
+  rapat:    { label: "Rapat",    dot: "bg-blue-500",   chip: "bg-blue-50 text-blue-600"     },
+  audit:    { label: "Audit",    dot: "bg-purple-500", chip: "bg-purple-50 text-purple-600" },
+  rtl:      { label: "RTL",      dot: "bg-amber-500",  chip: "bg-amber-50 text-amber-600"   },
+  deadline: { label: "Deadline", dot: "bg-red-500",    chip: "bg-red-50 text-red-600"       },
+};
+const kepadatan = (n: number) =>
+  n > 25 ? { label: "Sangat padat", cls: "bg-red-50 text-red-600 border-red-100" } :
+  n >= 8 ? { label: "Cukup padat",  cls: "bg-amber-50 text-amber-600 border-amber-100" } :
+           { label: "Tidak padat",  cls: "bg-green-50 text-green-600 border-green-100" };
 
-        const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-        const monthShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
-        const monthDays  = [31,28,31,30,31,30,31,31,30,31,30,31];
+function AgendaSPIPanel() {
+  const { rapatList } = useContext(RapatCtx);
+  const [selected, setSelected] = useState<{ bln: number; tgl: number } | null>(null);
 
-        const intStyle = (v: number) => {
-          if (!v)   return { bg:"#f8fafc", border:"#e2e8f0", text:"#cbd5e1" };
-          if (v===1) return { bg:"#d1fae5", border:"#6ee7b7", text:"#065f46" };
-          if (v===2) return { bg:"#6ee7b7", border:"#34d399", text:"#065f46" };
-          return       { bg:"#059669", border:"#047857", text:"#ffffff"  };
-        };
+  const monthShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  const monthDays  = [31,28,31,30,31,30,31,31,30,31,30,31];
 
-        const totalByMonth = monthNames.map((_, mi) => {
-          const mData = yearActivity[mi + 1] ?? {};
-          return Object.values(mData).reduce((s, v) => s + v, 0);
-        });
-        const totalYear  = totalByMonth.reduce((s, v) => s + v, 0);
-        const busiestIdx = totalByMonth.indexOf(Math.max(...totalByMonth));
-        const quietestIdx = totalByMonth.indexOf(Math.min(...totalByMonth));
+  const agenda = useMemo<AgendaItem[]>(() => {
+    const fromRapat: AgendaItem[] = rapatList.filter(r => r.status !== "Batal").flatMap(r => {
+      const [d, m, y] = r.tgl.split(" ");
+      const bln = monthShort.indexOf(m);
+      if (y !== "2025" || bln < 0) return [];
+      return [{ tgl: parseInt(d), bln, judul: r.judul, jenis: "rapat" as const, pihak: r.peserta, jam: r.jam, tempat: r.tempat, sumber: "rapat" as const }];
+    });
+    return [...AGENDA_SEED, ...fromRapat];
+  }, [rapatList]);
 
-        const auditEvts   = Object.values(events).flat().filter(e => e.type === "audit").length;
-        const rapatEvts   = Object.values(events).flat().filter(e => e.type === "rapat" || e.type === "meeting").length;
-        const dlEvts      = Object.values(events).flat().filter(e => e.type === "deadline").length;
+  const byDay = useMemo(() => {
+    const m: Record<string, AgendaItem[]> = {};
+    agenda.forEach(a => { (m[`${a.bln}-${a.tgl}`] ??= []).push(a); });
+    return m;
+  }, [agenda]);
+  const totalByMonth = AGENDA_BULAN.map((_, mi) => agenda.filter(a => a.bln === mi).length);
+  const totalYear = agenda.length;
+  const busiestIdx = totalByMonth.indexOf(Math.max(...totalByMonth));
+  const countJenis = (j: AgendaItem["jenis"]) => agenda.filter(a => a.jenis === j).length;
+  const nowMonth = 4; // demo: Mei 2025
+  const mendatang = agenda.filter(a => a.bln === nowMonth && a.tgl >= 22).length;
 
+  const intStyle = (v: number) => {
+    if (!v)    return { bg:"#f8fafc", border:"#e2e8f0", text:"#cbd5e1" };
+    if (v===1) return { bg:"#d1fae5", border:"#6ee7b7", text:"#065f46" };
+    if (v===2) return { bg:"#6ee7b7", border:"#34d399", text:"#065f46" };
+    return       { bg:"#059669", border:"#047857", text:"#ffffff"  };
+  };
+
+  const semesters = [
+    { label: "Semester I",  range: "Januari – Juni 2025",     months: [0,1,2,3,4,5]   },
+    { label: "Semester II", range: "Juli – Desember 2025",    months: [6,7,8,9,10,11] },
+  ];
+  const selItems = selected ? byDay[`${selected.bln}-${selected.tgl}`] ?? [] : [];
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Ringkasan agenda */}
+      <div className="grid grid-cols-5 gap-3">
+        {[
+          { label:"Total Agenda 2025",  value:totalYear,            cls:"bg-teal-50 border-teal-100 text-teal-700"       },
+          { label:"Rapat",              value:countJenis("rapat"),  cls:"bg-blue-50 border-blue-100 text-blue-700"       },
+          { label:"Audit",              value:countJenis("audit"),  cls:"bg-purple-50 border-purple-100 text-purple-700" },
+          { label:"RTL",                value:countJenis("rtl"),    cls:"bg-amber-50 border-amber-100 text-amber-700"    },
+          { label:"Deadline",           value:countJenis("deadline"), cls:"bg-red-50 border-red-100 text-red-700"        },
+        ].map(s => (
+          <div key={s.label} className={`rounded-xl border p-3 flex flex-col gap-1 ${s.cls}`}>
+            <div className="text-2xl font-black leading-none">{s.value}</div>
+            <div className="text-[9px] font-semibold opacity-80">{s.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white rounded-xl border border-gray-100 px-4 py-2.5 shadow-sm flex items-center justify-between text-[10px] text-gray-500">
+        <span>Bulan terpadat: <b className="text-teal-700">{AGENDA_BULAN[busiestIdx]}</b> ({totalByMonth[busiestIdx]} agenda) · Sisa agenda Mei: <b className="text-gray-700">{mendatang}</b></span>
+        <span className="text-gray-400">Rapat dari sub menu Jadwal Rapat ikut tampil otomatis</span>
+      </div>
+
+      {semesters.map(sem => {
+        const semTotal = sem.months.reduce((t, mi) => t + totalByMonth[mi], 0);
         return (
-          <div className="flex flex-col gap-4">
-            {/* Stats */}
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { label:"Total Kegiatan", value:totalYear,        icon:"", cls:"bg-teal-50 border-teal-100 text-teal-700"   },
-                { label:"Audit",          value:auditEvts * 4,   icon:"", cls:"bg-blue-50 border-blue-100 text-blue-700"   },
-                { label:"Rapat",          value:rapatEvts * 4,   icon:"", cls:"bg-purple-50 border-purple-100 text-purple-700" },
-                { label:"Deadline",       value:dlEvts * 4,      icon:"", cls:"bg-red-50 border-red-100 text-red-700"      },
-              ].map(s => (
-                <div key={s.label} className={`rounded-xl border p-3 flex flex-col gap-1 ${s.cls}`}>
-                  <div className="text-2xl font-black leading-none">{s.value}</div>
-                  <div className="text-[9px] font-semibold opacity-80">{s.label}</div>
-                </div>
-              ))}
+          <div key={sem.label} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h4 className="text-xs font-bold text-gray-700">Heatmap Agenda SPI — {sem.label}</h4>
+                <p className="text-[9px] text-gray-400 mt-0.5">{sem.range} · {semTotal} agenda · klik tanggal untuk melihat detail</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {[{ bg:"#f8fafc", label:"Kosong" },{ bg:"#d1fae5", label:"1" },{ bg:"#6ee7b7", label:"2" },{ bg:"#059669", label:"3+" }].map(l => (
+                  <div key={l.label} className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded" style={{ background:l.bg, border:"1px solid #e2e8f0" }}/>
+                    <span className="text-[8px] text-gray-400">{l.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-
-            {/* Full-year heatmap */}
-            <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="text-xs font-bold text-gray-700">Heatmap Aktivitas Pengawasan — 2025</h4>
-                  <p className="text-[9px] text-gray-400 mt-0.5">Intensitas kegiatan per hari sepanjang tahun</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {[
-                    { bg:"#f8fafc", label:"Tidak ada" },
-                    { bg:"#d1fae5", label:"Rendah"    },
-                    { bg:"#6ee7b7", label:"Sedang"    },
-                    { bg:"#059669", label:"Padat"      },
-                  ].map(l => (
-                    <div key={l.label} className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded" style={{ background:l.bg, border:"1px solid #e2e8f0" }}/>
-                      <span className="text-[8px] text-gray-400">{l.label}</span>
+            <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+              {sem.months.map(mi => {
+                const firstDow = new Date(2025, mi, 1).getDay();
+                const k = kepadatan(totalByMonth[mi]);
+                return (
+                  <div key={mi}>
+                    <div className="flex items-center justify-between mb-1 gap-1">
+                      <span className="text-[10px] font-bold text-gray-700">{AGENDA_BULAN[mi]}</span>
+                      <span className="flex items-center gap-1">
+                        <span className="text-[9px] text-gray-400">{totalByMonth[mi]} agenda</span>
+                        <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border ${k.cls}`}>{k.label}</span>
+                      </span>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-x-6 gap-y-5">
-                {monthNames.map((mName, mi) => {
-                  const dInM    = monthDays[mi];
-                  const firstDow = new Date(2025, mi, 1).getDay(); // 0=Sun
-                  const mData   = yearActivity[mi + 1] ?? {};
-                  const mTotal  = totalByMonth[mi];
-                  const isBusiest  = mi === busiestIdx;
-                  const isQuietest = mi === quietestIdx;
-                  return (
-                    <div key={mName}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className={`text-[10px] font-bold ${isBusiest ? "text-teal-700" : "text-gray-700"}`}>
-                          {monthShort[mi]}
-                          {isBusiest  && <span className="ml-1 text-[8px] text-teal-500">● Paling padat</span>}
-                          {isQuietest && <span className="ml-1 text-[8px] text-gray-400">● Paling sepi</span>}
-                        </span>
-                        <span className="text-[9px] text-gray-400">{mTotal} keg.</span>
-                      </div>
-                      <div className="grid grid-cols-7 gap-[2px] mb-[2px]">
-                        {["M","S","S","R","K","J","S"].map((d,i)=>(
-                          <div key={i} className="text-center text-[7px] font-bold text-gray-300 leading-none">{d}</div>
-                        ))}
-                      </div>
-                      <div className="grid grid-cols-7 gap-[2px]">
-                        {Array.from({length: firstDow}).map((_,i) => <div key={`p${i}`}/>)}
-                        {Array.from({length: dInM}, (_, i) => i + 1).map(d => {
-                          const v = mData[d] ?? 0;
-                          const s = intStyle(v);
-                          return (
-                            <div key={d}
-                              className="aspect-square rounded-[3px] flex items-center justify-center cursor-default transition-transform hover:scale-125"
-                              style={{ background:s.bg, border:`1px solid ${s.border}` }}
-                              title={v > 0 ? `${d} ${mName}: ${v} kegiatan` : `${d} ${mName}`}>
-                              <span className="text-[6px] font-semibold leading-none" style={{ color:s.text }}>{d}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
+                    <div className="grid grid-cols-7 gap-[2px] mb-[2px]">
+                      {["M","S","S","R","K","J","S"].map((d,i)=>(
+                        <div key={i} className="text-center text-[7px] font-bold text-gray-300 leading-none">{d}</div>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
-                <div className="text-[10px] text-gray-400">
-                  Paling padat: <span className="font-bold text-teal-700">{monthNames[busiestIdx]}</span>
-                  {" · "}Paling sepi: <span className="font-bold text-gray-600">{monthNames[quietestIdx]}</span>
-                </div>
-                <div className="text-[10px] text-gray-400">
-                  Total 2025: <span className="font-bold text-gray-700">{totalYear} kegiatan</span>
-                </div>
-              </div>
+                    <div className="grid grid-cols-7 gap-[2px]">
+                      {Array.from({length: firstDow}).map((_,i) => <div key={`p${i}`}/>)}
+                      {Array.from({length: monthDays[mi]}, (_, i) => i + 1).map(d => {
+                        const items = byDay[`${mi}-${d}`] ?? [];
+                        const s = intStyle(items.length);
+                        const isSel = selected?.bln === mi && selected?.tgl === d;
+                        return (
+                          <button key={d} type="button" onClick={() => setSelected({ bln: mi, tgl: d })}
+                            className="aspect-square rounded-[3px] flex items-center justify-center cursor-pointer transition-transform hover:scale-125"
+                            style={{ background:s.bg, border:`1px solid ${isSel ? "var(--tsu-teal)" : s.border}` }}
+                            title={items.length ? `${d} ${AGENDA_BULAN[mi]}: ${items.length} agenda` : `${d} ${AGENDA_BULAN[mi]}`}>
+                            <span className="text-[6px] font-semibold leading-none" style={{ color:s.text }}>{d}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
+      })}
+
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setSelected(null)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div>
+                <div className="text-sm font-bold text-gray-800">
+                  {["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"][new Date(2025, selected.bln, selected.tgl).getDay()]}, {selected.tgl} {AGENDA_BULAN[selected.bln]} 2025
+                </div>
+                <div className="text-[10px] text-gray-400">{selItems.length} agenda kegiatan</div>
+              </div>
+              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+            </div>
+            <div className="px-5 py-4 flex flex-col gap-2">
+              {selItems.length === 0 && <p className="text-center text-[10px] text-gray-400 py-6">Tidak ada agenda pada tanggal ini.</p>}
+              {selItems.map((a, i) => {
+                const j = agendaJenis[a.jenis];
+                return (
+                  <div key={i} className="p-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${j.dot}`} />
+                      <span className="text-xs font-semibold text-gray-700 flex-1">{a.judul}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${j.chip}`}>{j.label}</span>
+                    </div>
+                    {(a.jam || a.tempat) && <div className="text-[10px] text-gray-400 mt-1 pl-4">{a.jam} · {a.tempat} · dari Jadwal Rapat</div>}
+                    <div className="flex flex-wrap gap-1 mt-2 pl-4">
+                      {a.pihak.map(p => <span key={p} className="text-[9px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{p}</span>)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PemberitahuanJadwalPanel({ unit }: { unit: string }) {
+  const { suratKeluar } = useContext(SuratKeluarCtx);
+  const { rapatList } = useContext(RapatCtx);
+  const { rencanaList } = useContext(AuditCtx);
+  const rencana = rencanaList.filter(r => r.unit === unit);
+  const surat = suratKeluar.filter(s => /pemberitahuan/i.test(s.perihal) && s.kepada.toLowerCase().includes(unit.toLowerCase()));
+  const rapat = rapatList.filter(r => r.peserta.includes(unit) && /entry|exit|kick-off|penutupan|audit/i.test(r.judul));
+  const rapatStyle: Record<string, string> = { Terjadwal: "bg-blue-50 text-blue-600", Selesai: "bg-green-50 text-green-600", Batal: "bg-gray-100 text-gray-500" };
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="bg-white rounded-xl border border-purple-100 p-4 shadow-sm">
+        <h4 className="text-xs font-bold text-gray-700 mb-3">Rencana Audit (Program Audit) — {unit}</h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead><tr className="border-b border-gray-100">
+              {["No PA","Jenis Audit","Tim Auditor","Anggaran","Tgl Mulai","Status"].map(h => <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {rencana.map(r => (
+                <tr key={r.no} className="border-b border-gray-50 hover:bg-gray-50">
+                  <td className="py-2 pr-3 font-mono text-[10px] text-gray-500 font-bold">{r.no}</td>
+                  <td className="py-2 pr-3 text-gray-600">{r.jenis}</td>
+                  <td className="py-2 pr-3 text-gray-500">{r.tim}</td>
+                  <td className="py-2 pr-3 text-gray-600">{r.anggaran}</td>
+                  <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.tglMulai}</td>
+                  <td className="py-2"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status==="Disetujui"?"bg-green-50 text-green-600":"bg-gray-100 text-gray-500"}`}>{r.status}</span></td>
+                </tr>
+              ))}
+              {rencana.length === 0 && <tr><td colSpan={6} className="text-center py-6 text-xs text-gray-400">Belum ada rencana audit untuk unit {unit}.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl border border-purple-100 p-4 shadow-sm">
+        <h4 className="text-xs font-bold text-gray-700">Surat Pemberitahuan Audit — {unit}</h4>
+        <p className="text-[10px] text-gray-400 mb-3">Bersumber dari Surat Keluar Back Office yang ditujukan ke unit Anda.</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead><tr className="border-b border-gray-100">
+              {["No. Surat","Tanggal","Perihal","Kepada","Status","Dokumen"].map(h => <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {surat.map(s => (
+                <tr key={s.no} className="border-b border-gray-50 hover:bg-gray-50">
+                  <td className="py-2 pr-3 font-mono text-[10px] text-gray-500 whitespace-nowrap">{s.no}</td>
+                  <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{s.tgl}</td>
+                  <td className="py-2 pr-3 font-medium text-gray-700">{s.perihal}</td>
+                  <td className="py-2 pr-3 text-gray-500">{s.kepada}</td>
+                  <td className="py-2 pr-3"><span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">{s.disposisi}</span></td>
+                  <td className="py-2">{s.link
+                    ? <a href={s.link} target="_blank" rel="noopener noreferrer" className="text-[10px] font-semibold px-2 py-1 rounded border border-purple-200 text-purple-700 hover:bg-purple-50 whitespace-nowrap">Buka surat ↗</a>
+                    : <span className="text-[10px] text-gray-300">Belum ada link</span>}</td>
+                </tr>
+              ))}
+              {surat.length === 0 && <tr><td colSpan={6} className="text-center py-6 text-xs text-gray-400">Belum ada surat pemberitahuan audit untuk unit {unit}.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl border border-purple-100 p-4 shadow-sm">
+        <h4 className="text-xs font-bold text-gray-700">Jadwal Rapat Audit (Entry / Exit Meeting)</h4>
+        <p className="text-[10px] text-gray-400 mb-3">Bersumber dari Jadwal Rapat Back Office dengan unit Anda sebagai peserta.</p>
+        <div className="flex flex-col gap-2">
+          {rapat.map(r => (
+            <div key={r.id} className="flex items-start justify-between gap-3 p-3 rounded-xl border border-gray-100">
+              <div>
+                <div className="text-xs font-bold text-gray-700">{r.judul}</div>
+                <div className="text-[10px] text-gray-500 mt-0.5">{r.tgl} · {r.jam} WIB · {r.tempat}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">Peserta: {pesertaLabel(r.peserta)}</div>
+              </div>
+              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${rapatStyle[r.status] ?? "bg-gray-100 text-gray-500"}`}>{r.status}</span>
+            </div>
+          ))}
+          {rapat.length === 0 && <div className="text-center py-6 text-xs text-gray-400">Belum ada rapat audit yang ditujukan ke unit {unit}.</div>}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function PwKalender({ subSection }: { subSection: string }) {
@@ -3762,6 +4339,7 @@ function PwKalender({ subSection }: { subSection: string }) {
     ],
   };
 
+  if (myUnit && subSection === "Pemberitahuan & Jadwal") return <PemberitahuanJadwalPanel unit={myUnit} />;
   if (subSection === "Siklus Audit") return <SiklusAuditPanel onlyUnit={myUnit ?? null} />;
 
   if (myUnit) {
@@ -4041,10 +4619,7 @@ function PwKalender({ subSection }: { subSection: string }) {
 // ── Tab content ───────────────────────────────────────────────────────────────
 
 function TabPengawasan({ section, subSection }: { section: string; subSection: string }) {
-  const [laporanList, setLaporanList] = useState<LaporanItem[]>(LAPORAN_AWAL);
-  const [rencanaList, setRencanaList] = useState<RencanaItem[]>(RENCANA_AWAL);
   return (
-    <AuditCtx.Provider value={{ laporanList, setLaporanList, rencanaList, setRencanaList }}>
       <div className="flex flex-col gap-4">
         {section === "ringkasan" && <PwRingkasan />}
         {section === "risiko"    && <PwRisiko    subSection={subSection} />}
@@ -4053,7 +4628,6 @@ function TabPengawasan({ section, subSection }: { section: string; subSection: s
         {section === "riwayat"   && <PwRiwayat   subSection={subSection} />}
         {section === "kalender"  && <PwKalender  subSection={subSection} />}
       </div>
-    </AuditCtx.Provider>
   );
 }
 
@@ -4223,12 +4797,24 @@ function TambahItemModal({
   );
 }
 
+const BULAN_ID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const tglIdToIso = (t: string) => {
+  const m = t.match(/^(\d{1,2}) (\S+) (\d{4})$/);
+  if (!m) return t;
+  const b = BULAN_ID.indexOf(m[2]) + 1;
+  return b ? `${m[3]}-${String(b).padStart(2, "0")}-${m[1].padStart(2, "0")}` : t;
+};
+const tglIsoToId = (t: string) => {
+  const m = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${Number(m[3])} ${BULAN_ID[Number(m[2]) - 1]} ${m[1]}` : t;
+};
+
 type TFMField =
   | { key: string; label: string; type: "text" | "url" | "date" | "textarea"; placeholder?: string; required?: boolean }
   | { key: string; label: string; type: "select"; options: string[]; required?: boolean };
 
-function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fields: TFMField[]; onClose: () => void; onSave?: (vals: Record<string, string>) => void }) {
-  const [vals, setVals] = useState<Record<string, string>>({});
+function TambahFormModal({ title, fields, onClose, onSave, initial }: { title: string; fields: TFMField[]; onClose: () => void; onSave?: (vals: Record<string, string>) => void; initial?: Record<string, string> }) {
+  const [vals, setVals] = useState<Record<string, string>>(initial ?? {});
   const [step, setStep] = useState<"form" | "confirm" | "saved">("form");
   const hasLink = fields.some(f => f.type === "url");
   const requiredFilled = fields
@@ -4237,7 +4823,7 @@ function TambahFormModal({ title, fields, onClose, onSave }: { title: string; fi
   const set = (k: string, v: string) => setVals(p => ({ ...p, [k]: v }));
 
   function handleSimpan() {
-    if (hasLink) { setStep("confirm"); } else { onSave?.(vals); setStep("saved"); }
+    if (hasLink && (vals[fields.find(f => f.type === "url")!.key] ?? "").trim()) { setStep("confirm"); } else { onSave?.(vals); setStep("saved"); }
   }
   function handleSesuai() { onSave?.(vals); setStep("saved"); }
 
@@ -4345,7 +4931,7 @@ function SectionRingkasan() {
     { id: 4, kegiatan: "Update RTL BAUK Q1", unit: "BAUK", deadlineFull: "31 Mei 2025", relativeTime: "14 hari lagi", isOverdue: false, daysInfo: "Sisa 14 hari", tag: "RTL", prioritas: "Tinggi", deskripsi: "Unit BAUK wajib memperbarui status tindak lanjut untuk semua rekomendasi Q1 2025.", pic: "Andi Prasetyo",
       navFull: ["pengawasan","rtl","Tindak Lanjut (RTL)",undefined] as [string,string,string,undefined],
       navBO:   ["backoffice","B","PKPT",undefined] as [string,string,string,undefined] },
-    { id: 5, kegiatan: "Pengumpulan PKPT Semester II", unit: "Semua Unit", deadlineFull: "30 Jun 2025", relativeTime: "44 hari lagi", isOverdue: false, daysInfo: "Sisa 44 hari", tag: "Rencana", prioritas: "Normal", deskripsi: "Setiap unit wajib menyampaikan usulan kegiatan untuk Program Kerja Pengawasan Tahunan semester II.", pic: "Ketua SPI",
+    { id: 5, kegiatan: "Pengumpulan PKPT Semester II", unit: "Semua Unit", deadlineFull: "30 Jun 2025", relativeTime: "44 hari lagi", isOverdue: false, daysInfo: "Sisa 44 hari", tag: "Rencana", prioritas: "Normal", deskripsi: "Setiap unit wajib menyampaikan usulan kegiatan untuk Program Kerja Pengawasan Tahunan semester II.", pic: "Kepala SPI",
       navFull: ["backoffice","B","PKPT",undefined] as [string,string,string,undefined],
       navBO:   ["backoffice","B","PKPT",undefined] as [string,string,string,undefined] },
     { id: 6, kegiatan: "Penyusunan Laporan Tahunan SPI", unit: "Back Office", deadlineFull: "15 Jul 2025", relativeTime: "59 hari lagi", isOverdue: false, daysInfo: "Sisa 59 hari", tag: "Rencana", prioritas: "Normal", deskripsi: "Kompilasi dan penyusunan laporan tahunan SPI mencakup semua kegiatan audit dan administrasi 2025.", pic: "Budi Santoso",
@@ -5089,12 +5675,13 @@ function SectionRingkasan() {
   );
 }
 
-function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"status">) => void; onCancel: () => void }) {
-  const [judul,   setJudul]  = useState("");
-  const [tgl,     setTgl]    = useState("");
-  const [jam,     setJam]    = useState("");
-  const [tempat,  setTempat] = useState("");
-  const [peserta, setPeserta] = useState<string[]>(["Ketua SPI", "Tim Auditor", "Staf Back Office"]);
+function FormTambahRapat({ onSave, onCancel, initial }: { onSave: (r: Omit<Rapat,"id"|"status">) => void; onCancel: () => void; initial?: Rapat }) {
+  const isEdit = !!initial;
+  const [judul,   setJudul]  = useState(initial?.judul ?? "");
+  const [tgl,     setTgl]    = useState(initial ? tglIdToIso(initial.tgl) : "");
+  const [jam,     setJam]    = useState(initial ? initial.jam.replace(".", ":") : "");
+  const [tempat,  setTempat] = useState(initial?.tempat ?? "");
+  const [peserta, setPeserta] = useState<string[]>(initial?.peserta ?? ["Kepala SPI", "Tim Auditor", "Staf Back Office"]);
 
   function toggle(item: string) {
     setPeserta(prev =>
@@ -5113,9 +5700,9 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
 
   function handleSave() {
     if (!judul || !tgl || !jam || peserta.length === 0) return;
-    onSave({ judul, tgl, jam, tempat: tempat || "TBD", peserta });
+    onSave(isEdit ? { judul, tgl: tglIsoToId(tgl), jam: jam.replace(":", "."), tempat: tempat || "TBD", peserta } : { judul, tgl, jam, tempat: tempat || "TBD", peserta });
     setJudul(""); setTgl(""); setJam(""); setTempat("");
-    setPeserta(["Ketua SPI", "Tim Auditor", "Staf Back Office"]);
+    setPeserta(["Kepala SPI", "Tim Auditor", "Staf Back Office"]);
   }
 
   const allUnitsSelected = UNIT_KERJA_LIST.every(u => peserta.includes(u));
@@ -5124,7 +5711,7 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
   return (
     <div className="border border-teal-200 rounded-xl p-4 bg-teal-50 flex flex-col gap-4 mb-4">
       <div className="flex items-center justify-between">
-        <div className="text-xs font-bold text-teal-800">Form Tambah Rapat Baru</div>
+        <div className="text-xs font-bold text-teal-800">{isEdit ? "Edit Rapat" : "Form Tambah Rapat Baru"}</div>
         {peserta.length > 0 && (
           <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">
             {peserta.length} peserta dipilih
@@ -5208,7 +5795,7 @@ function FormTambahRapat({ onSave, onCancel }: { onSave: (r: Omit<Rapat,"id"|"st
           disabled={!judul || !tgl || !jam || peserta.length === 0}
           className="text-xs font-bold px-3 py-1.5 rounded-lg text-white disabled:opacity-40 transition-opacity"
           style={{ background:"var(--tsu-teal)" }}>
-          Simpan & Kirim Notif ke {peserta.length} Peserta
+          {isEdit ? "Simpan Perubahan" : `Simpan & Kirim Notif ke ${peserta.length} Peserta`}
         </button>
         <button onClick={onCancel}
           className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
@@ -5223,8 +5810,9 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
   const active = subSection || "Jadwal Rapat";
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
-  const { rapatList, addRapat, batalkanRapat } = useContext(RapatCtx);
+  const { rapatList, addRapat, batalkanRapat, selesaiRapat, updateRapat } = useContext(RapatCtx);
   const navigateTo = useContext(NavCtx);
+  const [editRapatId, setEditRapatId] = useState<number | null>(null);
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [suratTab, setSuratTab] = useState<"Masuk" | "Keluar">(suratTabHint ?? "Masuk");
   React.useEffect(() => { if (suratTabHint) setSuratTab(suratTabHint); }, [suratTabHint]);
@@ -5233,36 +5821,20 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
   const [arsipFilter, setArsipFilter] = useState("Semua");
   const [showRapatForm, setShowRapatForm] = useState(false);
   const [rapatDetailId, setRapatDetailId] = useState<number | null>(null);
-  const [suratPeriod, setSuratPeriod] = useState<"bulanan" | "triwulanan">("bulanan");
+  const [suratSearch, setSuratSearch] = useState("");
+  const [editSurat, setEditSurat] = useState<{ tab: "Masuk" | "Keluar"; idx: number } | null>(null);
+  const [editArsip, setEditArsip] = useState<number | null>(null);
 
-  const suratBulanan = [
-    { period: "Jan", masuk: 8,  keluar: 10 },
-    { period: "Feb", masuk: 12, keluar: 14 },
-    { period: "Mar", masuk: 10, keluar: 12 },
-    { period: "Apr", masuk: 15, keluar: 16 },
-    { period: "Mei", masuk: 22, keluar: 28 },
-  ];
-  const suratTriwulanan = [
-    { period: "Q1 2025", masuk: 30, keluar: 36 },
-    { period: "Q2 2025", masuk: 37, keluar: 44 },
-  ];
-  const suratChartData = suratPeriod === "bulanan" ? suratBulanan : suratTriwulanan;
 
   const [suratMasuk, setSuratMasuk] = useState([
     { no: "001/SPI/V/2025",  tgl: "20 Mei 2025", perihal: "Undangan Rapat Koordinasi",       dari: "Rektorat",          disposisi: "Diproses", link: null as string | null },
     { no: "005/SPI/V/2025",  tgl: "19 Mei 2025", perihal: "Permintaan Data Audit BAAK",       dari: "BAAK",              disposisi: "Selesai",  link: null as string | null },
-    { no: "009/EXT/V/2025",  tgl: "17 Mei 2025", perihal: "Laporan Hasil Pemeriksaan BPK",    dari: "BPK RI",            disposisi: "Arsip",    link: null as string | null },
+    { no: "009/EXT/V/2025",  tgl: "17 Mei 2025", perihal: "Laporan Hasil Pemeriksaan BPK",    dari: "BPK RI",            disposisi: "Selesai",  link: "https://drive.google.com/file/lhp-bpk-2025" as string | null },
     { no: "011/SPI/V/2025",  tgl: "15 Mei 2025", perihal: "Nota Dinas Evaluasi RTL",          dari: "Wakil Rektor II",   disposisi: "Diproses", link: null as string | null },
     { no: "014/SPI/IV/2025", tgl: "10 Apr 2025", perihal: "Undangan Workshop Audit Internal", dari: "BPKP Perwakilan",   disposisi: "Selesai",  link: null as string | null },
   ]);
 
-  const [suratKeluar, setSuratKeluar] = useState([
-    { no: "012/SPI/V/2025",  tgl: "19 Mei 2025", perihal: "Pemberitahuan Audit BAAK",         kepada: "Kepala BAAK",        disposisi: "Terkirim", link: null as string | null },
-    { no: "015/SPI/V/2025",  tgl: "18 Mei 2025", perihal: "Surat Tugas Audit Lapangan",        kepada: "Tim Auditor",        disposisi: "Terkirim", link: null as string | null },
-    { no: "018/SPI/V/2025",  tgl: "16 Mei 2025", perihal: "LHA Fakultas Teknik 2024",          kepada: "Dekan Fak. Teknik",  disposisi: "Diterima", link: null as string | null },
-    { no: "020/SPI/V/2025",  tgl: "14 Mei 2025", perihal: "Rekomendasi Tindak Lanjut Sarpras", kepada: "Kepala Sarpras",     disposisi: "Diterima", link: null as string | null },
-    { no: "022/SPI/IV/2025", tgl: "8 Apr 2025",  perihal: "Permohonan Data Anggaran 2025",     kepada: "Kepala Keuangan",    disposisi: "Terkirim", link: null as string | null },
-  ]);
+  const { suratKeluar, setSuratKeluar } = useContext(SuratKeluarCtx);
 
   const [arsipBase, setArsipBase] = useState([
     { nama: "LHA Fakultas Teknik 2024",      unit: "Fak. Teknik",   tahun: "2024", tipe: "LHA",    tipeIcon: "LHA",   link: "https://drive.google.com/file/lha-fak-teknik-2024" },
@@ -5274,7 +5846,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
     { nama: "RTL Audit Humas 2024",          unit: "Marcomm",       tahun: "2024", tipe: "RTL",    tipeIcon: "RTL",   link: "https://drive.google.com/file/rtl-humas-2024" },
     { nama: "Notulen Exit Meeting LPPM",     unit: "LPPM",          tahun: "2025", tipe: "Notulen",tipeIcon: "NOTU",  link: "https://drive.google.com/file/notulen-exit-lppm-2025" },
   ]);
-  const arsipDoks = arsipBase.filter(d =>
+  const arsipDoks = arsipBase.map((d, idx) => ({ ...d, idx })).filter(d =>
     (arsipFilter === "Semua" || d.tipe === arsipFilter) &&
     d.nama.toLowerCase().includes(arsipSearch.toLowerCase())
   );
@@ -5303,11 +5875,19 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
               onCancel={() => setShowRapatForm(false)}
             />
           )}
+          {editRapatId !== null && canEdit && (() => {
+            const r = rapatList.find(x => x.id === editRapatId);
+            return r ? (
+              <FormTambahRapat key={r.id} initial={r}
+                onSave={v => { updateRapat(r.id, v); setEditRapatId(null); }}
+                onCancel={() => setEditRapatId(null)} />
+            ) : null;
+          })()}
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-100">
-                  {["No", "Judul Rapat", "Tanggal", "Jam", "Tempat", "Peserta", "Status", "Aksi"].map(h => (
+                  {["No", "Judul Rapat", "Waktu", "Status", "Aksi"].map(h => (
                     <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -5316,30 +5896,27 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
                 {rapatList.map((r, idx) => (
                   <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="py-2 pr-3 text-gray-400 text-[10px]">{idx + 1}</td>
-                    <td className="py-2 pr-3 font-medium text-gray-700 max-w-[160px] truncate">{r.judul}</td>
-                    <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.tgl}</td>
-                    <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.jam}</td>
-                    <td className="py-2 pr-3 text-gray-500 max-w-[110px] truncate whitespace-nowrap">{r.tempat || "—"}</td>
-                    <td className="py-2 pr-3 text-gray-500 max-w-[120px] truncate">{pesertaLabel(r.peserta)}</td>
+                    <td className="py-2 pr-3 font-medium text-gray-700 max-w-[260px] truncate">{r.judul}</td>
+                    <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{r.tgl} <span className="text-gray-400">· {r.jam}</span></td>
                     <td className="py-2 pr-3">
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusBadge(r.status)}`}>{r.status}</span>
                     </td>
                     <td className="py-2">
                       <div className="flex items-center gap-1">
                         {/* Detail / Info */}
-                        <button title="Detail" onClick={() => setRapatDetailId(r.id)}
+                        <button title="Lihat Detail" onClick={() => setRapatDetailId(r.id)}
                           className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-500 transition-colors">
-                          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="currentColor"><circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none"/><path d="M8 7v5M8 5.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
                         </button>
                         {/* Edit */}
                         {canEdit && (
-                          <button title="Edit" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                          <button title="Edit" onClick={() => { setShowRapatForm(false); setEditRapatId(r.id); }} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
                             <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
                           </button>
                         )}
                         {/* Selesai */}
                         {canEdit && r.status === "Terjadwal" && (
-                          <button title="Tandai Selesai" className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-400 hover:text-green-600 transition-colors">
+                          <button title="Tandai Selesai" onClick={() => setPendingDelete({ msg: `Tandai rapat "${r.judul}" sebagai selesai?`, confirmLabel: "Ya, Selesai", fn: () => selesaiRapat(r.id) })} className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-400 hover:text-green-600 transition-colors">
                             <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
                           </button>
                         )}
@@ -5358,7 +5935,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
             </table>
           </div>
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <button onClick={() => navigateTo("pengawasan", "kalender", "Siklus Audit")}
+            <button onClick={() => navigateTo("backoffice", "F", "Agenda SPI")}
               className="w-full text-[10px] font-semibold py-2 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors flex items-center justify-center gap-1.5">
               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 2v2M11 2v2M2 7h12"/></svg>
               Lihat Kalender
@@ -5415,52 +5992,6 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
       {/* Surat Masuk & Keluar */}
       {active === "Surat Masuk & Keluar" && (
         <div className="flex flex-col gap-4">
-          {/* Chart tren — same layout as Ringkasan Administrasi card */}
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h4 className="text-xs font-bold text-gray-700">Tren Aktivitas Surat</h4>
-                <p className="text-[10px] text-gray-400">Surat masuk & keluar per periode</p>
-              </div>
-              <div className="flex rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                {(["bulanan","triwulanan"] as const).map(p => (
-                  <button key={p} onClick={() => setSuratPeriod(p)}
-                    className="text-[9px] font-semibold px-2 py-1 transition-colors"
-                    style={suratPeriod === p
-                      ? { background: "var(--tsu-teal)", color: "#fff" }
-                      : { background: "#fff", color: "#94a3b8" }}>
-                    {p === "bulanan" ? "Bulanan" : "Triwulan"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={130}>
-              <LineChart data={suratChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="period" tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} width={28} />
-                <Tooltip
-                  contentStyle={{ fontSize: 9, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}
-                  itemStyle={{ padding: "1px 0" }}
-                  formatter={(v: unknown, name: unknown) => [`${v}`, name === "masuk" ? "Surat Masuk" : "Surat Keluar"] as [string, string]}
-                  labelStyle={{ fontWeight: 700, marginBottom: 4, color: "#374151" }}
-                />
-                <Line type="monotone" dataKey="masuk"  stroke="#0e8080" strokeWidth={2} dot={{ r: 3, fill: "#0e8080" }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="keluar" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3, fill: "#3b82f6" }} activeDot={{ r: 5 }} />
-              </LineChart>
-            </ResponsiveContainer>
-            <div className="flex items-center gap-4 mt-1 justify-center">
-              {[
-                { label: "Surat Masuk",  color: "#0e8080" },
-                { label: "Surat Keluar", color: "#3b82f6" },
-              ].map(l => (
-                <span key={l.label} className="flex items-center gap-1.5 text-[9px] text-gray-400">
-                  <span className="w-4 h-0.5 rounded-full inline-block" style={{ background: l.color }} />
-                  {l.label}
-                </span>
-              ))}
-            </div>
-          </div>
           {/* Tabel surat */}
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
@@ -5473,6 +6004,9 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
                   </button>
                 ))}
               </div>
+              <input value={suratSearch} onChange={e => setSuratSearch(e.target.value)}
+                placeholder={`Cari no. surat, perihal, ${suratTab === "Masuk" ? "pengirim" : "tujuan"}...`}
+                className="flex-1 min-w-0 mx-3 border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-teal-400" />
               {canEdit && <button onClick={() => setTambahModal(suratTab === "Masuk" ? "Surat Masuk" : "Surat Keluar")} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>
                 + {suratTab === "Masuk" ? "Tambah Surat Masuk" : "Tambah Surat Keluar"}
               </button>}
@@ -5481,14 +6015,20 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {["No. Surat", "Tanggal", "Perihal", suratTab === "Masuk" ? "Dari" : "Kepada", "Status", "Aksi"].map(h => (
+                    {["No. Surat", "Tanggal", "Perihal", suratTab === "Masuk" ? "Dari" : "Kepada", "Status", "Arsip", "Aksi"].map(h => (
                       <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {(suratTab === "Masuk" ? suratMasuk : suratKeluar).map((s, i) => (
-                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                  {(suratTab === "Masuk" ? suratMasuk : suratKeluar)
+                    .map((s, i) => ({ s, i }))
+                    .filter(({ s }) => {
+                      const q = suratSearch.trim().toLowerCase();
+                      return !q || [s.no, s.tgl, s.perihal, "dari" in s ? s.dari : s.kepada].some(v => v.toLowerCase().includes(q));
+                    })
+                    .map(({ s, i }) => (
+                    <tr key={s.no + i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                       <td className="py-2 pr-3 text-[10px] font-mono text-gray-500 whitespace-nowrap">{s.no}</td>
                       <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{s.tgl}</td>
                       <td className="py-2 pr-3 text-gray-700 max-w-[180px] truncate">{s.perihal}</td>
@@ -5496,48 +6036,40 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
                       <td className="py-2 pr-3">
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                           s.disposisi === "Selesai" || s.disposisi === "Diterima" ? "bg-green-50 text-green-600" :
-                          s.disposisi === "Arsip"   ? "bg-yellow-50 text-yellow-600" :
                           s.disposisi === "Diproses" || s.disposisi === "Terkirim" ? "bg-blue-50 text-blue-600" :
                           "bg-gray-100 text-gray-500"}`}>{s.disposisi}</span>
+                      </td>
+                      <td className="py-2 pr-3 whitespace-nowrap">
+                        {s.link
+                          ? <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">Sudah Terarsip</span>
+                          : <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">Belum Terarsip</span>}
                       </td>
                       <td className="py-2">
                         <div className="flex items-center gap-1">
                           {/* Edit */}
                           {canEdit && (
-                            <button title="Edit" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                            <button title="Edit" onClick={() => setEditSurat({ tab: suratTab, idx: i })} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
                               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
                             </button>
                           )}
-                          {/* Status buttons — Masuk */}
-                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Diproses" && (
+                          {/* Status buttons — Masuk (Selesai bersifat final) */}
+                          {suratTab === "Masuk" && canEdit && s.disposisi === "Diterima" && (
                             <button title="Tandai Diproses" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Diproses"} : x))}
                               className="w-7 h-7 flex items-center justify-center rounded-lg border border-blue-100 hover:bg-blue-50 text-blue-300 hover:text-blue-500 transition-colors">
                               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M13 8A5 5 0 1 1 8 3M13 3v4h-4"/></svg>
                             </button>
                           )}
-                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Selesai" && (
+                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Selesai" && s.disposisi !== "Diterima" && (
                             <button title="Tandai Selesai" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Selesai"} : x))}
                               className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-300 hover:text-green-600 transition-colors">
                               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
                             </button>
                           )}
-                          {suratTab === "Masuk" && canEdit && s.disposisi !== "Arsip" && (
-                            <button title="Pindah ke Arsip" onClick={() => setSuratMasuk(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Arsip"} : x))}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-yellow-100 hover:bg-yellow-50 text-yellow-400 hover:text-yellow-600 transition-colors">
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M1 5h14M6 5V3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V5"/><path d="M6 9h4"/></svg>
-                            </button>
-                          )}
                           {/* Status buttons — Keluar */}
-                          {suratTab === "Keluar" && canEdit && s.disposisi !== "Diterima" && (
+                          {suratTab === "Keluar" && canEdit && s.disposisi === "Terkirim" && (
                             <button title="Tandai Diterima" onClick={() => setSuratKeluar(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Diterima"} : x))}
                               className="w-7 h-7 flex items-center justify-center rounded-lg border border-green-100 hover:bg-green-50 text-green-300 hover:text-green-600 transition-colors">
                               <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2.5,8.5 6.5,12.5 13.5,4"/></svg>
-                            </button>
-                          )}
-                          {suratTab === "Keluar" && canEdit && s.disposisi !== "Arsip" && (
-                            <button title="Pindah ke Arsip" onClick={() => setSuratKeluar(prev => prev.map((x,j) => j===i ? {...x, disposisi:"Arsip"} : x))}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg border border-yellow-100 hover:bg-yellow-50 text-yellow-400 hover:text-yellow-600 transition-colors">
-                              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="12" height="9" rx="1"/><path d="M1 5h14M6 5V3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V5"/><path d="M6 9h4"/></svg>
                             </button>
                           )}
                           {/* Link softfile */}
@@ -5583,8 +6115,8 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
             </select>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {arsipDoks.map((d, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+            {arsipDoks.map(d => (
+              <div key={d.idx} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${d.tipe === "LHA" ? "bg-teal-50 text-teal-600" : d.tipe === "KKA" ? "bg-purple-50 text-purple-600" : d.tipe === "RTL" ? "bg-amber-50 text-amber-600" : "bg-blue-50 text-blue-600"}`}>
                   
                 </div>
@@ -5601,7 +6133,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
                     style={{ borderColor: "var(--tsu-teal)", color: "var(--tsu-teal)" }}>
                     ↗ Buka
                   </a>
-                  {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-amber-200 hover:bg-amber-50 text-amber-600">Edit</button>}
+                  {canEdit && <button onClick={() => setEditArsip(d.idx)} className="text-[9px] px-2 py-1 rounded border border-amber-200 hover:bg-amber-50 text-amber-600">Edit</button>}
                   {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus arsip "${d.nama}"?`, fn: () => setArsipBase(prev => prev.filter(a => a.nama !== d.nama)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
                 </div>
               </div>
@@ -5617,7 +6149,7 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
           { key:"dari",    label:"Dari (Pengirim)",       type:"text" },
           { key:"link",    label:"Link Scan Surat (Google Drive)", type:"url", required:false },
         ]}
-        onSave={(v) => setSuratMasuk(prev => [{ no: v.no || "-", tgl: v.tgl || "-", perihal: v.perihal || "-", dari: v.dari || "-", disposisi: "Diterima", link: v.link || null }, ...prev])}
+        onSave={(v) => setSuratMasuk(prev => [{ no: v.no || "-", tgl: v.tgl ? tglIsoToId(v.tgl) : "-", perihal: v.perihal || "-", dari: v.dari || "-", disposisi: "Diterima", link: v.link || null }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Surat Keluar" && (
@@ -5628,9 +6160,49 @@ function SectionA({ subSection, suratTabHint }: { subSection: string; suratTabHi
           { key:"kepada",    label:"Kepada (Tujuan)",       type:"text" },
           { key:"link",      label:"Link Draft Surat (Google Drive)", type:"url", required:false },
         ]}
-        onSave={(v) => setSuratKeluar(prev => [{ no: v.no || "-", tgl: v.tgl || "-", perihal: v.perihal || "-", kepada: v.kepada || "-", disposisi: "Terkirim", link: v.link || null }, ...prev])}
+        onSave={(v) => setSuratKeluar(prev => [{ no: v.no || "-", tgl: v.tgl ? tglIsoToId(v.tgl) : "-", perihal: v.perihal || "-", kepada: v.kepada || "-", disposisi: "Terkirim", link: v.link || null }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
+      {editSurat && (() => {
+        const masuk = editSurat.tab === "Masuk";
+        const s = masuk ? suratMasuk[editSurat.idx] : suratKeluar[editSurat.idx];
+        if (!s) return null;
+        const pihak = "dari" in s ? s.dari : s.kepada;
+        return (
+          <TambahFormModal key={`${editSurat.tab}-${editSurat.idx}`} title={`Edit Surat ${editSurat.tab}`}
+            initial={{ no: s.no, tgl: tglIdToIso(s.tgl), perihal: s.perihal, pihak, disposisi: s.disposisi, link: s.link ?? "" }}
+            fields={[
+              { key:"no",        label:"No Surat", type:"text" },
+              { key:"tgl",       label:"Tanggal",  type:"date" },
+              { key:"perihal",   label:"Perihal",  type:"text" },
+              { key:"pihak",     label: masuk ? "Dari (Pengirim)" : "Kepada (Tujuan)", type:"text" },
+              { key:"disposisi", label:"Status",   type:"select", options: masuk ? ["Diterima","Diproses","Selesai"] : ["Terkirim","Diterima"] },
+              { key:"link",      label: masuk ? "Link Scan Surat (Google Drive)" : "Link Draft Surat (Google Drive)", type:"url", required:false },
+            ]}
+            onSave={v => {
+              const base = { no: v.no || "-", tgl: v.tgl ? tglIsoToId(v.tgl) : "-", perihal: v.perihal || "-", disposisi: v.disposisi || s.disposisi, link: v.link?.trim() || null };
+              if (masuk) setSuratMasuk(prev => prev.map((x, j) => j === editSurat.idx ? { ...x, ...base, dari: v.pihak || "-" } : x));
+              else setSuratKeluar(prev => prev.map((x, j) => j === editSurat.idx ? { ...x, ...base, kepada: v.pihak || "-" } : x));
+            }}
+            onClose={() => setEditSurat(null)} />
+        );
+      })()}
+      {editArsip !== null && arsipBase[editArsip] && (() => {
+        const d = arsipBase[editArsip];
+        return (
+          <TambahFormModal key={editArsip} title="Edit Dokumen Arsip"
+            initial={{ nama: d.nama, unit: d.unit, tahun: d.tahun, tipe: d.tipe, link: d.link }}
+            fields={[
+              { key:"nama",  label:"Nama Dokumen", type:"text" },
+              { key:"unit",  label:"Unit Kerja",   type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","BPU","D3-DKV","D3-DPT","D3-SI","D3-TI","Fak. Sains & Hum.","Fak. Teknik","Fak. Vokasi","KUI","LPM","LPPM","Perpustakaan","PMB","S1-Informatika","S1-Manajemen","S1-PGSD","S1-Psikologi","S1-ReKom","S1-Sistem Informasi","Marcomm","PIKD","SPI"] },
+              { key:"tahun", label:"Tahun",        type:"select", options:["2025","2024","2023","2022"] },
+              { key:"tipe",  label:"Tipe Dokumen", type:"select", options:["LHA","KKA","RTL","Notulen"] },
+              { key:"link",  label:"Link Dokumen (Google Drive)", type:"url" },
+            ]}
+            onSave={v => setArsipBase(prev => prev.map((x, j) => j === editArsip ? { ...x, nama: v.nama || x.nama, unit: v.unit || x.unit, tahun: v.tahun || x.tahun, tipe: v.tipe || x.tipe, tipeIcon: v.tipe || x.tipe, link: v.link?.trim() || x.link } : x))}
+            onClose={() => setEditArsip(null)} />
+        );
+      })()}
       {tambahModal === "Tambah Dokumen Arsip" && (
         <TambahFormModal title="Tambah Dokumen Arsip" fields={[
           { key:"nama",  label:"Nama Dokumen",            type:"text" },
@@ -5659,7 +6231,15 @@ function SectionB({ subSection }: { subSection: string }) {
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
   const [tambahModal, setTambahModal] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ msg: string; confirmLabel?: string; fn: () => void } | null>(null);
+  const [editUniverse, setEditUniverse] = useState<number | null>(null);
+  const [editPkpt, setEditPkpt] = useState<number | null>(null);
+  const [detailPkpt, setDetailPkpt] = useState<number | null>(null);
+  // Program PKPT diteruskan ke Rencana Audit (status Draft); validasi & persetujuan dilakukan di Rencana Audit.
+  const [ajukanPkpt, setAjukanPkpt] = useState<number | null>(null);
+  const { rencanaList, setRencanaList } = useContext(AuditCtx);
+  const notify = useContext(NotifyCtx);
+  const [editRiskId, setEditRiskId] = useState<string | null>(null);
   const levelBadge = (l: string) =>
     l === "Tinggi" ? "bg-red-50 text-red-600" : l === "Sedang" ? "bg-amber-50 text-amber-600" : "bg-green-50 text-green-600";
 
@@ -5852,8 +6432,8 @@ function SectionB({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${levelBadge(u.risiko)}`}>{u.risiko}</span></td>
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${u.status === "Aktif" ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"}`}>{u.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus unit "${u.unit}" dari Audit Universe?`, fn: () => setUniverseData(prev => prev.filter(x => x.no !== u.no)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
+                        {canEdit && <button title="Edit" onClick={() => setEditUniverse(u.no)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
+                        {canEdit && u.status === "Aktif" && <button title="Nonaktifkan" onClick={() => setPendingDelete({ msg: `Nonaktifkan unit "${u.unit}" dari Audit Universe?`, confirmLabel: "Ya, Nonaktifkan", fn: () => setUniverseData(prev => prev.map(x => x.no === u.no ? { ...x, status: "Tidak Aktif" } : x)) })} className="w-7 h-7 flex items-center justify-center rounded-lg border border-red-100 text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><line x1="3.8" y1="3.8" x2="12.2" y2="12.2"/></svg></button>}
                       </div></td>
                     </tr>
                   ))}
@@ -5900,8 +6480,13 @@ function SectionB({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3 text-gray-700 font-semibold">{p.anggaran.toFixed(1)}</td>
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${p.status === "Selesai" ? "bg-green-50 text-green-600" : p.status === "Berjalan" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"}`}>{p.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
+                        <button title="Lihat Detail" onClick={() => setDetailPkpt(p.no)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-blue-50 hover:border-blue-200 hover:text-blue-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg></button>
+                        {(() => {
+                          const ra = rencanaList.find(r => r.pkptNo === p.no);
+                          if (ra) return <span title="Sudah diteruskan ke Rencana Audit" className="h-7 px-2 flex items-center rounded-lg bg-teal-50 text-teal-700 text-[9px] font-bold whitespace-nowrap">{ra.no} · {ra.status}</span>;
+                          return canEdit ? <button title="Teruskan ke Rencana Audit" onClick={() => setAjukanPkpt(p.no)} className="h-7 px-2 flex items-center rounded-lg border border-teal-200 text-teal-700 text-[9px] font-bold whitespace-nowrap transition-colors hover:bg-teal-50">→ Rencana Audit</button> : null;
+                        })()}
+                        {canEdit && <button title="Edit" onClick={() => setEditPkpt(p.no)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
                       </div></td>
                     </tr>
                   ))}
@@ -5981,12 +6566,6 @@ function SectionB({ subSection }: { subSection: string }) {
                     {f.opts.map(o => <option key={o}>{o === "Semua" ? `${f.label}: Semua` : o}</option>)}
                   </select>
                 ))}
-                {(rrSearch || rrFilterUnit !== "Semua" || rrFilterKat !== "Semua" || rrFilterLevel !== "Semua" || rrFilterStatus !== "Semua" || rrFilterPIC !== "Semua" || rrFilterPeriode !== "Semua") && (
-                  <button onClick={() => { setRrSearch(""); setRrFilterUnit("Semua"); setRrFilterKat("Semua"); setRrFilterLevel("Semua"); setRrFilterStatus("Semua"); setRrFilterPIC("Semua"); setRrFilterPeriode("Semua"); }}
-                    className="text-[10px] font-semibold px-2 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 whitespace-nowrap">
-                    ✕ Reset
-                  </button>
-                )}
                 <div className="ml-auto flex-shrink-0">
                   {canEdit && (
                     <button onClick={() => setTambahModal("Tambah Risiko")}
@@ -6005,14 +6584,14 @@ function SectionB({ subSection }: { subSection: string }) {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
-                      {["ID Risiko","Unit/Bagian","Uraian Risiko","Kategori","Skor Awal","Level","Pengendalian","Skor Residual","PIC","Target","Status","Aksi"].map(h => (
+                      {["ID Risiko","Uraian Risiko","Risiko Awal","Residual","Status","Aksi"].map(h => (
                         <th key={h} className="text-left text-[10px] font-bold text-gray-400 px-3 py-2.5 whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.length === 0 && (
-                      <tr><td colSpan={12} className="px-4 py-8 text-center text-[10px] text-gray-400">Tidak ada risiko yang cocok dengan filter.</td></tr>
+                      <tr><td colSpan={6} className="px-4 py-8 text-center text-[10px] text-gray-400">Tidak ada risiko yang cocok dengan filter.</td></tr>
                     )}
                     {filtered.map(r => {
                       const skor    = r.kemungkinan * r.dampak;
@@ -6024,33 +6603,22 @@ function SectionB({ subSection }: { subSection: string }) {
                       return (
                         <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                           <td className="px-3 py-2.5 font-mono text-[10px] text-gray-500 whitespace-nowrap">{r.id}</td>
-                          <td className="px-3 py-2.5 text-gray-600 whitespace-nowrap text-[10px]">{r.unit}</td>
-                          <td className="px-3 py-2.5 text-gray-700 max-w-[180px]">
-                            <div className="flex items-start gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1" style={{ background: lc.dot }} />
-                              <span className="truncate" title={r.uraian}>{r.uraian}</span>
+                          <td className="px-3 py-2.5 text-gray-700 max-w-[260px]">
+                            <div className="truncate font-medium" title={r.uraian}>{r.uraian}</div>
+                            <div className="text-[9px] text-gray-400 mt-0.5">{r.unit} · {r.kategori}</div>
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-black" style={{ color: lc.dot }}>{skor}</span>
+                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lc.bg} ${lc.text}`}>{level}</span>
                             </div>
                           </td>
                           <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="text-[9px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{r.kategori}</span>
-                          </td>
-                          <td className="px-3 py-2.5 text-center">
-                            <span className="text-xs font-black" style={{ color: lc.dot }}>{skor}</span>
-                            <div className="text-[8px] text-gray-400">{r.kemungkinan}×{r.dampak}</div>
-                          </td>
-                          <td className="px-3 py-2.5">
-                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lc.bg} ${lc.text}`}>{level}</span>
-                          </td>
-                          <td className="px-3 py-2.5 text-gray-500 max-w-[140px] truncate text-[10px]" title={r.pengendalian}>{r.pengendalian}</td>
-                          <td className="px-3 py-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1">
+                            <div className="flex items-center gap-1.5">
                               <span className="text-xs font-black" style={{ color: lcRes.dot }}>{skorRes}</span>
-                              <span className={`text-[8px] font-bold px-1 py-0.5 rounded ${lcRes.bg} ${lcRes.text}`}>{levelRes}</span>
+                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lcRes.bg} ${lcRes.text}`}>{levelRes}</span>
                             </div>
-                            <div className="text-[8px] text-gray-400">{r.kemungkinanResidual}×{r.dampakResidual}</div>
                           </td>
-                          <td className="px-3 py-2.5 text-gray-600 whitespace-nowrap text-[10px]">{r.pic.split(" ")[0]}</td>
-                          <td className="px-3 py-2.5 text-gray-500 whitespace-nowrap text-[10px]">{r.target}</td>
                           <td className="px-3 py-2.5">
                             <div className="flex flex-col gap-0.5">
                               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full inline-block ${statusColor(r.status)}`}>{r.status}</span>
@@ -6066,11 +6634,11 @@ function SectionB({ subSection }: { subSection: string }) {
                               {/* Detail */}
                               <button title="Lihat Detail" onClick={() => setRrDetailId(r.id)}
                                 className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-200 text-gray-400 hover:text-blue-500 transition-colors">
-                                <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5"/></svg>
+                                <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
                               </button>
                               {/* Edit */}
                               {canEdit && (
-                                <button title="Edit Risiko" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
+                                <button title="Edit Risiko" onClick={() => setEditRiskId(r.id)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 hover:bg-amber-50 hover:border-amber-200 text-gray-400 hover:text-amber-500 transition-colors">
                                   <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg>
                                 </button>
                               )}
@@ -6248,6 +6816,142 @@ function SectionB({ subSection }: { subSection: string }) {
           </div>
         );
       })()}
+      {editUniverse !== null && (() => {
+        const u = universeData.find(x => x.no === editUniverse);
+        if (!u) return null;
+        return (
+          <TambahFormModal key={u.no} title="Edit Unit Audit Universe"
+            initial={{ unit: u.unit, kategori: u.kategori, terakhir: u.terakhir, frekuensi: u.frekuensi, risiko: u.risiko, status: u.status }}
+            fields={[
+              { key:"unit",      label:"Nama Unit Kerja",   type:"text" },
+              { key:"kategori",  label:"Kategori",          type:"select", options:["Layanan Akademik","Penelitian","Infrastruktur","Keuangan","Promosi","Akademik","Layanan Mhs"] },
+              { key:"terakhir",  label:"Terakhir Diaudit",  type:"text", placeholder:"Mei 2025", required:false },
+              { key:"frekuensi", label:"Frekuensi Audit",   type:"select", options:["Tahunan","Semesteran","2 Tahunan"] },
+              { key:"risiko",    label:"Tingkat Risiko",    type:"select", options:["Tinggi","Sedang","Rendah"] },
+              { key:"status",    label:"Status",            type:"select", options:["Aktif","Tidak Aktif"] },
+            ]}
+            onSave={v => setUniverseData(prev => prev.map(x => x.no === u.no ? { ...x, unit: v.unit || x.unit, kategori: v.kategori || x.kategori, terakhir: v.terakhir || "-", frekuensi: v.frekuensi || x.frekuensi, risiko: v.risiko || x.risiko, status: v.status || x.status } : x))}
+            onClose={() => setEditUniverse(null)} />
+        );
+      })()}
+      {ajukanPkpt !== null && (() => {
+        const p = pkptData.find(x => x.no === ajukanPkpt);
+        if (!p) return null;
+        return (
+          <TambahFormModal key={p.no} title="Teruskan PKPT ke Rencana Audit"
+            initial={{ unit: p.unit, periode: p.periode, ketua: p.ketua, anggaran: `Rp ${(p.anggaran * 1_000_000).toLocaleString("id-ID")}` }}
+            fields={[
+              { key:"unit",     label:"Unit Kerja",        type:"select", options:UNIT_KERJA_LIST },
+              { key:"jenis",    label:"Jenis Audit",       type:"select", options:["Kinerja","Kepatuhan","Keuangan","Investigatif"] },
+              { key:"periode",  label:"Periode Rencana",   type:"text" },
+              { key:"ketua",    label:"Ketua Tim Auditor", type:"text" },
+              { key:"anggaran", label:"Anggaran (Rp)",     type:"text" },
+            ]}
+            onSave={v => {
+              const no = `PA-${String(rencanaList.length + 1).padStart(3,"0")}`;
+              setRencanaList(prev => [{ no, unit: v.unit || p.unit, jenis: v.jenis || "-", tim: v.ketua || p.ketua, anggaran: v.anggaran || "-", tglMulai: v.periode || p.periode, status: "Draft", pkptNo: p.no }, ...prev]);
+              notify({ title: `Rencana Audit ${no} dari PKPT`, body: `${p.program} (${v.unit || p.unit}) menunggu persetujuan di Rencana Audit.`, tag: "Audit", roles: ["full", "pengawasan"] });
+            }}
+            onClose={() => setAjukanPkpt(null)} />
+        );
+      })()}
+      {editPkpt !== null && (() => {
+        const p = pkptData.find(x => x.no === editPkpt);
+        if (!p) return null;
+        return (
+          <TambahFormModal key={p.no} title="Edit Program Audit"
+            initial={{ program: p.program, unit: p.unit, periode: p.periode, ketua: p.ketua, anggaran: String(p.anggaran), status: p.status }}
+            fields={[
+              { key:"program",  label:"Nama Program Audit", type:"text" },
+              { key:"unit",     label:"Unit Kerja",          type:"select", options:UNIT_KERJA_LIST },
+              { key:"periode",  label:"Periode",             type:"text", placeholder:"Q1 2025" },
+              { key:"ketua",    label:"Ketua Tim Auditor",   type:"text" },
+              { key:"anggaran", label:"Anggaran (Rp Jt)",    type:"text", placeholder:"0.0" },
+              { key:"status",   label:"Status",              type:"select", options:["Direncanakan","Berjalan","Selesai"] },
+            ]}
+            onSave={v => setPkptData(prev => prev.map(x => x.no === p.no ? { ...x, program: v.program || x.program, unit: v.unit || x.unit, periode: v.periode || x.periode, ketua: v.ketua || x.ketua, anggaran: parseFloat(v.anggaran) || 0, status: v.status || x.status } : x))}
+            onClose={() => setEditPkpt(null)} />
+        );
+      })()}
+      {detailPkpt !== null && (() => {
+        const p = pkptData.find(x => x.no === detailPkpt);
+        if (!p) return null;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setDetailPkpt(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="text-sm font-bold text-gray-800">Detail Program Audit</div>
+                <button onClick={() => setDetailPkpt(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+              </div>
+              <div className="p-5 flex flex-col gap-3">
+                <div className="text-sm font-bold text-gray-800 leading-snug">{p.program}</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[["Unit Sasaran", p.unit], ["Periode", p.periode], ["Auditor Ketua", p.ketua], ["Anggaran", `Rp ${p.anggaran.toFixed(1)} Jt`]].map(([k, v]) => (
+                    <div key={k} className="rounded-xl p-3 bg-gray-50 border border-gray-100">
+                      <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">{k}</div>
+                      <div className="text-xs font-semibold text-gray-700">{v}</div>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Status</div>
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${p.status === "Selesai" ? "bg-green-50 text-green-600" : p.status === "Berjalan" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"}`}>{p.status}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      {editRiskId !== null && (() => {
+        const r = riskData.find(x => x.id === editRiskId);
+        if (!r) return null;
+        const skala = (v: string, d: number) => Math.min(5, Math.max(1, parseInt(v) || d));
+        return (
+          <TambahFormModal key={r.id} title={`Edit Risiko ${r.id}`}
+            initial={{
+              unit: r.unit, uraian: r.uraian, kategori: r.kategori, penyebab: r.penyebab, dampakDesc: r.dampakDesc,
+              kemungkinan: String(r.kemungkinan), dampak: String(r.dampak),
+              pengendalian: r.pengendalian, efektivitas: r.efektivitas,
+              kemungkinanResidual: String(r.kemungkinanResidual), dampakResidual: String(r.dampakResidual),
+              rencanamitigasi: r.rencanamitigasi, pic: r.pic, target: r.target, periode: r.periode,
+              status: r.status, progress: String(r.progress), catatanSPI: r.catatanSPI, buktiPengendalian: r.buktiPengendalian ?? "",
+            }}
+            fields={[
+              { key:"unit",                label:"Unit / Bagian",              type:"select", options:["BAAK","BAKPU","BAUK","Sarpras","SDM","LPPM","LPM","Marcomm","Fak. Teknik","Fak. Sains & Hum.","Fak. Vokasi","SPI","TI/Sistem"] },
+              { key:"uraian",              label:"Uraian Risiko",              type:"textarea" },
+              { key:"kategori",            label:"Kategori",                   type:"select", options:["Keuangan","Aset","Kepatuhan","Operasional","Teknologi"] },
+              { key:"penyebab",            label:"Penyebab",                   type:"textarea", required:false },
+              { key:"dampakDesc",          label:"Uraian Dampak",              type:"textarea", required:false },
+              { key:"kemungkinan",         label:"Kemungkinan Awal (1–5)",     type:"select", options:["1","2","3","4","5"] },
+              { key:"dampak",              label:"Dampak Awal (1–5)",          type:"select", options:["1","2","3","4","5"] },
+              { key:"pengendalian",        label:"Pengendalian yang Ada",      type:"textarea", required:false },
+              { key:"efektivitas",         label:"Efektivitas Pengendalian",   type:"select", options:["Efektif","Cukup","Kurang"] },
+              { key:"kemungkinanResidual", label:"Kemungkinan Residual (1–5)", type:"select", options:["1","2","3","4","5"] },
+              { key:"dampakResidual",      label:"Dampak Residual (1–5)",      type:"select", options:["1","2","3","4","5"] },
+              { key:"rencanamitigasi",     label:"Rencana Mitigasi",           type:"textarea", required:false },
+              { key:"pic",                 label:"PIC",                        type:"select", options:["Budi Santoso","Ratna Dewi","Andi Prasetyo","Siti Aisyah"] },
+              { key:"target",              label:"Target Penyelesaian",        type:"text", placeholder:"Des 2025" },
+              { key:"periode",             label:"Periode",                    type:"text", placeholder:"Q2 2025" },
+              { key:"status",              label:"Status",                     type:"select", options:["Belum Ditindaklanjuti","Proses","Terlambat","Selesai"] },
+              { key:"progress",            label:"Progress (%)",               type:"text", placeholder:"0–100" },
+              { key:"catatanSPI",          label:"Catatan SPI",                type:"textarea", required:false },
+              { key:"buktiPengendalian",   label:"Link Bukti Pengendalian (Google Drive)", type:"url", required:false },
+            ]}
+            onSave={v => setRiskData(prev => prev.map(x => x.id !== r.id ? x : {
+              ...x,
+              unit: v.unit || x.unit, uraian: v.uraian || x.uraian, kategori: v.kategori || x.kategori,
+              penyebab: v.penyebab ?? x.penyebab, dampakDesc: v.dampakDesc ?? x.dampakDesc,
+              kemungkinan: skala(v.kemungkinan, x.kemungkinan), dampak: skala(v.dampak, x.dampak),
+              pengendalian: v.pengendalian ?? x.pengendalian, efektivitas: v.efektivitas || x.efektivitas,
+              kemungkinanResidual: skala(v.kemungkinanResidual, x.kemungkinanResidual), dampakResidual: skala(v.dampakResidual, x.dampakResidual),
+              rencanamitigasi: v.rencanamitigasi ?? x.rencanamitigasi, pic: v.pic || x.pic, target: v.target || x.target,
+              periode: v.periode || x.periode, status: v.status || x.status,
+              progress: Math.min(100, Math.max(0, parseInt(v.progress) || 0)),
+              catatanSPI: v.catatanSPI ?? x.catatanSPI, buktiPengendalian: v.buktiPengendalian?.trim() || null,
+            }))}
+            onClose={() => setEditRiskId(null)} />
+        );
+      })()}
       {tambahModal === "Tambah Unit Kerja" && (
         <TambahFormModal title="Tambah Unit Kerja" fields={[
           { key:"unit",      label:"Nama Unit Kerja",  type:"text" },
@@ -6314,6 +7018,7 @@ function SectionB({ subSection }: { subSection: string }) {
       {pendingDelete && (
         <ConfirmModal
           message={pendingDelete.msg}
+          confirmLabel={pendingDelete.confirmLabel}
           onConfirm={() => { pendingDelete.fn(); setPendingDelete(null); }}
           onCancel={() => setPendingDelete(null)}
         />
@@ -6328,6 +7033,9 @@ function SectionC({ subSection }: { subSection: string }) {
   const canEdit = user?.role !== "rektor";
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [filterAuditor, setFilterAuditor] = useState("Semua");
+  const [pendingBatal, setPendingBatal] = useState<{ msg: string; fn: () => void } | null>(null);
+  const [detailPelatihan, setDetailPelatihan] = useState<number | null>(null);
+  const [editPelatihan, setEditPelatihan] = useState<number | null>(null);
 
   const [auditorList, setAuditorList] = useState([
     { nama: "Budi Santoso, S.E.",   inisial: "BS", jabatan: "Auditor Madya",  sertif: "CIA, CISA", diperbarui: "Jan 2025", status: "Aktif"  },
@@ -6348,7 +7056,7 @@ function SectionC({ subSection }: { subSection: string }) {
   ];
 
   const [pelatihanData, setPelatihanData] = useState([
-    { no: 1, judul: "Workshop Audit Berbasis Risiko", peserta: "Budi, Ratna",    tgl: "10 Jun 2025", penyelenggara: "BPKP Pusat",   anggaran: 4.5, status: "Terdaftar" },
+    { no: 1, judul: "Workshop Audit Berbasis Risiko", peserta: "Budi, Ratna",    tgl: "10 Jun 2025", penyelenggara: "BPKP Pusat",   anggaran: 4.5, status: "Terdaftar", link: null as string | null },
     { no: 2, judul: "Pelatihan CISA Online",          peserta: "Siti Aisyah",    tgl: "15 Jul 2025", penyelenggara: "ISACA",         anggaran: 8.0, status: "Terdaftar" },
     { no: 3, judul: "Seminar Standar Audit 2025",     peserta: "Semua Auditor",  tgl: "2 Agt 2025",  penyelenggara: "IAPI",          anggaran: 6.5, status: "Terdaftar" },
     { no: 4, judul: "Diklat Auditor Madya",           peserta: "Budi Santoso",   tgl: "Sep 2025",    penyelenggara: "BPKP",          anggaran: 12.0,status: "Rencana"   },
@@ -6356,15 +7064,51 @@ function SectionC({ subSection }: { subSection: string }) {
     { no: 6, judul: "Pelatihan GRC Internal",         peserta: "Semua Auditor",  tgl: "Nov 2025",    penyelenggara: "Internal SPI",  anggaran: 2.5, status: "Selesai"   },
   ]);
 
+  const pelatihanBadge = (st: string) =>
+    st === "Selesai" ? "bg-green-50 text-green-600" : st === "Terdaftar" ? "bg-blue-50 text-blue-600" : st === "Dibatalkan" ? "bg-red-50 text-red-500" : "bg-gray-100 text-gray-500";
+
   const auditorNames = ["Semua", ...Array.from(new Set(penugasanData.map(p => p.auditor)))];
   const filteredPenugasan = filterAuditor === "Semua" ? penugasanData : penugasanData.filter(p => p.auditor === filterAuditor);
 
-  const auditors = [
-    { key: "Budi",  label: "Budi S." },
-    { key: "Ratna", label: "Ratna D." },
-    { key: "Andi",  label: "Andi P." },
-    { key: "Siti",  label: "Siti A." },
-  ];
+  // Opsi C: skor kompetensi (1–5) per domain, diinput Kepala SPI di modal Detail/Evaluasi Auditor.
+  // Backend: tabel `auditor_competencies` (auditor_id → users, domain, skor, dinilai_oleh, tgl_penilaian).
+  const kompetensiDomains = sdmRadarAuditors.map(r => r.subject);
+  const canEvaluate = user?.role === "full";
+  const [kompetensi, setKompetensi] = useState<Record<string, { skor: number[]; dinilai: string; catatan: string }>>(() => {
+    const seed: Record<string, string> = { BS: "Budi", RD: "Ratna", AP: "Andi", SA: "Siti" };
+    return Object.fromEntries(Object.entries(seed).map(([ini, k]) => [ini, {
+      skor: sdmRadarAuditors.map(r => r[k as "Budi"] as number),
+      dinilai: "Jan 2025",
+      catatan: "",
+    }]));
+  });
+  const [detailAuditor, setDetailAuditor] = useState<string | null>(null);
+  const [draftSkor, setDraftSkor] = useState<number[]>([]);
+  const [draftCatatan, setDraftCatatan] = useState("");
+  const [draftProfil, setDraftProfil] = useState({ nama: "", jabatan: "", sertif: "", status: "" });
+  const openDetail = (ini: string) => {
+    const k = kompetensi[ini];
+    const a = auditorList.find(x => x.inisial === ini);
+    if (a) setDraftProfil({ nama: a.nama, jabatan: a.jabatan, sertif: a.sertif, status: a.status });
+    setDraftSkor(k ? [...k.skor] : kompetensiDomains.map(() => 0));
+    setDraftCatatan(k?.catatan ?? "");
+    setDetailAuditor(ini);
+  };
+  const saveEvaluasi = () => {
+    if (!detailAuditor) return;
+    const now = new Date().toLocaleDateString("id-ID", { month: "short", year: "numeric" });
+    setAuditorList(prev => prev.map(a => a.inisial !== detailAuditor ? a : {
+      ...a, nama: draftProfil.nama.trim() || a.nama, jabatan: draftProfil.jabatan || a.jabatan,
+      sertif: draftProfil.sertif.trim() || "—", status: draftProfil.status || a.status, diperbarui: now,
+    }));
+    if (canEvaluate) setKompetensi(prev => ({ ...prev, [detailAuditor]: { skor: draftSkor, dinilai: now, catatan: draftCatatan } }));
+    setDetailAuditor(null);
+  };
+
+  const auditors = auditorList.map(a => {
+    const parts = a.nama.split(",")[0].trim().split(/\s+/);
+    return { key: a.inisial, label: parts[0] + (parts[1] ? ` ${parts[1][0]}.` : "") };
+  });
   const cellStyle = (v: number) => v >= 4 ? { bg: "#dcfce7", text: "#166534" } : v >= 2 ? { bg: "#fef9c3", text: "#854d0e" } : { bg: "#fee2e2", text: "#991b1b" };
 
   return (
@@ -6387,11 +7131,12 @@ function SectionC({ subSection }: { subSection: string }) {
             <div className="flex gap-1 mb-1 pl-36">
               {auditors.map(a => <div key={a.key} className="flex-1 text-center text-[9px] font-bold text-gray-600">{a.label}</div>)}
             </div>
-            {sdmRadarAuditors.map(row => (
-              <div key={row.subject} className="flex items-center gap-1 mb-1">
-                <span className="text-[10px] text-gray-600 w-36 flex-shrink-0">{row.subject}</span>
+            {kompetensiDomains.map((subject, di) => (
+              <div key={subject} className="flex items-center gap-1 mb-1">
+                <span className="text-[10px] text-gray-600 w-36 flex-shrink-0">{subject}</span>
                 {auditors.map(a => {
-                  const v = row[a.key as keyof typeof row] as number;
+                  const v = kompetensi[a.key]?.skor[di] ?? 0;
+                  if (!v) return <div key={a.key} className="flex-1 h-8 rounded-lg flex items-center justify-center font-black text-sm bg-gray-50 text-gray-300" title="Belum dinilai">—</div>;
                   const s = cellStyle(v);
                   return <div key={a.key} className="flex-1 h-8 rounded-lg flex items-center justify-center font-black text-sm" style={{ background: s.bg, color: s.text }}>{v}</div>;
                 })}
@@ -6426,8 +7171,7 @@ function SectionC({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3 text-gray-500">{a.diperbarui}</td>
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${a.status === "Aktif" ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"}`}>{a.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
-                        <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
+                        {canEdit && <button title="Edit" onClick={() => openDetail(a.inisial)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
                       </div></td>
                     </tr>
                   ))}
@@ -6482,7 +7226,7 @@ function SectionC({ subSection }: { subSection: string }) {
           <div className="flex items-center justify-between mb-3">
             <div>
               <h4 className="text-xs font-bold text-gray-700">Jadwal Pelatihan & Pengembangan SDM</h4>
-              <p className="text-[10px] text-gray-400 mt-0.5">3 pelatihan mendatang</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">{pelatihanData.filter(t => t.status === "Terdaftar" || t.status === "Rencana").length} pelatihan mendatang</p>
             </div>
             {canEdit && <button onClick={() => setTambahModal("Daftarkan Pelatihan")} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white" style={{ background: "var(--tsu-teal)" }}>+ Daftarkan Pelatihan</button>}
           </div>
@@ -6490,7 +7234,7 @@ function SectionC({ subSection }: { subSection: string }) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-100">
-                  {["No","Nama Pelatihan","Peserta","Tanggal","Penyelenggara","Anggaran (Rp Jt)","Status","Aksi"].map(h=>(
+                  {["Nama Pelatihan","Peserta","Tanggal","Status","Aksi"].map(h=>(
                     <th key={h} className="text-left text-[10px] font-bold text-gray-400 pb-2 pr-3 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -6498,16 +7242,20 @@ function SectionC({ subSection }: { subSection: string }) {
               <tbody>
                 {pelatihanData.map(t => (
                   <tr key={t.no} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                    <td className="py-2 pr-3 text-[10px] text-gray-400">{t.no}</td>
-                    <td className="py-2 pr-3 font-medium text-gray-700">{t.judul}</td>
-                    <td className="py-2 pr-3 text-gray-500">{t.peserta}</td>
+                    <td className="py-2 pr-3 max-w-[240px]">
+                      <div className="font-medium text-gray-700 truncate" title={t.judul}>{t.judul}</div>
+                      <div className="text-[9px] text-gray-400 mt-0.5">{t.penyelenggara}</div>
+                    </td>
+                    <td className="py-2 pr-3 text-gray-500 max-w-[140px] truncate">{t.peserta}</td>
                     <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{t.tgl}</td>
-                    <td className="py-2 pr-3 text-gray-500 whitespace-nowrap">{t.penyelenggara}</td>
-                    <td className="py-2 pr-3 font-semibold text-gray-700">{t.anggaran.toFixed(1)}</td>
-                    <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${t.status === "Selesai" ? "bg-green-50 text-green-600" : t.status === "Terdaftar" ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-500"}`}>{t.status}</span></td>
+                    <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${pelatihanBadge(t.status)}`}>{t.status}</span></td>
                     <td className="py-2"><div className="flex gap-1">
-                      <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
-                      {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Batal</button>}
+                      <button title="Lihat Detail" onClick={() => setDetailPelatihan(t.no)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-blue-50 hover:border-blue-200 hover:text-blue-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg></button>
+                      {canEdit && <button title="Edit" onClick={() => setEditPelatihan(t.no)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
+                      {canEdit && (t.status === "Terdaftar" || t.status === "Rencana") && (
+                        <button title="Batalkan Pelatihan" onClick={() => setPendingBatal({ msg: `Batalkan pelatihan "${t.judul}"?`, fn: () => setPelatihanData(prev => prev.map(x => x.no === t.no ? { ...x, status: "Dibatalkan" } : x)) })}
+                          className="w-7 h-7 flex items-center justify-center rounded-lg border border-red-100 text-red-300 hover:bg-red-50 hover:text-red-500 transition-colors"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg></button>
+                      )}
                     </div></td>
                   </tr>
                 ))}
@@ -6519,7 +7267,7 @@ function SectionC({ subSection }: { subSection: string }) {
       {tambahModal === "Tambah Auditor" && (
         <TambahFormModal title="Tambah Data Auditor" fields={[
           { key:"nama",    label:"Nama Lengkap & Gelar",  type:"text" },
-          { key:"jabatan", label:"Jabatan",               type:"select", options:["Auditor Madya","Auditor Muda","Auditor Pertama","Ketua SPI"] },
+          { key:"jabatan", label:"Jabatan",               type:"select", options:["Auditor Madya","Auditor Muda","Auditor Pertama","Kepala SPI"] },
           { key:"sertif",  label:"Sertifikasi (jika ada)",type:"text",   placeholder:"CIA, CISA, CPA..." },
         ]}
         onSave={(v) => {
@@ -6537,9 +7285,167 @@ function SectionC({ subSection }: { subSection: string }) {
           { key:"anggaran",     label:"Anggaran (Rp Jt)",           type:"text", placeholder:"0.0" },
           { key:"link",         label:"Link Info / Sertifikat (Google Drive)", type:"url", required:false },
         ]}
-        onSave={(v) => setPelatihanData(prev => [{ no: prev.length + 1, judul: v.judul || "-", peserta: v.peserta || "-", tgl: v.tgl || "-", penyelenggara: v.penyelenggara || "-", anggaran: parseFloat(v.anggaran) || 0, status: "Terdaftar" }, ...prev])}
+        onSave={(v) => setPelatihanData(prev => [{ no: Math.max(0, ...prev.map(x => x.no)) + 1, judul: v.judul || "-", peserta: v.peserta || "-", tgl: v.tgl || "-", penyelenggara: v.penyelenggara || "-", anggaran: parseFloat(v.anggaran) || 0, status: "Terdaftar", link: v.link?.trim() || null }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
+      {editPelatihan !== null && (() => {
+        const t = pelatihanData.find(x => x.no === editPelatihan);
+        if (!t) return null;
+        return (
+          <TambahFormModal key={t.no} title="Edit Pelatihan"
+            initial={{ judul: t.judul, peserta: t.peserta, tgl: t.tgl, penyelenggara: t.penyelenggara, anggaran: String(t.anggaran), status: t.status, link: t.link ?? "" }}
+            fields={[
+              { key:"judul",        label:"Judul Pelatihan / Seminar",  type:"text" },
+              { key:"peserta",      label:"Peserta",                    type:"text", placeholder:"Nama auditor, pisahkan dengan koma" },
+              { key:"tgl",          label:"Tanggal Pelaksanaan",        type:"text", placeholder:"Jun 2025" },
+              { key:"penyelenggara",label:"Penyelenggara",              type:"text" },
+              { key:"anggaran",     label:"Anggaran (Rp Jt)",           type:"text", placeholder:"0.0" },
+              { key:"status",       label:"Status",                     type:"select", options:["Rencana","Terdaftar","Selesai","Dibatalkan"] },
+              { key:"link",         label:"Link Info / Sertifikat (Google Drive)", type:"url", required:false },
+            ]}
+            onSave={v => setPelatihanData(prev => prev.map(x => x.no !== t.no ? x : {
+              ...x, judul: v.judul || x.judul, peserta: v.peserta || x.peserta, tgl: v.tgl || x.tgl,
+              penyelenggara: v.penyelenggara || x.penyelenggara, anggaran: parseFloat(v.anggaran) || 0,
+              status: v.status || x.status, link: v.link?.trim() || null,
+            }))}
+            onClose={() => setEditPelatihan(null)} />
+        );
+      })()}
+      {detailPelatihan !== null && (() => {
+        const t = pelatihanData.find(x => x.no === detailPelatihan);
+        if (!t) return null;
+        const pesertaList = t.peserta === "Semua Auditor"
+          ? auditorList.map(a => a.nama.split(",")[0])
+          : t.peserta.split(",").map(x => x.trim()).filter(Boolean);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.45)" }} onClick={() => setDetailPelatihan(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="text-sm font-bold text-gray-800">Detail Pelatihan</div>
+                <button onClick={() => setDetailPelatihan(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+              </div>
+              <div className="p-5 flex flex-col gap-3">
+                <div>
+                  <div className="text-sm font-bold text-gray-800 leading-snug">{t.judul}</div>
+                  <span className={`inline-block mt-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full ${pelatihanBadge(t.status)}`}>{t.status}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[["Tanggal", t.tgl], ["Penyelenggara", t.penyelenggara], ["Anggaran", `Rp ${t.anggaran.toFixed(1)} Jt`], ["Jumlah Peserta", `${pesertaList.length} auditor`]].map(([k, v]) => (
+                    <div key={k} className="rounded-xl p-3 bg-gray-50 border border-gray-100">
+                      <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1">{k}</div>
+                      <div className="text-xs font-semibold text-gray-700">{v}</div>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="text-[8px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Peserta</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {pesertaList.map(p => <span key={p} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">{p}</span>)}
+                  </div>
+                </div>
+                {t.link
+                  ? <a href={t.link} target="_blank" rel="noreferrer" className="text-[10px] font-semibold text-center px-3 py-2 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50">↗ Buka Info / Sertifikat</a>
+                  : <div className="text-[9px] text-gray-400">Belum ada link info / sertifikat.</div>}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      {pendingBatal && (
+        <ConfirmModal message={pendingBatal.msg} confirmLabel="Ya, Batalkan"
+          onConfirm={() => { pendingBatal.fn(); setPendingBatal(null); }}
+          onCancel={() => setPendingBatal(null)} />
+      )}
+      {detailAuditor && (() => {
+        const a = auditorList.find(x => x.inisial === detailAuditor);
+        if (!a) return null;
+        const k = kompetensi[detailAuditor];
+        const filled = draftSkor.filter(v => v > 0);
+        const avg = filled.length ? (filled.reduce((x, y) => x + y, 0) / filled.length).toFixed(1) : "—";
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setDetailAuditor(null)}>
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center">{a.inisial}</div>
+                  <div>
+                    <div className="text-sm font-bold text-gray-800">Edit Data Auditor</div>
+                    <div className="text-[10px] text-gray-400">Profil, sertifikasi, dan evaluasi kompetensi</div>
+                  </div>
+                </div>
+                <button onClick={() => setDetailAuditor(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+              </div>
+              <div className="px-5 py-4 flex flex-col gap-3 border-b border-gray-100">
+                <h4 className="text-xs font-bold text-gray-700">Data Auditor</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="col-span-2">
+                    <label className="text-[10px] font-semibold text-gray-500">Nama Lengkap & Gelar</label>
+                    <input value={draftProfil.nama} onChange={e => setDraftProfil(p => ({ ...p, nama: e.target.value }))}
+                      className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-teal-400" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-gray-500">Jabatan</label>
+                    <select value={draftProfil.jabatan} onChange={e => setDraftProfil(p => ({ ...p, jabatan: e.target.value }))}
+                      className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:border-teal-400">
+                      {["Auditor Madya","Auditor Muda","Auditor Pertama","Kepala SPI"].map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-gray-500">Status</label>
+                    <select value={draftProfil.status} onChange={e => setDraftProfil(p => ({ ...p, status: e.target.value }))}
+                      className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:border-teal-400">
+                      {["Aktif","Proses","Tidak Aktif"].map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="text-[10px] font-semibold text-gray-500">Sertifikasi</label>
+                    <input value={draftProfil.sertif === "—" ? "" : draftProfil.sertif} onChange={e => setDraftProfil(p => ({ ...p, sertif: e.target.value }))}
+                      placeholder="CIA, CISA, CPA..."
+                      className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-teal-400" />
+                  </div>
+                </div>
+              </div>
+              <div className="px-5 py-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-gray-700">{canEvaluate ? "Evaluasi Kompetensi" : "Skor Kompetensi"}</h4>
+                  <span className="text-[10px] text-gray-400">Rata-rata <b className="text-gray-700">{avg}</b> / 5 · Dinilai {k?.dinilai ?? "—"}</span>
+                </div>
+                {kompetensiDomains.map((d, di) => {
+                  const v = draftSkor[di] ?? 0;
+                  return (
+                    <div key={d} className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-600 w-32 flex-shrink-0">{d}</span>
+                      <div className="flex gap-1 flex-1">
+                        {[1, 2, 3, 4, 5].map(n => {
+                          const on = v >= n;
+                          const s = cellStyle(v);
+                          return (
+                            <button key={n} type="button" disabled={!canEvaluate}
+                              onClick={() => setDraftSkor(prev => prev.map((x, i) => i === di ? (x === n ? 0 : n) : x))}
+                              className={`flex-1 h-7 rounded-md text-[10px] font-bold transition-colors ${canEvaluate ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+                              style={on ? { background: s.bg, color: s.text } : { background: "#f9fafb", color: "#d1d5db" }}>{n}</button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500">Catatan Evaluasi</label>
+                  <textarea value={draftCatatan} onChange={e => setDraftCatatan(e.target.value)} disabled={!canEvaluate} rows={2}
+                    placeholder={canEvaluate ? "Rekomendasi pengembangan / pelatihan…" : "—"}
+                    className="mt-1 w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none disabled:bg-gray-50 disabled:text-gray-500" />
+                </div>
+                {!canEvaluate && <p className="text-[9px] text-gray-400">Penilaian kompetensi hanya dapat diubah oleh Kepala SPI.</p>}
+              </div>
+              <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-100">
+                <button onClick={() => setDetailAuditor(null)} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">Batal</button>
+                <button onClick={saveEvaluasi} disabled={!draftProfil.nama.trim()} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white disabled:opacity-40" style={{ background: "var(--tsu-teal)" }}>Simpan Perubahan</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -6550,18 +7456,22 @@ function SectionD({ subSection }: { subSection: string }) {
   const canEdit = user?.role !== "rektor";
   const [tambahModal, setTambahModal] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [filterTahun, setFilterTahun] = useState("Semua");
-  const [selectedStandar, setSelectedStandar] = useState(0);
+  const [searchPeraturan, setSearchPeraturan] = useState("");
+  const [editPedoman, setEditPedoman] = useState<number | null>(null);
+  const [editStandar, setEditStandar] = useState<number | null>(null);
+  const [editPeraturan, setEditPeraturan] = useState<number | null>(null);
+  const statusDokBadge = (st: string) =>
+    st === "Berlaku" ? "bg-green-50 text-green-600" : st === "Revisi" ? "bg-amber-50 text-amber-600" : st === "Draft" ? "bg-gray-100 text-gray-500" : "bg-red-50 text-red-500";
 
   const [pedomanBase, setPedomanBase] = useState([
-    { icon: "", judul: "Pedoman Audit Internal SPI",    deskripsi: "Panduan pelaksanaan audit internal sesuai standar AAIPI",         versi: "v3.1", berlaku: "Jan 2025", link: "https://drive.google.com/file/pedoman-audit-internal-spi" },
-    { icon: "", judul: "Kode Etik Auditor Internal",    deskripsi: "Prinsip dan aturan perilaku auditor internal universitas",        versi: "v2.0", berlaku: "Jan 2025", link: "https://drive.google.com/file/kode-etik-auditor" },
-    { icon: "", judul: "SOP Pelaksanaan Audit Kinerja", deskripsi: "Prosedur standar operasional audit kinerja unit kerja",           versi: "v1.5", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kinerja" },
-    { icon: "", judul: "SOP Audit Kepatuhan",           deskripsi: "Prosedur audit kepatuhan terhadap regulasi dan kebijakan",        versi: "v1.2", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kepatuhan" },
-    { icon: "", judul: "Panduan Kertas Kerja Audit",    deskripsi: "Format dan panduan pengisian kertas kerja audit (KKA)",           versi: "v2.3", berlaku: "Mar 2025", link: "https://drive.google.com/file/panduan-kka" },
-    { icon: "", judul: "Pedoman Audit Berbasis Risiko", deskripsi: "Kerangka audit berbasis risiko untuk perencanaan dan pelaksanaan", versi: "v1.0", berlaku: "Apr 2025", link: "https://drive.google.com/file/pedoman-audit-risiko" },
+    { icon: "", judul: "Pedoman Audit Internal SPI",    deskripsi: "Panduan pelaksanaan audit internal sesuai standar AAIPI",         versi: "v3.1", berlaku: "Jan 2025", link: "https://drive.google.com/file/pedoman-audit-internal-spi", status: "Berlaku" },
+    { icon: "", judul: "Kode Etik Auditor Internal",    deskripsi: "Prinsip dan aturan perilaku auditor internal universitas",        versi: "v2.0", berlaku: "Jan 2025", link: "https://drive.google.com/file/kode-etik-auditor", status: "Berlaku" },
+    { icon: "", judul: "SOP Pelaksanaan Audit Kinerja", deskripsi: "Prosedur standar operasional audit kinerja unit kerja",           versi: "v1.5", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kinerja", status: "Berlaku" },
+    { icon: "", judul: "SOP Audit Kepatuhan",           deskripsi: "Prosedur audit kepatuhan terhadap regulasi dan kebijakan",        versi: "v1.2", berlaku: "Feb 2025", link: "https://drive.google.com/file/sop-audit-kepatuhan", status: "Berlaku" },
+    { icon: "", judul: "Panduan Kertas Kerja Audit",    deskripsi: "Format dan panduan pengisian kertas kerja audit (KKA)",           versi: "v2.3", berlaku: "Mar 2025", link: "https://drive.google.com/file/panduan-kka", status: "Berlaku" },
+    { icon: "", judul: "Pedoman Audit Berbasis Risiko", deskripsi: "Kerangka audit berbasis risiko untuk perencanaan dan pelaksanaan", versi: "v1.0", berlaku: "Apr 2025", link: "https://drive.google.com/file/pedoman-audit-risiko", status: "Revisi" },
   ]);
-  const pedomanList = pedomanBase.filter(d => d.judul.toLowerCase().includes(search.toLowerCase()));
+  const pedomanList = pedomanBase.map((d, idx) => ({ ...d, idx })).filter(d => d.judul.toLowerCase().includes(search.toLowerCase()));
 
   const [peraturanBase, setPeraturanBase] = useState([
     { nomor: "Peraturan Rektor No. 12/2024",    judul: "Tata Kelola Pengawasan Internal",        instansi: "Rektor",        terbit: "Des 2024", status: "Berlaku", link: "https://drive.google.com/file/peraturan-rektor-12-2024" as string | null },
@@ -6570,17 +7480,19 @@ function SectionD({ subSection }: { subSection: string }) {
     { nomor: "Permendagri No. 78/2012",          judul: "Tata Kearsipan di Lingkungan Kemendagri",instansi: "Kemendagri",    terbit: "2012",     status: "Berlaku", link: "https://drive.google.com/file/permendagri-78-2012" as string | null },
     { nomor: "Peraturan Rektor No. 5/2022",      judul: "Manajemen Risiko Universitas",           instansi: "Rektor",        terbit: "2022",     status: "Dicabut", link: null as string | null },
   ]);
-  const peraturanList = peraturanBase.filter(d => filterTahun === "Semua" || d.terbit.includes(filterTahun));
+  const peraturanList = peraturanBase.map((d, idx) => ({ ...d, idx })).filter(d => {
+    const q = searchPeraturan.trim().toLowerCase();
+    return !q || [d.nomor, d.judul, d.instansi, d.terbit, d.status].some(f => f.toLowerCase().includes(q));
+  });
 
-  const standarList = [
-    { judul: "IPPF — International Professional Practices Framework", isi: "Kerangka praktik profesional internasional yang dikeluarkan IIA, mencakup standar, kode etik, dan panduan implementasi audit internal global.", link: "https://drive.google.com/file/ippf-framework" },
-    { judul: "Standar Audit AAIPI 2023",                               isi: "Standar audit internal yang diterbitkan Asosiasi Auditor Internal Pemerintah Indonesia, wajib diterapkan oleh SPI perguruan tinggi negeri.",  link: "https://drive.google.com/file/standar-aaipi-2023" },
-    { judul: "SPIP — Sistem Pengendalian Intern Pemerintah",           isi: "Kerangka pengendalian intern berdasarkan PP No. 60/2008 yang menjadi acuan tata kelola dan pengawasan di lingkungan instansi pemerintah.",  link: "https://drive.google.com/file/spip-pp-60-2008" },
-    { judul: "IIA Standard 2100 — Nature of Work",                     isi: "Standar yang mengatur lingkup pekerjaan audit internal: evaluasi manajemen risiko, pengendalian, dan tata kelola organisasi.",                link: "https://drive.google.com/file/iia-standard-2100" },
-    { judul: "SNI ISO 31000:2018 — Manajemen Risiko",                  isi: "Standar nasional Indonesia untuk manajemen risiko, memberikan panduan prinsip, kerangka kerja, dan proses manajemen risiko.",                link: "https://drive.google.com/file/sni-iso-31000-2018" },
-    { judul: "COSO ERM Framework 2017",                                isi: "Kerangka manajemen risiko perusahaan dari Committee of Sponsoring Organizations yang mengintegrasikan strategi, kinerja, dan risiko.",         link: "https://drive.google.com/file/coso-erm-2017" },
-  ];
-  const [dipelajari, setDipelajari] = useState<boolean[]>(standarList.map(() => false));
+  const [standarList, setStandarList] = useState([
+    { judul: "IPPF — International Professional Practices Framework", isi: "Kerangka praktik profesional internasional yang dikeluarkan IIA, mencakup standar, kode etik, dan panduan implementasi audit internal global.", link: "https://drive.google.com/file/ippf-framework" as string | null, status: "Berlaku" },
+    { judul: "Standar Audit AAIPI 2023",                               isi: "Standar audit internal yang diterbitkan Asosiasi Auditor Internal Pemerintah Indonesia, wajib diterapkan oleh SPI perguruan tinggi negeri.",  link: "https://drive.google.com/file/standar-aaipi-2023" as string | null, status: "Berlaku" },
+    { judul: "SPIP — Sistem Pengendalian Intern Pemerintah",           isi: "Kerangka pengendalian intern berdasarkan PP No. 60/2008 yang menjadi acuan tata kelola dan pengawasan di lingkungan instansi pemerintah.",  link: "https://drive.google.com/file/spip-pp-60-2008" as string | null, status: "Berlaku" },
+    { judul: "IIA Standard 2100 — Nature of Work",                     isi: "Standar yang mengatur lingkup pekerjaan audit internal: evaluasi manajemen risiko, pengendalian, dan tata kelola organisasi.",                link: "https://drive.google.com/file/iia-standard-2100" as string | null, status: "Berlaku" },
+    { judul: "SNI ISO 31000:2018 — Manajemen Risiko",                  isi: "Standar nasional Indonesia untuk manajemen risiko, memberikan panduan prinsip, kerangka kerja, dan proses manajemen risiko.",                link: "https://drive.google.com/file/sni-iso-31000-2018" as string | null, status: "Berlaku" },
+    { judul: "COSO ERM Framework 2017",                                isi: "Kerangka manajemen risiko perusahaan dari Committee of Sponsoring Organizations yang mengintegrasikan strategi, kinerja, dan risiko.",         link: "https://drive.google.com/file/coso-erm-2017" as string | null, status: "Berlaku" },
+  ]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -6604,33 +7516,38 @@ function SectionD({ subSection }: { subSection: string }) {
                   </div>
                 </div>
                 <div className="flex items-center justify-between mt-auto pt-1 border-t border-gray-50">
-                  <div className="flex gap-1.5">
-                    <span className="text-[9px] text-gray-400">{d.versi}</span>
-                    <span className="text-[9px] text-gray-300">·</span>
-                    <span className="text-[9px] text-gray-400">{d.berlaku}</span>
+                  <div className="flex gap-1.5 items-center">
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusDokBadge(d.status)}`}>{d.status}</span>
+                    <span className="text-[9px] text-gray-400">{d.versi} · {d.berlaku}</span>
                   </div>
-                  <a href={d.link} target="_blank" rel="noreferrer"
-                    className="text-[9px] font-semibold px-2 py-1 rounded border border-teal-200 text-teal-600 hover:bg-teal-50">
-                    ↗ Buka Link
-                  </a>
+                  <div className="flex gap-1">
+                    {d.link && d.link !== "#" ? <a href={d.link} target="_blank" rel="noreferrer" title="Buka Link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-teal-50 hover:border-teal-200 hover:text-teal-600"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></a> : <span title="Belum ada link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-dashed border-gray-200 text-gray-300"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></span>}
+                    {canEdit && <button title="Edit" onClick={() => setEditPedoman(d.idx)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           {/* Standar Referensi — merged from Standar Audit */}
           <div className="mt-4 pt-4 border-t border-gray-100">
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-3">Standar Referensi</div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Standar Referensi</div>
+              {canEdit && <button onClick={() => setTambahModal("Tambah Standar")} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg border border-teal-200 text-teal-600 hover:bg-teal-50">+ Tambah Standar</button>}
+            </div>
             <div className="flex flex-col gap-2">
               {standarList.map((s, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-gray-700 leading-tight">{s.judul}</div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="text-xs font-semibold text-gray-700 leading-tight">{s.judul}</div>
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusDokBadge(s.status)}`}>{s.status}</span>
+                    </div>
                     <div className="text-[9px] text-gray-400 mt-0.5 leading-relaxed line-clamp-2">{s.isi}</div>
                   </div>
-                  <a href={s.link} target="_blank" rel="noreferrer"
-                    className="text-[9px] font-semibold px-2 py-1 rounded border border-teal-200 text-teal-600 hover:bg-teal-50 flex-shrink-0">
-                    ↗ Buka
-                  </a>
+                  <div className="flex gap-1 flex-shrink-0">
+                    {s.link ? <a href={s.link} target="_blank" rel="noreferrer" title="Buka Link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-teal-50 hover:border-teal-200 hover:text-teal-600"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></a> : <span title="Belum ada link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-dashed border-gray-200 text-gray-300"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></span>}
+                    {canEdit && <button title="Edit" onClick={() => setEditStandar(i)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
+                  </div>
                 </div>
               ))}
             </div>
@@ -6644,13 +7561,12 @@ function SectionD({ subSection }: { subSection: string }) {
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-bold text-gray-700">Peraturan Internal & Eksternal</h4>
             <div className="flex items-center gap-2">
-              <select value={filterTahun} onChange={e => setFilterTahun(e.target.value)}
-                className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-gray-600 focus:outline-none">
-                {["Semua","2025","2024","2022","2021","2017","2012"].map(t=><option key={t}>{t}</option>)}
-              </select>
               {canEdit && <button onClick={() => setTambahModal("Tambah Peraturan")} className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-white whitespace-nowrap" style={{ background: "var(--tsu-teal)" }}>+ Tambah Peraturan</button>}
             </div>
           </div>
+          <input value={searchPeraturan} onChange={e => setSearchPeraturan(e.target.value)}
+            placeholder="Cari nomor, judul, instansi, tahun, atau status..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs mb-3 focus:outline-none focus:border-teal-400" />
+          {peraturanList.length === 0 && <div className="text-[10px] text-gray-400 text-center py-6">Tidak ada peraturan yang cocok.</div>}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {peraturanList.map((r, i) => (
               <div key={i} className="flex flex-col gap-2 p-3 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
@@ -6661,13 +7577,9 @@ function SectionD({ subSection }: { subSection: string }) {
                     <span className="text-[9px] text-gray-400">{r.instansi} · {r.terbit}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status === "Berlaku" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`}>{r.status}</span>
-                    {r.link && (
-                      <a href={r.link} target="_blank" rel="noreferrer"
-                        className="text-[9px] font-semibold px-2 py-0.5 rounded border border-teal-200 text-teal-600 hover:bg-teal-50">
-                        ↗ Buka
-                      </a>
-                    )}
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusDokBadge(r.status)}`}>{r.status}</span>
+                    {r.link ? <a href={r.link} target="_blank" rel="noreferrer" title="Buka Link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-teal-50 hover:border-teal-200 hover:text-teal-600"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></a> : <span title="Belum ada link" className="w-7 h-7 flex items-center justify-center rounded-lg border border-dashed border-gray-200 text-gray-300"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2l-.9.9"/><path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8A3 3 0 0 0 7.2 13l.9-.9"/></svg></span>}
+                    {canEdit && <button title="Edit" onClick={() => setEditPeraturan(r.idx)} className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition-colors hover:bg-amber-50 hover:border-amber-200 hover:text-amber-500"><svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/></svg></button>}
                   </div>
                 </div>
               </div>
@@ -6676,15 +7588,83 @@ function SectionD({ subSection }: { subSection: string }) {
         </div>
       )}
 
+      {tambahModal === "Tambah Standar" && (
+        <TambahFormModal title="Tambah Standar Referensi" fields={[
+          { key:"judul",  label:"Nama Standar",                  type:"text", placeholder:"mis. IIA Global Internal Audit Standards 2024" },
+          { key:"isi",    label:"Ringkasan / Ruang Lingkup",     type:"textarea" },
+          { key:"status", label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
+          { key:"link",   label:"Link Dokumen (Google Drive)",   type:"url", required:false },
+        ]}
+        onSave={(v) => setStandarList(prev => [...prev, { judul: v.judul || "-", isi: v.isi || "-", status: v.status || "Berlaku", link: v.link?.trim() || null }])}
+        onClose={() => setTambahModal(null)} />
+      )}
+      {editPedoman !== null && pedomanBase[editPedoman] && (() => {
+        const d = pedomanBase[editPedoman];
+        return (
+          <TambahFormModal key={editPedoman} title="Edit Pedoman / SOP"
+            initial={{ judul: d.judul, deskripsi: d.deskripsi, versi: d.versi, berlaku: d.berlaku, status: d.status, link: d.link === "#" ? "" : d.link }}
+            fields={[
+              { key:"judul",    label:"Judul Pedoman / SOP",          type:"text" },
+              { key:"deskripsi",label:"Deskripsi Singkat",             type:"textarea" },
+              { key:"versi",    label:"Versi",                         type:"text", placeholder:"v1.0" },
+              { key:"berlaku",  label:"Berlaku Sejak",                 type:"text", placeholder:"Jan 2025" },
+              { key:"status",   label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
+              { key:"link",     label:"Link Dokumen (Google Drive)",   type:"url", required:false },
+            ]}
+            onSave={v => setPedomanBase(prev => prev.map((x, i) => i !== editPedoman ? x : {
+              ...x, judul: v.judul || x.judul, deskripsi: v.deskripsi || x.deskripsi, versi: v.versi || x.versi,
+              berlaku: v.berlaku || x.berlaku, status: v.status || x.status, link: v.link?.trim() || "#",
+            }))}
+            onClose={() => setEditPedoman(null)} />
+        );
+      })()}
+      {editStandar !== null && standarList[editStandar] && (() => {
+        const d = standarList[editStandar];
+        return (
+          <TambahFormModal key={editStandar} title="Edit Standar Referensi"
+            initial={{ judul: d.judul, isi: d.isi, status: d.status, link: d.link ?? "" }}
+            fields={[
+              { key:"judul",  label:"Nama Standar",                  type:"text" },
+              { key:"isi",    label:"Ringkasan / Ruang Lingkup",     type:"textarea" },
+              { key:"status", label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
+              { key:"link",   label:"Link Dokumen (Google Drive)",   type:"url", required:false },
+            ]}
+            onSave={v => setStandarList(prev => prev.map((x, i) => i !== editStandar ? x : {
+              ...x, judul: v.judul || x.judul, isi: v.isi || x.isi, status: v.status || x.status, link: v.link?.trim() || null,
+            }))}
+            onClose={() => setEditStandar(null)} />
+        );
+      })()}
+      {editPeraturan !== null && peraturanBase[editPeraturan] && (() => {
+        const d = peraturanBase[editPeraturan];
+        return (
+          <TambahFormModal key={editPeraturan} title="Edit Peraturan"
+            initial={{ nomor: d.nomor, judul: d.judul, instansi: d.instansi, terbit: d.terbit, status: d.status, link: d.link ?? "" }}
+            fields={[
+              { key:"nomor",    label:"Nomor Peraturan",               type:"text" },
+              { key:"judul",    label:"Judul",                         type:"text" },
+              { key:"instansi", label:"Instansi Penerbit",             type:"text" },
+              { key:"terbit",   label:"Tahun Terbit",                  type:"text" },
+              { key:"status",   label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
+              { key:"link",     label:"Link Dokumen (Google Drive)",   type:"url", required:false },
+            ]}
+            onSave={v => setPeraturanBase(prev => prev.map((x, i) => i !== editPeraturan ? x : {
+              ...x, nomor: v.nomor || x.nomor, judul: v.judul || x.judul, instansi: v.instansi || x.instansi,
+              terbit: v.terbit || x.terbit, status: v.status || x.status, link: v.link?.trim() || null,
+            }))}
+            onClose={() => setEditPeraturan(null)} />
+        );
+      })()}
       {tambahModal === "Tambah Pedoman" && (
         <TambahFormModal title="Tambah Pedoman / SOP" fields={[
           { key:"judul",    label:"Judul Pedoman / SOP",          type:"text" },
           { key:"deskripsi",label:"Deskripsi Singkat",             type:"textarea" },
           { key:"versi",    label:"Versi",                         type:"text", placeholder:"v1.0" },
           { key:"berlaku",  label:"Berlaku Sejak",                 type:"text", placeholder:"Jan 2025" },
+          { key:"status",   label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
           { key:"link",     label:"Link Dokumen (Google Drive)",   type:"url" },
         ]}
-        onSave={(v) => setPedomanBase(prev => [{ icon: "", judul: v.judul || "-", deskripsi: v.deskripsi || "-", versi: v.versi || "v1.0", berlaku: v.berlaku || "-", link: v.link || "#" }, ...prev])}
+        onSave={(v) => setPedomanBase(prev => [{ icon: "", judul: v.judul || "-", deskripsi: v.deskripsi || "-", versi: v.versi || "v1.0", berlaku: v.berlaku || "-", link: v.link || "#", status: v.status || "Berlaku" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Peraturan" && (
@@ -6693,7 +7673,7 @@ function SectionD({ subSection }: { subSection: string }) {
           { key:"judul",    label:"Judul",                         type:"text" },
           { key:"instansi", label:"Instansi Penerbit",             type:"text" },
           { key:"terbit",   label:"Tahun Terbit",                  type:"text", placeholder:"2025" },
-          { key:"status",   label:"Status",                        type:"select", options:["Berlaku","Dicabut"] },
+          { key:"status",   label:"Status",                        type:"select", options:["Berlaku","Revisi","Draft","Dicabut"] },
           { key:"link",     label:"Link Dokumen (Google Drive)",   type:"url", required:false },
         ]}
         onSave={(v) => setPeraturanBase(prev => [{ nomor: v.nomor || "-", judul: v.judul || "-", instansi: v.instansi || "-", terbit: v.terbit || "-", status: v.status || "Berlaku", link: v.link || null }, ...prev])}
@@ -6707,29 +7687,37 @@ function SectionF({ subSection }: { subSection: string }) {
   const active = subSection || "Jadwal Rapat";
   const user = useContext(UserCtx);
   const canEdit = user?.role !== "rektor";
-  const { rapatList, addRapat, batalkanRapat } = useContext(RapatCtx);
+  const { rapatList, addRapat, batalkanRapat, updateRapat } = useContext(RapatCtx);
+  const { rtlList } = useContext(TemuanCtx);
   const [pendingDelete, setPendingDelete] = useState<{ msg: string; fn: () => void } | null>(null);
   const today = 22;
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const [doneIds, setDoneIds] = useState<number[]>([]);
   const [showRapatForm, setShowRapatForm] = useState(false);
+  const [editRapatId, setEditRapatId] = useState<number | null>(null);
+  const [detailRapatId, setDetailRapatId] = useState<number | null>(null);
 
   const rapatMendatang = rapatList.filter(r => r.status === "Terjadwal");
 
   const events: Record<number, { label: string; color: string }[]> = {
     26: [{ label: "Audit LPPM",     color: "bg-purple-500" }],
-    10: [{ label: "Deadline RTL",   color: "bg-red-500" }],
-    15: [{ label: "Deadline RTL",   color: "bg-red-500" }],
-    18: [{ label: "Deadline RTL",   color: "bg-amber-500" }],
   };
+  const rtlAktif = rtlList.filter(r => rtlTlStatus(r) !== "Close");
+  rtlAktif.forEach(r => {
+    const [d, m, y] = r.target.split(" ");
+    if (m === "Mei" && y === "2025") {
+      (events[parseInt(d)] ??= []).push({ label: `Deadline RTL ${r.unit}`, color: sisaHariRtl(r.target) < 0 ? "bg-red-500" : "bg-amber-500" });
+    }
+  });
 
   const reminders = [
-    { id: 1, label: "RTL Terlambat — Fakultas Hukum",  deadline: "10 Mei 2025", tag: "Overdue",  prioritas: "Kritis"  },
-    { id: 2, label: "RTL Terlambat — LPPM",            deadline: "15 Mei 2025", tag: "Overdue",  prioritas: "Kritis"  },
-    { id: 3, label: "RTL Terlambat — Sarpras",         deadline: "18 Mei 2025", tag: "RTL",      prioritas: "Tinggi"  },
-    { id: 4, label: "Audit Pendahuluan LPPM",          deadline: "26 Mei 2025", tag: "Audit",    prioritas: "Tinggi"  },
-    { id: 5, label: "Koordinasi Program Audit 2025",   deadline: "28 Mei 2025", tag: "Rapat",    prioritas: "Normal"  },
-    { id: 6, label: "Pengumpulan PKPT Semester II",    deadline: "30 Jun 2025", tag: "Rencana",  prioritas: "Normal"  },
+    ...rtlAktif.map(r => {
+      const sisa = sisaHariRtl(r.target);
+      return { id: 1000 + r.id, label: `${sisa < 0 ? "RTL Terlambat" : "RTL"} — ${r.unit} (${r.temuanId})`, deadline: r.target, tag: sisa < 0 ? "Overdue" : "RTL", prioritas: sisa < 0 ? "Kritis" : sisa <= 7 ? "Tinggi" : "Normal", sisa };
+    }).sort((a, b) => a.sisa - b.sisa),
+    { id: 4, label: "Audit Pendahuluan LPPM",          deadline: "26 Mei 2025", tag: "Audit",    prioritas: "Tinggi" },
+    { id: 5, label: "Koordinasi Program Audit 2025",   deadline: "28 Mei 2025", tag: "Rapat",    prioritas: "Normal" },
+    { id: 6, label: "Pengumpulan PKPT Semester II",    deadline: "30 Jun 2025", tag: "Rencana",  prioritas: "Normal" },
   ];
   const overdue    = reminders.filter(r => r.tag === "Overdue" && !doneIds.includes(r.id));
   const mendatang  = reminders.filter(r => r.tag !== "Overdue" && !doneIds.includes(r.id));
@@ -6782,12 +7770,21 @@ function SectionF({ subSection }: { subSection: string }) {
                 onCancel={() => setShowRapatForm(false)}
               />
             )}
+            {editRapatId !== null && canEdit && (() => {
+              const r = rapatList.find(x => x.id === editRapatId);
+              return r ? (
+                <FormTambahRapat key={r.id} initial={r}
+                  onSave={v => { updateRapat(r.id, v); setEditRapatId(null); }}
+                  onCancel={() => setEditRapatId(null)} />
+              ) : null;
+            })()}
             <div className="flex flex-col gap-2">
               {rapatMendatang.length === 0 && (
                 <div className="text-center py-6 text-[10px] text-gray-400">Belum ada agenda mendatang.</div>
               )}
               {rapatMendatang.map((r) => (
-                <div key={r.id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+                <div key={r.id} className="flex flex-col gap-1">
+                <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
                   <div className="flex-shrink-0 text-center bg-teal-50 rounded-lg px-2 py-1.5 min-w-[52px]">
                     <div className="text-[10px] text-teal-600 font-bold leading-tight">{r.tgl.split(" ").slice(0,2).join(" ")}</div>
                     <div className="text-[9px] text-teal-400">{r.jam}</div>
@@ -6797,10 +7794,18 @@ function SectionF({ subSection }: { subSection: string }) {
                     <div className="text-[10px] text-gray-400">{r.tempat} · {pesertaLabel(r.peserta)}</div>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Detail</button>
-                    {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
+                    <button onClick={() => setDetailRapatId(v => v === r.id ? null : r.id)} className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">{detailRapatId === r.id ? "Tutup" : "Detail"}</button>
+                    {canEdit && <button onClick={() => { setShowRapatForm(false); setEditRapatId(r.id); }} className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
                     {canEdit && <button onClick={() => setPendingDelete({ msg: `Batalkan rapat "${r.judul}"?`, fn: () => batalkanRapat(r.id) })} className="text-[9px] px-2 py-1 rounded border border-red-100 text-red-500 hover:bg-red-50">Batalkan</button>}
                   </div>
+                </div>
+                {detailRapatId === r.id && (
+                  <div className="ml-[64px] px-3 py-2 rounded-lg bg-gray-50 border border-gray-100 text-[10px] text-gray-600 leading-relaxed">
+                    <div><span className="font-bold text-gray-500">Tanggal:</span> {r.tgl} · {r.jam}</div>
+                    <div><span className="font-bold text-gray-500">Tempat:</span> {r.tempat}</div>
+                    <div><span className="font-bold text-gray-500">Peserta:</span> {r.peserta.join(", ")}</div>
+                  </div>
+                )}
                 </div>
               ))}
             </div>
@@ -6855,7 +7860,7 @@ function SectionF({ subSection }: { subSection: string }) {
         </div>
       )}
 
-      {active === "Deadline & Reminder" && <DeadlineReminderPanel />}
+      {active === "Agenda SPI" && <AgendaSPIPanel />}
       {pendingDelete && (
         <ConfirmModal
           message={pendingDelete.msg}
@@ -6914,6 +7919,7 @@ function SectionG({ subSection }: { subSection: string }) {
     { no: 9, komponen: "Lain-lain",     sub: "Biaya Pelatihan Eksternal",  jumlah: 20.0, sumber: "DIPA",     status: "Revisi"    },
     { no:10, komponen: "Lain-lain",     sub: "Langganan Aplikasi Audit",   jumlah: 15.0, sumber: "Internal", status: "Disetujui" },
   ]);
+  const [editAnggaran, setEditAnggaran] = useState<number | null>(null);
   const totalRencana = rencanaDetail.reduce((s, d) => s + d.jumlah, 0);
   const [pendingDelete, setPendingDelete] = useState<{ msg: string; confirmLabel?: string; fn: () => void } | null>(null);
 
@@ -6934,25 +7940,6 @@ function SectionG({ subSection }: { subSection: string }) {
       {/* Rencana Anggaran */}
       {active === "Rencana Anggaran" && (
         <div className="flex flex-col gap-4">
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-gray-700">Rencana vs Realisasi per Komponen</h4>
-              <div className="flex gap-3">
-                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-300"/><span className="text-[8px] text-gray-400">Rencana</span></div>
-                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm" style={{background:"var(--tsu-teal)"}}/><span className="text-[8px] text-gray-400">Realisasi</span></div>
-              </div>
-            </div>
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={komponenAnggaran} barSize={14} barGap={3} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="komponen" tick={{ fontSize: 8, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} unit=" Jt" />
-                <Tooltip contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} formatter={(v: unknown, name: unknown) => [`Rp ${v} Jt`, name === "rencana" ? "Rencana" : "Realisasi"]} />
-                <Bar dataKey="rencana"   fill="#cbd5e1" radius={[3,3,0,0]} />
-                <Bar dataKey="realisasi" fill="var(--tsu-teal)" radius={[3,3,0,0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -6980,7 +7967,7 @@ function SectionG({ subSection }: { subSection: string }) {
                       <td className="py-2 pr-3 text-gray-500">{r.sumber}</td>
                       <td className="py-2 pr-3"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${r.status === "Disetujui" ? "bg-green-50 text-green-600" : r.status === "Revisi" ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-500"}`}>{r.status}</span></td>
                       <td className="py-2"><div className="flex gap-1">
-                        {canEdit && <button className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
+                        {canEdit && <button onClick={() => setEditAnggaran(r.no)} className="text-[9px] px-2 py-1 rounded border border-gray-200 hover:bg-gray-50 text-gray-600">Edit</button>}
                         {canEdit && <button onClick={() => setPendingDelete({ msg: `Hapus "${r.komponen} – ${r.sub}"?`, fn: () => setRencanaDetail(prev => prev.filter(x => x.no !== r.no)) })} className="text-[9px] px-2 py-1 rounded border border-red-100 hover:bg-red-50 text-red-500">Hapus</button>}
                       </div></td>
                     </tr>
@@ -6995,29 +7982,6 @@ function SectionG({ subSection }: { subSection: string }) {
       {/* Realisasi Anggaran */}
       {active === "Realisasi Anggaran" && (
         <div className="flex flex-col gap-4">
-          <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
-            <h4 className="text-xs font-bold text-gray-700 mb-3">Tren Realisasi vs Rencana (Rp Jt)</h4>
-            <ResponsiveContainer width="100%" height={160}>
-              <AreaChart data={anggaranTrend} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="gradRencanaG" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gradRealisasiG" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0e8080" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#0e8080" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="bulan" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} unit=" Jt" />
-                <Tooltip contentStyle={{ fontSize: 10, borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} formatter={((v: unknown, name: unknown) => [`Rp ${v} Jt`, name === "rencana" ? "Rencana" : "Realisasi"]) as never} />
-                <Area type="monotone" dataKey="rencana" stroke="#94a3b8" strokeWidth={2} strokeDasharray="4 4" fill="url(#gradRencanaG)" />
-                <Area type="monotone" dataKey="realisasi" stroke="var(--tsu-teal)" strokeWidth={2.5} fill="url(#gradRealisasiG)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs font-bold text-gray-700">Realisasi vs Rencana per Komponen</h4>
@@ -7116,6 +8080,22 @@ function SectionG({ subSection }: { subSection: string }) {
           </div>
         </div>
       )}
+      {editAnggaran !== null && canEdit && (() => {
+        const r = rencanaDetail.find(x => x.no === editAnggaran);
+        return r ? (
+          <TambahFormModal key={r.no} title="Edit Komponen Anggaran"
+            initial={{ komponen: r.komponen, sub: r.sub, jumlah: String(r.jumlah), sumber: r.sumber, status: r.status }}
+            fields={[
+              { key:"komponen", label:"Komponen",       type:"text" },
+              { key:"sub",      label:"Sub-Komponen",   type:"text" },
+              { key:"jumlah",   label:"Jumlah (Rp Jt)", type:"text" },
+              { key:"sumber",   label:"Sumber Dana",    type:"select", options:["DIPA","Internal","BOPTN","PNBP","Dana Mandiri"] },
+              { key:"status",   label:"Status",         type:"select", options:["Draft","Revisi","Disetujui"] },
+            ]}
+            onSave={v => setRencanaDetail(prev => prev.map(x => x.no !== r.no ? x : { ...x, komponen: v.komponen || x.komponen, sub: v.sub || x.sub, jumlah: parseFloat(v.jumlah) || x.jumlah, sumber: v.sumber || x.sumber, status: v.status || x.status }))}
+            onClose={() => setEditAnggaran(null)} />
+        ) : null;
+      })()}
       {tambahModal === "Tambah Komponen Anggaran" && (
         <TambahFormModal title="Tambah Komponen Anggaran" fields={[
           { key:"komponen", label:"Komponen",          type:"text" },
@@ -7123,7 +8103,7 @@ function SectionG({ subSection }: { subSection: string }) {
           { key:"jumlah",   label:"Jumlah (Rp Jt)",    type:"text", placeholder:"0.0" },
           { key:"sumber",   label:"Sumber Dana",       type:"select", options:["DIPA","BOPTN","PNBP","Dana Mandiri"] },
         ]}
-        onSave={(v) => setRencanaDetail(prev => [{ no: prev.length + 1, komponen: v.komponen || "-", sub: v.sub || "-", jumlah: parseFloat(v.jumlah) || 0, sumber: v.sumber || "DIPA", status: "Draft" }, ...prev])}
+        onSave={(v) => setRencanaDetail(prev => [{ no: Math.max(0, ...prev.map(x => x.no)) + 1, komponen: v.komponen || "-", sub: v.sub || "-", jumlah: parseFloat(v.jumlah) || 0, sumber: v.sumber || "DIPA", status: "Draft" }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
       {tambahModal === "Tambah Komponen Realisasi" && (
@@ -7162,35 +8142,24 @@ function SectionG({ subSection }: { subSection: string }) {
   );
 }
 
-function IndeksKomposit() {
-  const metrics = [
-    { label: "Kepatuhan",             val: "85,2%" },
-    { label: "Pengendalian Internal", val: "82,7%" },
-    { label: "Manajemen Risiko",      val: "78,4%" },
-    { label: "Efektivitas RTL",       val: "83,1%" },
-  ];
+function IndeksKomposit({ data = kpiData }: { data?: KpiKategori[] }) {
+  const nilai = hitungIndeksKomposit(data);
+  const kat = nilai === null ? null : getKategoriIndeks(nilai);
+
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {metrics.map((m) => (
-          <div key={m.label} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm" style={{ borderTop: "3px solid var(--tsu-teal)" }}>
-            <div className="text-[10px] text-gray-400">{m.label}</div>
-            <div className="text-2xl font-black mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-teal)" }}>{m.val}</div>
-          </div>
-        ))}
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex items-center justify-between gap-3" style={{ borderTop: "3px solid var(--tsu-gold)" }}>
           <div>
             <div className="text-[10px] font-bold" style={{ color: "var(--tsu-teal-dark)" }}>Indeks Komposit</div>
-            <div className="text-2xl font-black mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-gold)" }}>82,4%</div>
+            <div className="text-2xl font-black mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "var(--tsu-gold)" }}>{nilai === null ? "Belum tersedia" : `${nilai.toLocaleString("id-ID", { minimumFractionDigits: 1 })}%`}</div>
           </div>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>Efektif</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>{kat?.label ?? "—"}</span>
         </div>
         <div className="md:col-span-2 bg-white rounded-xl border border-gray-100 p-4 shadow-sm flex flex-col justify-center" style={{ borderLeft: "4px solid var(--tsu-teal)" }}>
           <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "var(--tsu-teal-dark)" }}>Tindakan Manajemen</div>
-          <div className="text-xs font-semibold text-gray-600 mt-1">Pertahankan dan lakukan perbaikan pada indikator yang belum tercapai</div>
+          <div className="text-xs font-semibold text-gray-600 mt-1">{kat?.tindakan ?? "Belum ditetapkan SPI"}</div>
         </div>
       </div>
     </div>
@@ -7200,7 +8169,7 @@ function IndeksKomposit() {
 // ── Pengaturan Sistem ─────────────────────────────────────────────────────────
 
 export const DEMO_USERS_EXT = [
-  { id:1, nama:"Setiyowati, S.Kom., M.Kom.", email:"ketua@spi.tsu.ac.id",       role:"full",       unit:"—",       jabatan:"Ketua SPI",           aktif:true },
+  { id:1, nama:"Setiyowati, S.Kom., M.Kom.", email:"ketua@spi.tsu.ac.id",       role:"full",       unit:"—",       jabatan:"Kepala SPI",           aktif:true },
   { id:2, nama:"Budi Santoso, S.E.",         email:"auditor@spi.tsu.ac.id",     role:"pengawasan", unit:"—",       jabatan:"Auditor Internal",    aktif:true },
   { id:3, nama:"Dewi Rahayu, A.Md.",         email:"backoffice@spi.tsu.ac.id",  role:"backoffice", unit:"—",       jabatan:"Staff Back Office",   aktif:true },
   { id:4, nama:"Ahmad Fauzi, S.Pd.",         email:"baak@auditee.tsu.ac.id",    role:"auditee",    unit:"BAAK",    jabatan:"Kabag BAAK",          aktif:true },
@@ -7678,7 +8647,7 @@ function PengaturanSistem({ user, onClose, onPasswordChanged, userList, setUserL
                     {newUser.password && newUser.password.length < 8 && (
                       <p className="text-[10px] text-red-500">Password minimal 8 karakter.</p>
                     )}
-                    <p className="text-[10px] text-amber-700">Diisi manual oleh Ketua SPI lalu diserahkan ke pengguna. Saat pengguna login, muncul peringatan agar segera mengganti password ini.</p>
+                    <p className="text-[10px] text-amber-700">Diisi manual oleh Kepala SPI lalu diserahkan ke pengguna. Saat pengguna login, muncul peringatan agar segera mengganti password ini.</p>
                   </div>
                   <div className="flex gap-2">
                     <button onClick={addUserHandler}
@@ -7970,12 +8939,46 @@ function PengaturanSistem({ user, onClose, onPasswordChanged, userList, setUserL
 
 // ── Rektor Executive Dashboard ────────────────────────────────────────────────
 
+function RektorDetailModal({ title, rows, link, extra, onClose }: {
+  title: string; rows: [string, React.ReactNode][]; link?: string | null; extra?: React.ReactNode; onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.4)" }} onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl p-5 w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-gray-800">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+        </div>
+        <dl className="flex flex-col gap-1.5">
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex gap-3 text-[11px]">
+              <dt className="w-36 flex-shrink-0 text-gray-400">{k}</dt>
+              <dd className="flex-1 text-gray-700 font-medium break-words">{v}</dd>
+            </div>
+          ))}
+        </dl>
+        {extra}
+        {link && (
+          <a href={link} target="_blank" rel="noreferrer" className="mt-4 inline-flex text-[11px] font-bold px-3 py-1.5 rounded-lg"
+            style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>↗ Buka Dokumen</a>
+        )}
+        <p className="mt-3 text-[10px] text-gray-400">Tampilan baca saja.</p>
+      </div>
+    </div>
+  );
+}
+
 function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config, setConfig, prefs, setPrefs }: {
   user: User; onLogout: () => void; users: UserRow[]; setUsers: React.Dispatch<React.SetStateAction<UserRow[]>>;
   onUpdateUser: (patch: Partial<User>) => void; config: AppConfig; setConfig: React.Dispatch<React.SetStateAction<AppConfig>>;
   prefs: PrefsMap; setPrefs: React.Dispatch<React.SetStateAction<PrefsMap>>;
 }) {
   const { rapatList } = useContext(RapatCtx);
+  // Rektor: angka dashboard tetap, tetapi detail LHA & RTL dapat dilihat (baca saja).
+  const { laporanList, rencanaList } = useContext(AuditCtx);
+  const { rtlList, temuanList } = useContext(TemuanCtx);
+  const [detailLha, setDetailLha] = useState<string | null>(null);
+  const [detailRtl, setDetailRtl] = useState<number | null>(null);
   const [showLogout, setShowLogout] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pwWarn, setPwWarn] = useState(!!user.mustChangePassword);
@@ -8014,11 +9017,6 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
     { unit: "LPM",           program: "Audit Kinerja Mhs",         status: "Rencana",  temuan: 0, rtlSelesai: 0, rtlTotal: 0,  lha: false },
   ];
 
-  const lhaList = [
-    { judul: "LHA Audit Kinerja BAAK 2025",   tgl: "12 Mei 2025",  unit: "BAAK",   status: "Final", link: "https://drive.google.com/file/lha-baak-2025"   },
-    { judul: "LHA Audit Kepatuhan LPPM 2025", tgl: "28 Mar 2025",  unit: "LPPM",   status: "Final", link: "https://drive.google.com/file/lha-lppm-2025"   },
-    { judul: "LHA Audit Sarpras Q1 2025",     tgl: "15 Feb 2025",  unit: "Sarpras",status: "Draft", link: "https://drive.google.com/file/lha-sarpras-2025" },
-  ];
 
   const rapatMendatang = rapatList.filter(r => r.status === "Terjadwal").slice(0, 4);
 
@@ -8027,6 +9025,10 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
     s === "Berjalan"     ? "bg-blue-100 text-blue-700"     :
     s === "Draft"        ? "bg-amber-100 text-amber-700"   :
     s === "Final"        ? "bg-teal-100 text-teal-700"     :
+    s === "Diterima"     ? "bg-teal-100 text-teal-700"     :
+    s === "Revisi"       ? "bg-amber-100 text-amber-700"   :
+    s === "Proses"       ? "bg-blue-100 text-blue-700"     :
+    s === "Menunggu Verifikasi" ? "bg-purple-100 text-purple-700" :
     s === "Dalam Proses" ? "bg-blue-100 text-blue-700"     :
     s === "Terlambat"    ? "bg-red-100 text-red-700"       :
                            "bg-gray-100 text-gray-500";
@@ -8078,7 +9080,7 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
             Pengaturan
           </button>
           <button onClick={() => setShowLogout(true)}
-            className="text-[10px] font-semibold text-red-400 hover:text-white px-2 py-1 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0">
+            className="text-[10px] font-semibold text-red-700 border border-red-600 px-2 py-1 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0">
             Keluar
           </button>
         </div>
@@ -8090,7 +9092,7 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
           <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="text-xs font-bold text-amber-800">Segera ganti password sementara Anda</div>
-              <p className="text-[11px] text-amber-700 mt-0.5">Akun Anda masih memakai password sementara dari Ketua SPI. Demi keamanan, ganti dengan password pribadi di Pengaturan.</p>
+              <p className="text-[11px] text-amber-700 mt-0.5">Akun Anda masih memakai password sementara dari Kepala SPI. Demi keamanan, ganti dengan password pribadi di Pengaturan.</p>
             </div>
             <button onClick={() => setShowSettings(true)}
               className="text-xs font-bold px-3 py-2 rounded-xl text-white flex-shrink-0" style={{ background:"var(--tsu-teal)" }}>
@@ -8364,28 +9366,86 @@ function RektorDashboard({ user, onLogout, users, setUsers, onUpdateUser, config
                 </div>
               </div>
               <div className="divide-y divide-gray-50">
-                {lhaList.map((l, i) => (
-                  <div key={i} className="flex items-center gap-3 px-4 py-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm flex-shrink-0"
-                      style={{ background: "var(--tsu-teal-light)" }}>
-                      
-                    </div>
+                {laporanList.map(l => (
+                  <div key={l.no} className="flex items-center gap-3 px-4 py-3">
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-gray-700 truncate">{l.judul}</div>
+                      <div className="text-xs font-semibold text-gray-700 truncate">{l.no}</div>
                       <div className="text-[10px] text-gray-400 mt-0.5">{l.unit} · {l.tgl}</div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${statusBadge(l.status)}`}>{l.status}</span>
-                      <a href={l.link} target="_blank" rel="noreferrer"
-                        className="text-[9px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 hover:opacity-80 transition-opacity"
+                      <button onClick={() => setDetailLha(l.no)}
+                        className="text-[9px] font-bold px-2 py-1 rounded-lg hover:opacity-80 transition-opacity"
                         style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>
-                        ↗ Buka
-                      </a>
+                        Detail
+                      </button>
                     </div>
                   </div>
                 ))}
+                {laporanList.length === 0 && <div className="px-4 py-6 text-center text-[11px] text-gray-400">Belum ada LHA.</div>}
               </div>
             </div>
+
+            {/* RTL — baca saja */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+                <h2 className="text-sm font-bold text-gray-700">Tindak Lanjut Rekomendasi (RTL)</h2>
+              </div>
+              <div className="divide-y divide-gray-50">
+                {rtlList.map(r => {
+                  const tl = rtlTlStatus(r);
+                  return (
+                    <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-gray-700 truncate">{temuanList.find(t => t.id === r.temuanId)?.deskripsi ?? r.temuanId}</div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">{r.unit} · Target {r.target}</div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${TL_STATUS_STYLE[tl].cls}`}>{tl}</span>
+                        <button onClick={() => setDetailRtl(r.id)}
+                          className="text-[9px] font-bold px-2 py-1 rounded-lg hover:opacity-80 transition-opacity"
+                          style={{ background: "var(--tsu-teal-light)", color: "var(--tsu-teal)" }}>
+                          Detail
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {rtlList.length === 0 && <div className="px-4 py-6 text-center text-[11px] text-gray-400">Belum ada RTL.</div>}
+              </div>
+            </div>
+
+            {(() => {
+              const l = laporanList.find(x => x.no === detailLha);
+              if (!l) return null;
+              const rows: [string, React.ReactNode][] = [
+                ["No LHA", l.no], ["Audit", l.auditNo ? `${l.auditNo} — ${rencanaList.find(a => a.no === l.auditNo)?.jenis ?? ""}` : "—"],
+                ["Unit", l.unit], ["Tanggal", l.tgl], ["Status", l.status],
+                ["Temuan", l.temuan], ["Rekomendasi", l.rekomendasi], ["Revisi ke", l.revisiKe ?? 0],
+              ];
+              return (
+                <RektorDetailModal title="Detail LHA" rows={rows} onClose={() => setDetailLha(null)}
+                  link={l.status === "Diterima" ? l.link : null}
+                  extra={l.riwayatRevisi && l.riwayatRevisi.length > 0 ? (
+                    <div className="mt-3">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase mb-1">Riwayat Revisi</div>
+                      {l.riwayatRevisi.map((rv, i) => <div key={i} className="text-[11px] text-gray-600">{rv.tgl} — {rv.catatan}</div>)}
+                    </div>
+                  ) : null} />
+              );
+            })()}
+            {(() => {
+              const r = rtlList.find(x => x.id === detailRtl);
+              if (!r) return null;
+              const tl = rtlTlStatus(r);
+              const rows: [string, React.ReactNode][] = [
+                ["Temuan", temuanList.find(t => t.id === r.temuanId)?.deskripsi ?? r.temuanId], ["Unit", r.unit],
+                ["Rencana Tindak Lanjut", r.rencana], ["PIC", r.pic], ["Target", r.target],
+                ["Status RTL", <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${TL_STATUS_STYLE[tl].cls}`}>{tl}</span>],
+                ["Tanggal Selesai", r.tglSelesai || "—"],
+              ];
+              return <RektorDetailModal title="Detail RTL" rows={rows} onClose={() => setDetailRtl(null)} link={r.bukti} />;
+            })()}
           </div>
 
           {/* Right column — Charts */}
@@ -8574,16 +9634,16 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
   const [pwWarn, setPwWarn]                       = useState(!!user.mustChangePassword);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [rapatList, setRapatList]                 = useState<Rapat[]>(RAPAT_AWAL);
+  const [suratKeluar, setSuratKeluar]             = useState<SuratKeluarItem[]>(SURAT_KELUAR_AWAL);
   const [readNotifIds, setReadNotifIds] = useState<Set<number>>(new Set());
 
-  type Notif = { id: number; icon: string; title: string; body: string; time: string; tag: string; roles: string[] };
+  type Notif = { id: number; icon: string; title: string; body: string; time: string; tag: string; roles: string[]; unit?: string };
   const [allNotifs, setAllNotifs] = useState<Notif[]>([
     { id:1,  icon:"", title:"RTL Sarpras jatuh tempo",              body:"Tindak lanjut rekomendasi R-003 batas akhir 3 hari lagi.",         time:"5 mnt lalu",  tag:"Deadline", roles:["full","pengawasan"] },
     { id:2,  icon:"", title:"Audit BAAK selesai",                    body:"LHA sudah diterbitkan dan tersedia di modul Riwayat.",              time:"1 jam lalu",  tag:"Audit",    roles:["full","pengawasan","rektor"] },
     { id:3,  icon:"", title:"Rapat Tinjauan Manajemen besok",        body:"Rapat dijadwalkan pukul 09.00 — Ruang Sidang Utama.",              time:"2 jam lalu",  tag:"Rapat",    roles:["full","pengawasan","backoffice","auditee","rektor"] },
     { id:4,  icon:"", title:"PKPT baru diunggah",                    body:"Rencana Kerja Pengawasan Tahunan 2025 telah diperbarui.",           time:"3 jam lalu",  tag:"Info",     roles:["full","backoffice"] },
     { id:5,  icon:"", title:"Auditor baru ditambahkan",              body:"Dwi Santoso, CISA — telah terdaftar di modul SDM.",                time:"Kemarin",     tag:"SDM",      roles:["full","backoffice"] },
-    { id:6,  icon:"", title:"Jadwal pemusnahan dokumen menunggu",    body:"3 arsip menunggu persetujuan pemusnahan di modul Retensi.",        time:"4 jam lalu",  tag:"Arsip",    roles:["full","backoffice"] },
     { id:7,  icon:"", title:"Realisasi anggaran kurang dari 80%",    body:"Penyerapan anggaran Q2 masih 67% — perlu evaluasi segera.",        time:"Hari ini",    tag:"Anggaran", roles:["full","backoffice","rektor"] },
     { id:8,  icon:"", title:"Rekomendasi baru dari auditor",         body:"2 rekomendasi baru pada audit BAAK perlu ditindaklanjuti.",        time:"6 mnt lalu",  tag:"RTL",      roles:["auditee"] },
     { id:9,  icon:"", title:"Deadline RTL #2 dalam 4 hari",          body:"Mohon segera unggah bukti tindak lanjut sebelum batas waktu.",    time:"30 mnt lalu", tag:"Deadline", roles:["auditee"] },
@@ -8608,6 +9668,110 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
     }, ...prev]);
   }
 
+  const [temuanList, setTemuanList] = useState<TemuanRisiko[]>(TEMUAN_AWAL);
+  const [rtlList, setRtlList] = useState<RtlItem[]>(RTL_AWAL);
+  // Rencana Audit & LHA dipakai bersama oleh Pengawasan, Back Office (PKPT → Rencana Audit), dan Rektor.
+  const [laporanList, setLaporanList] = useState<LaporanItem[]>(LAPORAN_AWAL);
+  const [rencanaList, setRencanaList] = useState<RencanaItem[]>(RENCANA_AWAL);
+  const laporanView = useMemo(() => laporanList.map(l => {
+    if (!l.auditNo) return l;
+    const ids = temuanList.filter(t => t.auditNo === l.auditNo).map(t => t.id);
+    return { ...l, temuan: ids.length, rekomendasi: rtlList.filter(r => ids.includes(r.temuanId)).length };
+  }), [laporanList, temuanList, rtlList]);
+  const auditCtxValue: AuditCtxType = { laporanList: laporanView, setLaporanList, rencanaList, setRencanaList };
+
+  function pushNotif(n: Omit<Notif, "id" | "icon" | "time">) {
+    setAllNotifs(prev => [{ ...n, id: Math.max(0, ...prev.map(x => x.id)) + 1, icon: "", time: "Baru saja" }, ...prev]);
+  }
+
+  function addTemuan(t: Omit<TemuanRisiko, "status">) {
+    if (temuanList.some(x => x.id === t.id)) {
+      const n = Math.max(0, ...temuanList.map(x => parseInt(x.id.replace(/\D/g, "")) || 0)) + 1;
+      t = { ...t, id: `R-${String(n).padStart(3, "0")}` };
+    }
+    setTemuanList(prev => [{ ...t, status: "Belum Ditindak" }, ...prev]);
+    pushNotif({ title: `Temuan risiko baru — ${t.unit}`, body: `${t.id}: ${t.deskripsi}. Mohon susun rencana tindak lanjut.`, tag: "RTL", roles: ["auditee"], unit: t.unit });
+  }
+
+  function ajukanRtl(temuanId: string, v: { rencana: string; pic: string; target: string; link: string | null }) {
+    const t = temuanList.find(x => x.id === temuanId);
+    if (!t || rtlList.some(r => r.temuanId === temuanId)) return;
+    setRtlList(prev => [{
+      id: Math.max(0, ...prev.map(x => x.id)) + 1, temuanId, unit: t.unit,
+      rencana: v.rencana, pic: v.pic, target: v.target ? tglIsoToId(v.target) : "-",
+      link: v.link, progres: 0, bukti: null, hasil: null, catatan: "", verifikator: "—", tglSelesai: "—",
+    }, ...prev]);
+    setTemuanList(prev => prev.map(x => x.id === temuanId ? { ...x, status: "Proses" } : x));
+    pushNotif({ title: `RTL baru — ${t.unit}`, body: `${temuanId}: ${v.rencana} (PIC ${v.pic}).`, tag: "RTL", roles: ["full", "pengawasan"] });
+  }
+
+  function setProgresRtl(id: number, progres: number) {
+    setRtlList(prev => prev.map(r => r.id === id ? { ...r, progres: Math.max(0, Math.min(100, progres)) } : r));
+  }
+
+  function kirimBukti(id: number, link: string) {
+    const r = rtlList.find(x => x.id === id);
+    if (!r) return;
+    setRtlList(prev => prev.map(x => x.id === id ? { ...x, bukti: link, tlStatus: x.tlStatus === "Close" ? "Close" : "Progres", catatan: "" } : x));
+    pushNotif({ title: `Bukti RTL diunggah — ${r.unit}`, body: `${r.temuanId}: Bukti pelaksanaan telah diunggah (${r.rencana}).`, tag: "RTL", roles: ["full", "pengawasan"] });
+  }
+
+  function verifikasiRtl(id: number, hasil: "Diterima" | "Ditolak", catatan: string, verifikator: string) {
+    const r = rtlList.find(x => x.id === id);
+    if (!r) return;
+    setRtlList(prev => prev.map(x => x.id === id ? { ...x, hasil, catatan: catatan.trim(), verifikator, tglSelesai: hasil === "Diterima" ? RTL_TODAY_LABEL : "—" } : x));
+    setTemuanList(prev => prev.map(x => x.id === r.temuanId ? { ...x, status: hasil === "Diterima" ? "Selesai" : "Proses" } : x));
+    pushNotif({
+      title: hasil === "Diterima" ? "Verifikasi RTL disetujui" : "Verifikasi RTL ditolak",
+      body: `${r.temuanId}: ${r.rencana}${hasil === "Ditolak" && catatan.trim() ? ` — Catatan: ${catatan.trim()}` : ""}`,
+      tag: "RTL", roles: ["auditee", "full", "pengawasan", "rektor"].filter(x => x !== "rektor" || hasil === "Diterima"), unit: r.unit,
+    });
+  }
+
+  function setTlStatusRtl(id: number, status: TlStatus) {
+    const r = rtlList.find(x => x.id === id);
+    if (!r) return;
+    setRtlList(prev => prev.map(x => x.id === id ? { ...x, tlStatus: status, tglSelesai: status === "Close" ? RTL_TODAY_LABEL : "—" } : x));
+    setTemuanList(prev => prev.map(x => x.id === r.temuanId ? { ...x, status: status === "Close" ? "Selesai" : "Proses" } : x));
+    if (r.tlStatus !== status) {
+      pushNotif({ title: `Status RTL diperbarui — ${status}`, body: `RTL-${String(r.id).padStart(3, "0")} (${r.temuanId}): ${r.rencana}`, tag: "RTL", roles: ["auditee"], unit: r.unit });
+    }
+  }
+
+  function updateRtl(id: number, patch: { rencana: string; pic: string; target: string; link: string | null; bukti: string | null }) {
+    const r = rtlList.find(x => x.id === id);
+    if (!r) return;
+    const buktiBaru = !!patch.bukti && patch.bukti !== r.bukti;
+    setRtlList(prev => prev.map(x => x.id === id ? {
+      ...x, ...patch,
+      tlStatus: buktiBaru && rtlTlStatus(x) === "Diterima" ? "Progres" : x.tlStatus,
+    } : x));
+    pushNotif({ title: `RTL diperbarui — ${r.unit}`, body: `RTL-${String(id).padStart(3, "0")} (${r.temuanId}): ${buktiBaru ? "Bukti pelaksanaan diperbarui." : "Isian RTL diperbarui."}`, tag: "RTL", roles: ["full", "pengawasan"] });
+  }
+
+  function tambahRtl(temuanId: string, v: { rencana: string; pic: string; target: string; link: string | null; bukti: string | null }) {
+    const t = temuanList.find(x => x.id === temuanId);
+    if (!t) return;
+    const id = Math.max(0, ...rtlList.map(x => x.id)) + 1;
+    setRtlList(prev => [{
+      id, temuanId, unit: t.unit, rencana: v.rencana, pic: v.pic, target: v.target,
+      link: v.link, progres: 0, bukti: v.bukti, hasil: null, catatan: "", verifikator: "—", tglSelesai: "—",
+      tlStatus: v.bukti ? "Progres" : "Diterima",
+    }, ...prev]);
+    setTemuanList(prev => prev.map(x => x.id === temuanId && x.status === "Belum Ditindak" ? { ...x, status: "Proses" } : x));
+    pushNotif({ title: `RTL baru — ${t.unit}`, body: `RTL-${String(id).padStart(3, "0")} (${temuanId}): ${v.rencana} (PIC ${v.pic}).`, tag: "RTL", roles: ["full", "pengawasan"] });
+  }
+
+  const temuanCtxValue: TemuanCtxType = { temuanList, rtlList, addTemuan, ajukanRtl, setProgresRtl, kirimBukti, verifikasiRtl, setTlStatusRtl, updateRtl, tambahRtl };
+
+  function updateRapat(id: number, r: Omit<Rapat, "id" | "status">) {
+    setRapatList(prev => prev.map(x => x.id === id ? { ...x, ...r } : x));
+  }
+
+  function selesaiRapat(id: number) {
+    setRapatList(prev => prev.map(r => r.id === id ? { ...r, status: "Selesai" } : r));
+  }
+
   function batalkanRapat(id: number) {
     setRapatList(prev => prev.map(r => r.id === id ? { ...r, status: "Batal" } : r));
   }
@@ -8620,7 +9784,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
     const keys = Object.keys(myPrefs).filter(k => k.toLowerCase().includes(kw));
     return keys.length === 0 || keys.some(k => myPrefs[k]);
   };
-  const myNotifs = allNotifs.filter(n => n.roles.includes(user.role) && notifAllowed(n.tag));
+  const myNotifs = allNotifs.filter(n => n.roles.includes(user.role) && notifAllowed(n.tag) && (!n.unit || user.role !== "auditee" || n.unit === user.unit));
   const unreadCount = myNotifs.filter(n => !readNotifIds.has(n.id)).length;
   const notifTagColor: Record<string,string> = {
     Deadline:"bg-red-50 text-red-600",   Audit:"bg-teal-50 text-teal-700",
@@ -8632,7 +9796,21 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
   const defaultModule = user.role === "backoffice" ? "backoffice" : "pengawasan";
   const defaultSection = user.role === "backoffice" ? "R" : "ringkasan";
   const isReadOnly = user.role === "rektor";
-  const defaultItem = navGroups.find(g => g.key === defaultModule)?.items.find(i => i.sectionKey === defaultSection);
+  const navGroupsView = user.role === "auditee"
+    ? navGroups.map(g => {
+        if (g.key !== "pengawasan") return g;
+        const by = (k: string) => g.items.find(i => i.sectionKey === k)!;
+        const rest = g.items.filter(i => !["ringkasan", "kalender", "audit", "risiko"].includes(i.sectionKey));
+        return { ...g, items: [
+          by("ringkasan"),
+          { ...by("kalender"), children: ["Pemberitahuan & Jadwal", "Kalender Pengawasan"] },
+          { ...by("audit"), children: ["Entry Meeting", "Draft Temuan & Konfirmasi", "Exit Meeting"] },
+          by("risiko"),
+          ...rest.map(it => it.sectionKey === "riwayat" ? { ...it, label: "Riwayat Audit", children: [] as string[] } : it),
+        ] };
+      })
+    : navGroups;
+  const defaultItem = navGroupsView.find(g => g.key === defaultModule)?.items.find(i => i.sectionKey === defaultSection);
 
   const [activeModule, setActiveModule]     = useState(defaultModule);
   const [activeSection, setActiveSection]   = useState(defaultSection);
@@ -8659,7 +9837,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
   function navigate(module: string, section: string) {
     setActiveModule(module);
     setActiveSection(section);
-    const firstChild = navGroups.find(g => g.key === module)?.items.find(i => i.sectionKey === section)?.children?.[0] ?? "";
+    const firstChild = navGroupsView.find(g => g.key === module)?.items.find(i => i.sectionKey === section)?.children?.[0] ?? "";
     setActiveSubSection(firstChild);
     setMobileSidebarOpen(false);
   }
@@ -8672,8 +9850,9 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
     setMobileSidebarOpen(false);
   };
 
-  const activeNavItem = navGroups.find(g => g.key === activeModule)?.items.find(i => i.sectionKey === activeSection);
-  const activeChildren = activeNavItem?.children ?? [];
+  const activeNavItem = navGroupsView.find(g => g.key === activeModule)?.items.find(i => i.sectionKey === activeSection);
+  // Auditee: Pemetaan Risiko digabung ke halaman Temuan Risiko
+  const activeChildren = (activeNavItem?.children ?? []).filter(c => !(user.role === "auditee" && c === "Pemetaan Risiko"));
 
   const roleBadge = ({
     full:        { label: "Akses Penuh",                          style: { background: "var(--tsu-teal-light)", color: "var(--tsu-teal-dark)" } },
@@ -8683,23 +9862,33 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
     auditee:     { label: `Auditee — ${user.unit ?? "Unit"}`,     style: { background: "#f5f3ff", color: "#7c3aed" } },
   } as Record<string, { label: string; style: React.CSSProperties }>)[user.role];
 
-  const activeLabel = [...navGroups.flatMap(g => g.items)].find(
+  const activeLabel = [...navGroupsView.flatMap(g => g.items)].find(
     i => i.sectionKey === activeSection
   )?.label ?? "Dashboard SPI";
 
   if (user.role === "rektor") {
     return (
-      <RapatCtx.Provider value={{ rapatList, addRapat, batalkanRapat }}>
+      <RapatCtx.Provider value={{ rapatList, addRapat, batalkanRapat, selesaiRapat, updateRapat }}>
+    <SuratKeluarCtx.Provider value={{ suratKeluar, setSuratKeluar }}>
+        <TemuanCtx.Provider value={temuanCtxValue}>
+        <AuditCtx.Provider value={auditCtxValue}>
         <UserCtx.Provider value={user}>
           <RektorDashboard user={user} onLogout={onLogout} users={users} setUsers={setUsers} onUpdateUser={onUpdateUser} config={config} setConfig={setConfig} prefs={prefs} setPrefs={setPrefs} />
         </UserCtx.Provider>
+        </AuditCtx.Provider>
+        </TemuanCtx.Provider>
+      </SuratKeluarCtx.Provider>
       </RapatCtx.Provider>
     );
   }
 
   return (
     <NavCtx.Provider value={navigateFull}>
-    <RapatCtx.Provider value={{ rapatList, addRapat, batalkanRapat }}>
+    <RapatCtx.Provider value={{ rapatList, addRapat, batalkanRapat, selesaiRapat, updateRapat }}>
+    <SuratKeluarCtx.Provider value={{ suratKeluar, setSuratKeluar }}>
+    <NotifyCtx.Provider value={pushNotif}>
+    <TemuanCtx.Provider value={temuanCtxValue}>
+    <AuditCtx.Provider value={auditCtxValue}>
     <UserCtx.Provider value={user}>
     <div className="flex h-dvh overflow-hidden" style={{ fontFamily: "'Inter', sans-serif", background: "#f1f5f9" }}>
       {/* Mobile sidebar backdrop */}
@@ -8744,7 +9933,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
               <div className="text-[9px] text-red-200 mt-0.5 leading-tight">Tidak dapat mengubah data sistem</div>
             </div>
           )}
-          {navGroups.filter((g) => canAccess(g.key)).map((group) => (
+          {navGroupsView.filter((g) => canAccess(g.key)).map((group) => (
             <div key={group.key}>
               <div className="text-[10px] font-bold tracking-widest px-3 mb-2 uppercase" style={{ color: "var(--tsu-gold)" }}>{group.section}</div>
               <div className="flex flex-col gap-0.5">
@@ -8844,7 +10033,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
             <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <div className="text-xs font-bold text-amber-800">Segera ganti password sementara Anda</div>
-                <p className="text-[11px] text-amber-700 mt-0.5">Akun Anda masih memakai password sementara dari Ketua SPI. Demi keamanan, ganti dengan password pribadi di Pengaturan Sistem.</p>
+                <p className="text-[11px] text-amber-700 mt-0.5">Akun Anda masih memakai password sementara dari Kepala SPI. Demi keamanan, ganti dengan password pribadi di Pengaturan Sistem.</p>
               </div>
               <button onClick={() => setShowSettings(true)}
                 className="text-xs font-bold px-3 py-2 rounded-xl text-white flex-shrink-0" style={{ background:"var(--tsu-teal)" }}>
@@ -8984,6 +10173,10 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
       </div>
     )}
     </UserCtx.Provider>
+    </AuditCtx.Provider>
+    </TemuanCtx.Provider>
+    </NotifyCtx.Provider>
+    </SuratKeluarCtx.Provider>
     </RapatCtx.Provider>
     </NavCtx.Provider>
   );
