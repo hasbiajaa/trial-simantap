@@ -299,6 +299,16 @@ const DRAFT_AWAL: DraftTemuan[] = [
   { unit: "Sarpras", no: "DT-004", temuan: "Belanja Modal Tanpa Berita Acara",       tglKirim: "18 Mei 2025", disposisi: "Setuju",     catatanAuditor: "Lampirkan berita acara setiap belanja modal", catatanAuditee: "BA sedang disiapkan" },
 ];
 type DokLink = Record<string, { name: string; url: string }>;
+// Kertas Kerja Audit — disimpan bersama agar stepper Auditee bisa membaca dokumen KKA dari auditor
+type KkaItem = { id: string; unit: string; pengujian: string; auditor: string; statusAudit: string; linkAuditor: string | null; linkAuditee: string | null };
+const KKA_AWAL: KkaItem[] = [
+  { id: "KKA-S-01", unit: "Sarpras",  pengujian: "Inventarisasi Aset",      auditor: "Budi S.",  statusAudit: "Selesai",  linkAuditor: "https://drive.google.com/file/kka-s-01-auditor", linkAuditee: "https://drive.google.com/file/bukti-inventaris" },
+  { id: "KKA-S-02", unit: "Sarpras",  pengujian: "Belanja Modal 2024",       auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: "https://drive.google.com/file/kka-s-02-auditor", linkAuditee: null },
+  { id: "KKA-S-03", unit: "Sarpras",  pengujian: "Penghapusan Aset",         auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
+  { id: "KKA-B-01", unit: "BAAK",     pengujian: "Prosedur Penerimaan Mhs",  auditor: "Budi S.",  statusAudit: "Selesai",  linkAuditor: "https://drive.google.com/file/kka-b-01-auditor", linkAuditee: "https://drive.google.com/file/sop-admisi-2024" },
+  { id: "KKA-B-02", unit: "BAAK",     pengujian: "Arsip Mahasiswa Keluar",   auditor: "Budi S.",  statusAudit: "Berjalan", linkAuditor: "https://drive.google.com/file/kka-b-02-draft",   linkAuditee: null },
+  { id: "KKA-K-01", unit: "BAUK",     pengujian: "Rekonsiliasi Kas & Bank",  auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
+];
 // Persetujuan tanggal Entry Meeting per rapat (id rapat → pihak yang sudah setuju)
 type JadwalSetuju = Record<number, { auditor?: boolean; auditee?: boolean }>;
 type PenutupanAudit = { status: "Open" | "Close"; tgl: string; oleh: string; residualKe?: string };
@@ -307,14 +317,68 @@ interface LapanganCtxType {
   penutupan: Record<string, PenutupanAudit>; setPenutupan: React.Dispatch<React.SetStateAction<Record<string, PenutupanAudit>>>;
   residualList: ResidualRisk[]; setResidualList: React.Dispatch<React.SetStateAction<ResidualRisk[]>>;
   draftList: DraftTemuan[]; setDraftList: React.Dispatch<React.SetStateAction<DraftTemuan[]>>;
+  kkaList: KkaItem[]; setKkaList: React.Dispatch<React.SetStateAction<KkaItem[]>>;
   uploadDocs: DokLink; setUploadDocs: React.Dispatch<React.SetStateAction<DokLink>>;
   jadwalSetuju: JadwalSetuju; setJadwalSetuju: React.Dispatch<React.SetStateAction<JadwalSetuju>>;
 }
 const LapanganCtx = createContext<LapanganCtxType>({
   penutupan: {}, setPenutupan: () => {}, residualList: [], setResidualList: () => {},
-  draftList: DRAFT_AWAL, setDraftList: () => {}, uploadDocs: {}, setUploadDocs: () => {}, jadwalSetuju: {}, setJadwalSetuju: () => {},
+  draftList: DRAFT_AWAL, setDraftList: () => {}, kkaList: KKA_AWAL, setKkaList: () => {}, uploadDocs: {}, setUploadDocs: () => {}, jadwalSetuju: {}, setJadwalSetuju: () => {},
 });
 const DOK_DIPERLUKAN = ["Struktur Organisasi Unit", "SOP / Pedoman Unit", "Daftar Dokumen Pendukung"];
+
+// ── Stepper Auditee: tahap diturunkan otomatis dari data siklus audit ───────
+// Urutan sinyal (indeks = indeks tahap stepper):
+// 0 Pemberitahuan      ← surat Pemberitahuan dari Back Office
+// 1 Entry Meeting      ← jadwal Entry Meeting (tidak Batal)
+// 2 Draft Temuan       ← draft temuan dikirim auditor
+// 3 KKA                ← dokumen KKA (link auditor) tersedia
+// 4 Exit Meeting & LHA ← LHA dari auditor (bukan draft kosong)
+// 5 RTL                ← RTL sudah dikirim auditee
+// 6 Pemantauan         ← ada RTL berstatus Progres (atau sebagian sudah Close/Open)
+// 7 Riwayat            ← seluruh RTL berstatus Close/Open
+// Tahap aktif = sinyal tertinggi yang terpenuhi; tahap sebelumnya terlampaui, sesudahnya belum dijalankan.
+function tglMs(tgl: string): number {
+  const [d, m, y] = tgl.split(" ");
+  return new Date(parseInt(y) || 0, BULAN_IDX[m] ?? 0, parseInt(d) || 1).getTime();
+}
+function hitungTahapAuditee(unit: string, d: {
+  rencanaList: RencanaItem[]; suratKeluar: SuratKeluarItem[]; rapatList: Rapat[]; draftList: DraftTemuan[];
+  kkaList: KkaItem[]; laporanList: LaporanItem[]; temuanList: TemuanRisiko[]; rtlList: RtlItem[];
+}): { aktif: number; bukti: (string | null)[]; auditNo?: string } {
+  // Audit berjalan = Rencana Audit unit yang disetujui dengan tanggal mulai terbaru
+  const auditNo = d.rencanaList
+    .filter(r => r.unit === unit && r.status === "Disetujui")
+    .sort((a, b) => tglMs(b.tglMulai) - tglMs(a.tglMulai))[0]?.no;
+  // Data milik audit ini: cocokkan nomor audit bila tercatat, selain itu cocokkan unit
+  const milik = (x: { auditNo?: string; unit: string }) => x.auditNo ? x.auditNo === auditNo : x.unit === unit;
+
+  const surat = d.suratKeluar.find(s => s.jenis === "Pemberitahuan" && (s.auditNo ? s.auditNo === auditNo : s.kepada.includes(unit)));
+  const entry = (auditNo ? entryMeetingOf(d.rapatList, auditNo) : undefined)
+    ?? d.rapatList.find(r => r.status !== "Batal" && /entry meeting/i.test(r.judul) && r.peserta.includes(unit));
+  const drafts = d.draftList.filter(milik);
+  const kka = d.kkaList.filter(k => k.unit === unit && k.linkAuditor);
+  const lha = d.laporanList.find(l => milik(l) && (l.link || l.status !== "Draft"));
+  const temuanIds = d.temuanList.filter(milik).map(t => t.id);
+  const status = d.rtlList.filter(r => temuanIds.includes(r.temuanId)).map(rtlTlStatus);
+  const n = (s: TlStatus) => status.filter(x => x === s).length;
+  const selesai = n("Close") + n("Open");
+  const semuaSelesai = status.length > 0 && selesai === status.length;
+
+  const bukti: (string | null)[] = [
+    surat ? `Surat ${surat.no} · ${surat.tgl}` : null,
+    entry ? `${entry.tgl}, ${entry.jam} · ${entry.tempat}` : null,
+    drafts.length ? `${drafts.length} draft temuan dari auditor` : null,
+    kka.length ? `${kka.length} dokumen KKA dari auditor` : null,
+    lha ? `${lha.no}${lha.link ? "" : ` · ${lha.status}`}` : null,
+    status.length ? `${status.length} RTL dikirim unit` : null,
+    !semuaSelesai && (n("Progres") > 0 || selesai > 0) ? `${n("Progres")} RTL Progres · ${selesai}/${status.length} selesai` : null,
+    semuaSelesai ? `${n("Close")} Close · ${n("Open")} Open` : null,
+  ];
+  let aktif = -1;
+  bukti.forEach((b, i) => { if (b) aktif = i; });
+  return { aktif, bukti, auditNo };
+}
 
 type NavFn = (module: string, section: string, subSection: string, suratTab?: "Masuk" | "Keluar") => void;
 const NavCtx = createContext<NavFn>(() => {});
@@ -942,6 +1006,10 @@ function PwRingkasan() {
   const [chartDetail, setChartDetail] = useState<string|null>(null);
   const navigateTo = useContext(NavCtx);
   const { temuanList, rtlList } = useContext(TemuanCtx);
+  const { rencanaList, laporanList } = useContext(AuditCtx);
+  const { suratKeluar } = useContext(SuratKeluarCtx);
+  const { rapatList } = useContext(RapatCtx);
+  const { draftList, kkaList } = useContext(LapanganCtx);
   const { risikoDonut, risikoPerUnit, totalTemuan } = buildRisikoStats(temuanList);
   return (
     <div className="flex flex-col gap-4">
@@ -1253,7 +1321,7 @@ function PwRingkasan() {
           <div className="flex flex-col gap-4">
             {/* Stepper 8 tahap */}
             {(() => {
-              const tahapAktif = 2; // Draft Temuan
+              const { aktif: tahapAktif, bukti } = hitungTahapAuditee(myUnit, { rencanaList, suratKeluar, rapatList, draftList, kkaList, laporanList, temuanList, rtlList });
               const steps: { label: string; nav: [string, string, string] }[] = [
                 { label: "Pemberitahuan",      nav: ["pengawasan", "audit", "Pemberitahuan & Jadwal"] },
                 { label: "Entry Meeting",      nav: ["pengawasan", "audit", "Entry Meeting"] },
@@ -1270,29 +1338,45 @@ function PwRingkasan() {
                     <h4 className="text-xs font-bold text-gray-700">Alur Tahapan Pengawasan</h4>
                     <span className="text-[9px] text-gray-400">Klik tahap untuk membuka menu terkait</span>
                   </div>
-                  <ol className="flex items-start overflow-x-auto pb-1">
-                    {steps.map((s, i) => {
-                      const done = i < tahapAktif;
-                      const active = i === tahapAktif;
-                      return (
-                        <li key={s.label} className="flex items-start flex-1 min-w-[84px]">
-                          <button onClick={() => navigateTo(...s.nav)}
-                            aria-current={active ? "step" : undefined}
-                            className="flex flex-col items-center gap-1.5 w-full group">
-                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all group-hover:scale-110 ${active ? "text-white ring-4 ring-purple-100" : done ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400 group-hover:bg-gray-200"}`}
-                              style={active ? { background: "#7c3aed" } : {}}>
-                              {done ? "✓" : i + 1}
-                            </span>
-                            <span className={`text-[10px] leading-tight text-center px-1 ${active ? "font-bold text-purple-700" : done ? "font-semibold text-gray-600" : "text-gray-400"}`}>{s.label}</span>
-                            {active && <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-purple-50 text-purple-600">Sedang berjalan</span>}
-                          </button>
-                          {i < steps.length - 1 && (
-                            <span className={`h-0.5 w-4 mt-4 flex-shrink-0 rounded-full ${i < tahapAktif ? "bg-purple-300" : "bg-gray-200"}`} />
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ol>
+                  <div className="overflow-x-auto pb-1">
+                    <ol className="flex" style={{ minWidth: 860 }}>
+                      {steps.map((s, i) => {
+                        const done = i < tahapAktif;
+                        const active = i === tahapAktif;
+                        const statusLabel = active ? "Sedang berjalan" : done ? "Terlampaui" : "Belum dijalankan";
+                        const ARROW = 16;
+                        const tone = "#7c3aed";
+                        const bg = active ? tone : done ? `${tone}1f` : "#f1f5f9";
+                        const fg = active ? "#fff" : done ? tone : "#94a3b8";
+                        const clip = i === 0
+                          ? `polygon(0 0, calc(100% - ${ARROW}px) 0, 100% 50%, calc(100% - ${ARROW}px) 100%, 0 100%)`
+                          : `polygon(0 0, calc(100% - ${ARROW}px) 0, 100% 50%, calc(100% - ${ARROW}px) 100%, 0 100%, ${ARROW}px 50%)`;
+                        return (
+                          <li key={s.label} className="flex-1" style={{ marginLeft: i === 0 ? 0 : -ARROW + 4 }}>
+                            <button onClick={() => navigateTo(...s.nav)}
+                              aria-current={active ? "step" : undefined}
+                              title={`${s.label} — ${statusLabel}${bukti[i] ? ` (${bukti[i]})` : ""}`}
+                              className="group w-full text-left transition-transform hover:-translate-y-0.5 focus:outline-none">
+                              <div className="h-[84px] flex flex-col justify-center transition-[filter] group-hover:brightness-95"
+                                style={{ clipPath: clip, background: bg, color: fg, paddingLeft: i === 0 ? 14 : ARROW + 10, paddingRight: ARROW + 8 }}>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center flex-shrink-0"
+                                    style={{ background: active ? "rgba(255,255,255,0.25)" : done ? "#fff" : "#e2e8f0", color: active ? "#fff" : done ? tone : "#94a3b8" }}>{done ? "✓" : i + 1}</span>
+                                  <span className="text-[10px] font-bold leading-tight truncate">{s.label}</span>
+                                </div>
+                                <div className="text-[9px] font-bold leading-tight mt-2 truncate" style={{ opacity: active ? 0.9 : 1 }}>{statusLabel}</div>
+                              </div>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
+                    {tahapAktif >= 0
+                      ? <>Tahap saat ini: <span className="font-bold text-purple-700">{steps[tahapAktif].label}</span> — {bukti[tahapAktif]}</>
+                      : <>Belum ada surat pemberitahuan audit untuk unit {myUnit}.</>}
+                  </div>
                 </div>
               );
             })()}
@@ -3202,19 +3286,10 @@ function AuditPageKKA({ approved }: { approved?: DraftTemuan[] } = {}) {
   const myUnit = user?.role === "auditee" ? user.unit : null;
   const canEdit = user?.role !== "rektor";
   const [tambahModal, setTambahModal] = useState<string | null>(null);
-  const [linkMap, setLinkMap] = useState<Record<string, string>>({});
   const [editingLink, setEditingLink] = useState<{ key: string; value: string } | null>(null);
   const [filterUnit, setFilterUnit] = useState(myUnit ?? "Semua");
   const [catatanAuditor, setCatatanAuditor] = useState<Record<string, string>>({});
-
-  const [kkaList, setKkaList] = useState([
-    { id: "KKA-S-01", unit: "Sarpras",  pengujian: "Inventarisasi Aset",      auditor: "Budi S.",  statusAudit: "Selesai",  linkAuditor: "https://drive.google.com/file/kka-s-01-auditor", linkAuditee: "https://drive.google.com/file/bukti-inventaris" },
-    { id: "KKA-S-02", unit: "Sarpras",  pengujian: "Belanja Modal 2024",       auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: "https://drive.google.com/file/kka-s-02-auditor", linkAuditee: null },
-    { id: "KKA-S-03", unit: "Sarpras",  pengujian: "Penghapusan Aset",         auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
-    { id: "KKA-B-01", unit: "BAAK",     pengujian: "Prosedur Penerimaan Mhs",  auditor: "Budi S.",  statusAudit: "Selesai",  linkAuditor: "https://drive.google.com/file/kka-b-01-auditor", linkAuditee: "https://drive.google.com/file/sop-admisi-2024" },
-    { id: "KKA-B-02", unit: "BAAK",     pengujian: "Arsip Mahasiswa Keluar",   auditor: "Budi S.",  statusAudit: "Berjalan", linkAuditor: "https://drive.google.com/file/kka-b-02-draft",   linkAuditee: null },
-    { id: "KKA-K-01", unit: "BAUK",     pengujian: "Rekonsiliasi Kas & Bank",  auditor: "Ratna D.", statusAudit: "Berjalan", linkAuditor: null,                                               linkAuditee: null },
-  ]);
+  const { kkaList, setKkaList } = useContext(LapanganCtx);
 
   const baseList = myUnit ? kkaList.filter(k => k.unit === myUnit) : kkaList;
   const units = myUnit ? [myUnit] : ["Semua", ...Array.from(new Set(kkaList.map(k => k.unit)))];
@@ -3222,7 +3297,7 @@ function AuditPageKKA({ approved }: { approved?: DraftTemuan[] } = {}) {
 
   function LinkCell({ id, role, existingLink, canEdit, locked }: { id: string; role: "auditor"|"auditee"; existingLink: string|null; canEdit: boolean; locked?: boolean }) {
     const key = `${id}-${role}`;
-    const savedLink = linkMap[key] ?? existingLink;
+    const savedLink = existingLink;
     return (
       <div className="flex items-center gap-1">
         {savedLink ? (
@@ -3350,7 +3425,7 @@ function AuditPageKKA({ approved }: { approved?: DraftTemuan[] } = {}) {
           { key:"linkAuditor", label:"Link Dokumen Auditor (Google Drive)", type:"url" },
           { key:"linkAuditee", label:"Link Bukti Auditee (Google Drive)",   type:"url", required:false },
         ]}
-        onSave={(v) => setKkaList(prev => [{ id: v.noKKA || `KKA-NEW-${prev.length + 1}`, unit: (approved ? approved.find(d => d.no === (v.temuan || "").split(" — ")[0])?.unit : v.unit) || "-", pengujian: v.program || "-", auditor: v.auditor || "-", statusAudit: "Baru", linkAuditor: (v.linkAuditor || null) as string | null, linkAuditee: (v.linkAuditee || null) as string | null } as typeof prev[0], ...prev])}
+        onSave={(v) => setKkaList(prev => [{ id: v.noKKA || `KKA-NEW-${prev.length + 1}`, unit: (approved ? approved.find(d => d.no === (v.temuan || "").split(" — ")[0])?.unit : v.unit) || "-", pengujian: v.program || "-", auditor: v.auditor || "-", statusAudit: "Baru", linkAuditor: v.linkAuditor || null, linkAuditee: v.linkAuditee || null }, ...prev])}
         onClose={() => setTambahModal(null)} />
       )}
 
@@ -3361,9 +3436,11 @@ function AuditPageKKA({ approved }: { approved?: DraftTemuan[] } = {}) {
           value={editingLink.value}
           onChange={v => setEditingLink(p => p ? { ...p, value: v } : null)}
           onSave={() => {
-            if (editingLink.value.trim()) {
-              setLinkMap(prev => ({ ...prev, [editingLink.key]: editingLink.value.trim() }));
-            }
+            const url = editingLink.value.trim();
+            // Simpan ke store bersama → stepper Auditee ikut membaca link KKA auditor
+            if (url) setKkaList(prev => prev.map(k =>
+              `${k.id}-auditor` === editingLink.key ? { ...k, linkAuditor: url }
+              : `${k.id}-auditee` === editingLink.key ? { ...k, linkAuditee: url } : k));
           }}
           onClose={() => setEditingLink(null)}
         />
@@ -10228,6 +10305,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
   const [laporanList, setLaporanList] = useState<LaporanItem[]>(LAPORAN_AWAL);
   const [rencanaList, setRencanaList] = useState<RencanaItem[]>(RENCANA_AWAL);
   const [draftList, setDraftList] = useState<DraftTemuan[]>(DRAFT_AWAL);
+  const [kkaList, setKkaList] = useState<KkaItem[]>(KKA_AWAL);
   const [uploadDocs, setUploadDocs] = useState<DokLink>({});
   const [jadwalSetuju, setJadwalSetuju] = useState<JadwalSetuju>({ 7: { auditor: true, auditee: true } });
   const [pedomanBase, setPedomanBase] = useState<PedomanItem[]>(PEDOMAN_AWAL);
@@ -10238,7 +10316,7 @@ export default function Dashboard({ user, onLogout, users, setUsers, onUpdateUse
   const [pkptList, setPkptList] = useState<PkptItem[]>(PKPT_AWAL);
   const [penutupan, setPenutupan] = useState<Record<string, PenutupanAudit>>({});
   const [residualList, setResidualList] = useState<ResidualRisk[]>([]);
-  const lapanganCtxValue: LapanganCtxType = { penutupan, setPenutupan, residualList, setResidualList, draftList, setDraftList, uploadDocs, setUploadDocs, jadwalSetuju, setJadwalSetuju };
+  const lapanganCtxValue: LapanganCtxType = { penutupan, setPenutupan, residualList, setResidualList, draftList, setDraftList, kkaList, setKkaList, uploadDocs, setUploadDocs, jadwalSetuju, setJadwalSetuju };
   const laporanView = useMemo(() => laporanList.map(l => {
     if (!l.auditNo) return l;
     const ids = temuanList.filter(t => t.auditNo === l.auditNo).map(t => t.id);
